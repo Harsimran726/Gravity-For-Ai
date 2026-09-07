@@ -25,7 +25,7 @@ export function generateMetadata({ params }: { params: { city: string } }): Meta
     title: city.title,
     description: city.metaDescription,
     alternates: {
-      canonical: `https://gravity4ai.com/locations/${city.citySlug}`,
+      canonical: `https://gravityforai.com/locations/${city.citySlug}`,
     },
   };
 }
@@ -42,8 +42,8 @@ export default function CityPage({ params }: { params: { city: string } }) {
         '@type': 'LocalBusiness',
         name: 'Gravity For AI',
         description: city.metaDescription,
-        url: `https://gravity4ai.com/locations/${city.citySlug}`,
-        email: 'contact@gravity4ai.com',
+        url: `https://gravityforai.com/locations/${city.citySlug}`,
+        email: 'contact@gravityforai.com',
         address: {
           '@type': 'PostalAddress',
           addressLocality: city.cityName,

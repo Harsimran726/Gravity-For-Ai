@@ -91,7 +91,7 @@ function LoginFormContent() {
               name="email"
               required
               autoComplete="email"
-              placeholder="name@gravity4ai.com"
+              placeholder="name@gravityforai.com"
               className="w-full px-4 py-2.5 bg-[#0A0A0D]/80 border border-[#233A6B] text-xs text-[#FFFFFF] focus:outline-none focus:border-[#C99A44] rounded placeholder:text-[#6B7280]"
             />
             <Mail className="w-3.5 h-3.5 absolute right-3 top-3 text-[#6B7280]" />

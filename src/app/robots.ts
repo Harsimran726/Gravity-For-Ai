@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/'],
       },
     ],
-    sitemap: 'https://gravity4ai.com/sitemap.xml',
+    sitemap: 'https://gravityforai.com/sitemap.xml',
   };
 }

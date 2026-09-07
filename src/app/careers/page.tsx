@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Careers & Engineering Team | Gravity For AI',
   description: 'Join the engineering team at Gravity For AI in Mansa, Punjab building next-generation agentic AI and voice systems.',
   alternates: {
-    canonical: 'https://gravity4ai.com/careers',
+    canonical: 'https://gravityforai.com/careers',
   },
 };
 
@@ -39,7 +39,7 @@ export default function CareersPage() {
               Experience with Python, LLM orchestration frameworks, WebSockets, WebRTC, and low-latency voice synthesis pipelines.
             </p>
             <div className="pt-4">
-              <Button href="mailto:contact@gravity4ai.com?subject=Careers%20-%20AI%20Engineer" variant="ghost" size="sm">
+              <Button href="mailto:contact@gravityforai.com?subject=Careers%20-%20AI%20Engineer" variant="ghost" size="sm">
                 Apply via Email
               </Button>
             </div>
@@ -55,7 +55,7 @@ export default function CareersPage() {
               Mastery of Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Core Web Vitals optimization.
             </p>
             <div className="pt-4">
-              <Button href="mailto:contact@gravity4ai.com?subject=Careers%20-%20Frontend%20Engineer" variant="ghost" size="sm">
+              <Button href="mailto:contact@gravityforai.com?subject=Careers%20-%20Frontend%20Engineer" variant="ghost" size="sm">
                 Apply via Email
               </Button>
             </div>

@@ -42,7 +42,7 @@
   - `src/components/contact/contact-booking-tabs.tsx`: Dual-tab container switching between "📅 Book Call on Calendar" and "✉️ Send Quick Message".
   - Updated `src/app/contact/page.tsx` with the enhanced booking interface.
 - Built Automated Email Notification Dispatcher:
-  - `src/lib/mail.ts`: Supports SMTP (`nodemailer`) with fallback console logging in development. Dispatches branded HTML confirmation email with Google Meet video link to client and immediate alert email to `contact@gravity4ai.com` / `harsimran@gravity4ai.com`.
+  - `src/lib/mail.ts`: Supports SMTP (`nodemailer`) with fallback console logging in development. Dispatches branded HTML confirmation email with Google Meet video link to client and immediate alert email to `contact@gravityforai.com` / `harsimran@gravityforai.com`.
   - `src/actions/booking-actions.ts`: Server Action validating calendar date/time, persisting booking to PostgreSQL, and triggering dual email notifications.
   - `src/actions/lead-actions.ts`: Updated to dispatch email notifications upon inquiry submission.
 - Built Admin Security & Appointments Module:

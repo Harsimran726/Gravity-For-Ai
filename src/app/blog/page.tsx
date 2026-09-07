@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     'Practical guides, ROI teardowns, and architecture insights on AI voice agents, Next.js web development, and agentic AI systems for growing businesses.',
   alternates: {
-    canonical: 'https://gravity4ai.com/blog',
+    canonical: 'https://gravityforai.com/blog',
   },
 };
 
@@ -24,12 +24,12 @@ export default function BlogListingPage() {
     '@type': 'CollectionPage',
     name: 'Gravity For AI Blog',
     description: 'Technical and business guides on agentic AI, voice agents, and web engineering.',
-    url: 'https://gravity4ai.com/blog',
+    url: 'https://gravityforai.com/blog',
     publisher: {
       '@type': 'Organization',
       name: 'Gravity For AI',
-      url: 'https://gravity4ai.com',
-      logo: 'https://gravity4ai.com/icon.png',
+      url: 'https://gravityforai.com',
+      logo: 'https://gravityforai.com/icon.png',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Mansa',

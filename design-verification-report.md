@@ -2,7 +2,7 @@
 
 **Date of Audit:** September 1, 2026  
 **Auditor / Agent:** Antigravity AI (Lead Build Agent)  
-**Target URL:** `https://gravity4ai.com`  
+**Target URL:** `https://gravityforai.com`  
 **Status:** **APPROVED & SIGNED OFF (100% Pass)**
 
 ---

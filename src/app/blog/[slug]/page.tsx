@@ -67,12 +67,12 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       jobTitle: post.author.role,
       description: post.author.bio,
       image: post.author.avatarUrl,
-      url: 'https://gravity4ai.com/about',
+      url: 'https://gravityforai.com/about',
       sameAs: [post.author.githubUrl, post.author.linkedinUrl],
       worksFor: {
         '@type': 'Organization',
         name: 'Gravity For AI',
-        url: 'https://gravity4ai.com',
+        url: 'https://gravityforai.com',
         address: {
           '@type': 'PostalAddress',
           addressLocality: 'Mansa',
@@ -85,10 +85,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     publisher: {
       '@type': 'Organization',
       name: 'Gravity For AI',
-      url: 'https://gravity4ai.com',
+      url: 'https://gravityforai.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://gravity4ai.com/icon.png',
+        url: 'https://gravityforai.com/icon.png',
       },
       address: {
         '@type': 'PostalAddress',
@@ -108,13 +108,13 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://gravity4ai.com',
+        item: 'https://gravityforai.com',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://gravity4ai.com/blog',
+        item: 'https://gravityforai.com/blog',
       },
       {
         '@type': 'ListItem',
@@ -144,7 +144,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
   return (
     <>
       <head>
-        <link rel="amphtml" href={`https://gravity4ai.com/amp/blog/${post.slug}`} />
+        <link rel="amphtml" href={`https://gravityforai.com/amp/blog/${post.slug}`} />
       </head>
       <script
         type="application/ld+json"

@@ -64,7 +64,7 @@ export default function AdminLeadsClient({ initialLeads }: AdminLeadsClientProps
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `gravity4ai-leads-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `gravityforai-leads-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     'Schedule a live 20-minute AI audit call on our interactive calendar or send a message to Gravity For AI in Mansa, Punjab.',
   alternates: {
-    canonical: 'https://gravity4ai.com/contact',
+    canonical: 'https://gravityforai.com/contact',
   },
 };
 
@@ -67,7 +67,7 @@ export default async function ContactPage() {
               <div className="p-6 bg-[#FFFFFF] border border-[#E4E2DC] space-y-3 text-xs sm:text-sm text-[#6B7280]">
                 <div className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#122C57]" />
-                  <span className="text-[#122C57] font-medium">contact@gravity4ai.com</span>
+                  <span className="text-[#122C57] font-medium">contact@gravityforai.com</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="w-4 h-4 text-[#122C57]" />

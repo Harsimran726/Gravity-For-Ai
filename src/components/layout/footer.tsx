@@ -41,7 +41,7 @@ export function Footer() {
             <div className="pt-2 text-xs text-[#6B7280] space-y-1 font-sans">
               <p className="font-medium text-[#0A1B3D]">Headquarters:</p>
               <p>Mansa, Punjab 151505, India</p>
-              <p>contact@gravity4ai.com</p>
+              <p>contact@gravityforai.com</p>
             </div>
           </div>
 

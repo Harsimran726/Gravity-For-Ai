@@ -110,7 +110,7 @@ export async function createBookingAction(
     return {
       success: false,
       message:
-        'We were unable to save your booking at this time. Please try again or contact us directly at contact@gravity4ai.com.',
+        'We were unable to save your booking at this time. Please try again or contact us directly at contact@gravityforai.com.',
     };
   }
 

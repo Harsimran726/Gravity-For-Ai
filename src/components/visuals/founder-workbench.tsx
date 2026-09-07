@@ -15,7 +15,7 @@ export function FounderWorkbench() {
         </div>
         <div className="flex items-center gap-1.5 font-mono text-[11px] text-[#C99A44]">
           <Terminal className="w-3.5 h-3.5" />
-          <span>lead-engineer@gravity4ai:~$</span>
+          <span>lead-engineer@gravityforai:~$</span>
         </div>
         <div className="w-4" />
       </div>

@@ -73,7 +73,7 @@ export async function submitLeadAction(
     console.error('[LEAD] Critical: Failed to persist contact form submission to PostgreSQL:', error);
     return {
       success: false,
-      message: 'We were unable to save your inquiry at this time. Please email us directly at contact@gravity4ai.com.',
+      message: 'We were unable to save your inquiry at this time. Please email us directly at contact@gravityforai.com.',
     };
   }
 

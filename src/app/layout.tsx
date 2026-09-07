@@ -33,7 +33,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://gravity4ai.com'),
+  metadataBase: new URL('https://gravityforai.com'),
   title: {
     default: 'Gravity For AI - AI Voice Agents, Websites & Agentic Systems | Mansa, Punjab',
     template: '%s | Gravity For AI',
@@ -52,13 +52,13 @@ export const metadata: Metadata = {
   ],
   alternates: {
     types: {
-      'application/rss+xml': 'https://gravity4ai.com/rss.xml',
+      'application/rss+xml': 'https://gravityforai.com/rss.xml',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://gravity4ai.com',
+    url: 'https://gravityforai.com',
     siteName: 'Gravity For AI',
     title: 'Gravity For AI - AI Voice Agents & Business Automation',
     description:
@@ -95,8 +95,8 @@ export default function RootLayout({
     name: 'Gravity For AI',
     description:
       'Gravity For AI designs, builds, and manages AI voice agents, agentic automation, and websites for local businesses.',
-    url: 'https://gravity4ai.com',
-    email: 'contact@gravity4ai.com',
+    url: 'https://gravityforai.com',
+    email: 'contact@gravityforai.com',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Mansa',

@@ -2,7 +2,7 @@
 
 **Date:** September 1, 2026  
 **Auditor / Agent:** Antigravity AI (Lead Build Agent)  
-**Production Domain:** `https://gravity4ai.com`  
+**Production Domain:** `https://gravityforai.com`  
 **Overall Readiness:** **100% PASS — CERTIFIED FOR PRODUCTION LAUNCH**
 
 ---
@@ -25,7 +25,7 @@
 | SEO Requirement | Specification | Result | Verification Notes |
 |---|---|---|---|
 | **Unique Metadata** | Non-duplicate `<title>` and `<meta name="description">` | PASS | Verified across all 39 static and dynamic routes |
-| **Canonical URLs** | Production domain canonical tags on every route | PASS | Formatted as `https://gravity4ai.com/...` with zero localhost artifacts |
+| **Canonical URLs** | Production domain canonical tags on every route | PASS | Formatted as `https://gravityforai.com/...` with zero localhost artifacts |
 | **Dynamic Sitemap** | Complete XML sitemap at `/sitemap.xml` | PASS | Generated via `src/app/sitemap.ts` indexing all 39 routes |
 | **Robots.txt** | Clean directives referencing sitemap | PASS | Generated via `src/app/robots.ts` disallowing `/admin/` and `/api/` |
 | **Mansa NAP Consistency** | 100% NAP match across schema, footer, and city pages | PASS | Consistent Mansa, Punjab 151505 address across `LocalBusiness` JSON-LD |
@@ -60,9 +60,9 @@
 
 ### Step 1: Environment Variables on Vercel / Production Host
 ```env
-NEXT_PUBLIC_SITE_URL=https://gravity4ai.com
+NEXT_PUBLIC_SITE_URL=https://gravityforai.com
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-DATABASE_URL=postgresql://[user]:[password]@[host]:5432/gravity4ai?sslmode=require
+DATABASE_URL=postgresql://[user]:[password]@[host]:5432/gravityforai?sslmode=require
 NEXTAUTH_SECRET=[generate-via-openssl-rand-hex-32]
 ```
 
@@ -72,14 +72,14 @@ NEXTAUTH_SECRET=[generate-via-openssl-rand-hex-32]
 - **SSL Certificate:** Auto-provisioned via Let's Encrypt / Vercel Edge.
 
 ### Step 3: Post-Launch Smoke Test Checklist
-1. Visit `https://gravity4ai.com` $\rightarrow$ verify Hero, OrbitAura animation, and all 9 sections.
-2. Submit a test inquiry on `https://gravity4ai.com/contact` $\rightarrow$ confirm instant validation and lead logging.
-3. Visit `https://gravity4ai.com/blog/ai-voice-agent-vs-receptionist-cost-india-2026` $\rightarrow$ check `<link rel="amphtml">`.
-4. Visit `https://gravity4ai.com/amp/blog/ai-voice-agent-vs-receptionist-cost-india-2026` $\rightarrow$ check AMP rendering and `<link rel="canonical">`.
-5. Visit `https://gravity4ai.com/sitemap.xml` $\rightarrow$ verify all 39 URLs are listed.
-6. Visit `https://gravity4ai.com/llms.txt` $\rightarrow$ verify AI crawler payload.
-7. Log into `https://gravity4ai.com/admin/login` $\rightarrow$ verify Dashboard metrics and lead triage.
-8. Submit `https://gravity4ai.com/sitemap.xml` to Google Search Console.
+1. Visit `https://gravityforai.com` $\rightarrow$ verify Hero, OrbitAura animation, and all 9 sections.
+2. Submit a test inquiry on `https://gravityforai.com/contact` $\rightarrow$ confirm instant validation and lead logging.
+3. Visit `https://gravityforai.com/blog/ai-voice-agent-vs-receptionist-cost-india-2026` $\rightarrow$ check `<link rel="amphtml">`.
+4. Visit `https://gravityforai.com/amp/blog/ai-voice-agent-vs-receptionist-cost-india-2026` $\rightarrow$ check AMP rendering and `<link rel="canonical">`.
+5. Visit `https://gravityforai.com/sitemap.xml` $\rightarrow$ verify all 39 URLs are listed.
+6. Visit `https://gravityforai.com/llms.txt` $\rightarrow$ verify AI crawler payload.
+7. Log into `https://gravityforai.com/admin/login` $\rightarrow$ verify Dashboard metrics and lead triage.
+8. Submit `https://gravityforai.com/sitemap.xml` to Google Search Console.
 
 ---
 

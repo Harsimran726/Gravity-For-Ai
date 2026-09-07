@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     'Meet Gravity For AI, founded by Harsimran Singh in Mansa, Punjab. We build custom AI voice agents, high-performance websites, and agentic workflows for growing businesses.',
   alternates: {
-    canonical: 'https://gravity4ai.com/about',
+    canonical: 'https://gravityforai.com/about',
   },
 };
 

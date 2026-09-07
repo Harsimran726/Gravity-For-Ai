@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     'Real results and measurable outcomes from our AI Voice Agent, Next.js website, and agentic workflow deployments in Punjab.',
   alternates: {
-    canonical: 'https://gravity4ai.com/case-studies',
+    canonical: 'https://gravityforai.com/case-studies',
   },
 };
 

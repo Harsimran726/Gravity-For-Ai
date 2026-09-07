@@ -57,7 +57,7 @@ export default function AdminSettingsPage() {
               </label>
               <input
                 type="email"
-                defaultValue="contact@gravity4ai.com"
+                defaultValue="contact@gravityforai.com"
                 className="w-full px-3 py-2 bg-[#F7F5F0] border border-[#E4E2DC] text-xs text-[#0A1B3D]"
               />
             </div>

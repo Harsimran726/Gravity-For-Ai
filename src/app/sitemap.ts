@@ -5,7 +5,7 @@ import { CITIES_DATA } from '@/data/city-data';
 import { SERVICES_DATA } from '@/data/services-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://gravity4ai.com';
+  const baseUrl = 'https://gravityforai.com';
   const now = new Date();
 
   // Core static marketing pages

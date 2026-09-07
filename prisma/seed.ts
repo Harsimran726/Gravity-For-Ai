@@ -21,13 +21,13 @@ async function main() {
   console.log('🔐 Generating bcrypt hash (12 rounds)...');
 
   const admin = await prisma.user.upsert({
-    where: { email: 'harsimran@gravity4ai.com' },
+    where: { email: 'harsimran@gravityforai.com' },
     update: {
       passwordHash,
       role: 'ADMIN',
     },
     create: {
-      email: 'harsimran@gravity4ai.com',
+      email: 'harsimran@gravityforai.com',
       name: 'Harsimran Singh',
       passwordHash,
       role: 'ADMIN',
@@ -42,7 +42,7 @@ async function main() {
   console.log('💡 Next steps:');
   console.log('   1. Start the dev server: npm run dev');
   console.log('   2. Log in at: http://localhost:3000/admin/login');
-  console.log(`   3. Email: harsimran@gravity4ai.com`);
+  console.log(`   3. Email: harsimran@gravityforai.com`);
   console.log(`   4. Password: [the SEED_ADMIN_PASSWORD you set]`);
 }
 

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Terms of Service | Gravity For AI',
   description: 'Terms of service and engagement terms of Gravity For AI.',
   alternates: {
-    canonical: 'https://gravity4ai.com/terms-of-service',
+    canonical: 'https://gravityforai.com/terms-of-service',
   },
 };
 

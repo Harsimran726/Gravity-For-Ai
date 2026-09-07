@@ -168,7 +168,7 @@ model SiteSettings {
   siteName          String   @default("Gravity For AI")
   companyName       String   @default("Gravity For AI")
   tagline           String   @default("AI Voice Agents, Websites & Agentic Systems")
-  contactEmail      String   @default("contact@gravity4ai.com")
+  contactEmail      String   @default("contact@gravityforai.com")
   contactPhone      String?
   addressLocality   String   @default("Mansa")
   addressRegion     String   @default("Punjab")

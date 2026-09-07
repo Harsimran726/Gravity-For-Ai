@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     'Gravity For AI builds AI voice agents, agentic AI systems, and premium websites for local businesses in Punjab, India & beyond. Book a free AI audit.',
   alternates: {
-    canonical: 'https://gravity4ai.com',
+    canonical: 'https://gravityforai.com',
   },
 };
 

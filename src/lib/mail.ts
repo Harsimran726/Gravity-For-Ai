@@ -91,7 +91,7 @@ export async function sendBookingEmails(params: BookingEmailParams) {
 
           <div class="footer">
             Gravity For AI · Mansa, Punjab 151505, India<br/>
-            Need to reschedule? Reply directly to this email or write to contact@gravity4ai.com.
+            Need to reschedule? Reply directly to this email or write to contact@gravityforai.com.
           </div>
         </div>
       </body>
@@ -123,14 +123,14 @@ export async function sendBookingEmails(params: BookingEmailParams) {
     try {
       await Promise.all([
         transporter.sendMail({
-          from: `"Gravity For AI" <${process.env.SMTP_FROM || 'contact@gravity4ai.com'}>`,
+          from: `"Gravity For AI" <${process.env.SMTP_FROM || 'contact@gravityforai.com'}>`,
           to: params.email,
           subject: `Confirmed: 20-Min AI Discovery Audit - ${formattedDate} at ${params.timeSlot}`,
           html: clientHtml,
         }),
         transporter.sendMail({
-          from: `"Gravity Web Engine" <${process.env.SMTP_FROM || 'contact@gravity4ai.com'}>`,
-          to: process.env.ADMIN_NOTIFICATION_EMAIL || 'contact@gravity4ai.com',
+          from: `"Gravity Web Engine" <${process.env.SMTP_FROM || 'contact@gravityforai.com'}>`,
+          to: process.env.ADMIN_NOTIFICATION_EMAIL || 'contact@gravityforai.com',
           subject: `🔔 New Call Booked: ${params.name} (${params.businessName || 'SMB'}) - ${formattedDate}`,
           html: adminHtml,
         }),
@@ -172,8 +172,8 @@ export async function sendContactInquiryEmail(params: ContactEmailParams) {
   if (transporter) {
     try {
       await transporter.sendMail({
-        from: `"Gravity Web Engine" <${process.env.SMTP_FROM || 'contact@gravity4ai.com'}>`,
-        to: process.env.ADMIN_NOTIFICATION_EMAIL || 'contact@gravity4ai.com',
+        from: `"Gravity Web Engine" <${process.env.SMTP_FROM || 'contact@gravityforai.com'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL || 'contact@gravityforai.com',
         subject: `✉️ New Inquiry from ${params.name} (${params.businessName || 'SMB'})`,
         html: adminHtml,
       });

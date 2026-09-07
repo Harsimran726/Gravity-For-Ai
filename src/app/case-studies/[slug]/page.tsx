@@ -25,7 +25,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     title: `${study.title} | Gravity For AI Case Study`,
     description: study.summary,
     alternates: {
-      canonical: `https://gravity4ai.com/case-studies/${study.slug}`,
+      canonical: `https://gravityforai.com/case-studies/${study.slug}`,
     },
   };
 }

@@ -48,15 +48,15 @@ export default function AmpBlogPostPage({ params }: { params: { slug: string } }
       '@type': 'Person',
       name: post.author.name,
       jobTitle: post.author.role,
-      url: 'https://gravity4ai.com/about',
+      url: 'https://gravityforai.com/about',
     },
     publisher: {
       '@type': 'Organization',
       name: 'Gravity For AI',
-      url: 'https://gravity4ai.com',
+      url: 'https://gravityforai.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://gravity4ai.com/icon.png',
+        url: 'https://gravityforai.com/icon.png',
       },
     },
   };

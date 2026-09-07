@@ -3,7 +3,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.ampproject.org;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' blob: data: https://github.com https://avatars.githubusercontent.com https://gravity4ai.com https://www.google-analytics.com;
+  img-src 'self' blob: data: https://github.com https://avatars.githubusercontent.com https://gravityforai.com https://www.google-analytics.com;
   font-src 'self' https://fonts.gstatic.com data:;
   object-src 'none';
   base-uri 'self';

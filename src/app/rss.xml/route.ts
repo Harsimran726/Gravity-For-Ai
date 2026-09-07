@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 
 export async function GET() {
-  const baseUrl = 'https://gravity4ai.com';
+  const baseUrl = 'https://gravityforai.com';
 
   const itemsXml = BLOG_POSTS_SEED.map(
     (post) => `
@@ -13,7 +13,7 @@ export async function GET() {
       <description><![CDATA[${post.metaDescription}]]></description>
       <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
       <category>${post.category}</category>
-      <author>contact@gravity4ai.com (${post.author.name})</author>
+      <author>contact@gravityforai.com (${post.author.name})</author>
     </item>`
   ).join('');
 

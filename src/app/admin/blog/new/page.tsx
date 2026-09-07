@@ -326,7 +326,7 @@ export default function NewBlogPostPage() {
                 <div className="w-5 h-5 rounded-full bg-[#F7F5F0] border border-[#E4E2DC] flex items-center justify-center font-serif text-[#122C57] font-bold">G</div>
                 <div>
                   <div className="text-[#0A1B3D] font-medium">Gravity For AI</div>
-                  <div className="text-[#6B7280]">https://gravity4ai.com/blog/{slug || 'your-slug'}</div>
+                  <div className="text-[#6B7280]">https://gravityforai.com/blog/{slug || 'your-slug'}</div>
                 </div>
               </div>
               <h3 className="text-[16px] text-[#1a0dab] font-medium cursor-pointer hover:underline pt-1">
@@ -349,7 +349,7 @@ export default function NewBlogPostPage() {
   "@type": "Article",
   "headline": title || "Your Article Title",
   "description": description || "Meta description",
-  "url": `https://gravity4ai.com/blog/${slug || 'your-slug'}`,
+  "url": `https://gravityforai.com/blog/${slug || 'your-slug'}`,
   "author": {
     "@type": "Person",
     "name": "Harsimran Singh"

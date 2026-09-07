@@ -1,5 +1,5 @@
 # Gravity For AI — Project Overview
-**Brand:** Gravity For AI (short form used throughout: Gravity4AI — swap for your real handle/domain once locked)
+**Brand:** Gravity For AI (short form used throughout: Gravity For AI — swap for your real handle/domain once locked)
 **Founder:** Harsimran | **Base:** Mansa, Punjab | **Services:** AI Voice Agents · Website Development · Agentic AI Systems
 
 ## What this is
@@ -9,10 +9,10 @@ Same founder, same city, same core service lines as H4Ai — but this is being t
 "Gravity" is not a keyword anyone searches for — it's a brand word, not a search term. That's fine and normal (most strong brands aren't keyword-matches), but it means **100% of your organic discoverability has to come from service + city + problem keywords**, not the brand name, until the brand itself starts getting searched directly (branded search volume). Practically: don't expect "Gravity For AI" searches for the first 6–12 months — all early SEO/AEO/GEO work should target *category* terms (see keyword file), and brand search becomes a signal you track later, not one you rely on early.
 
 ## Files in this package
-1. `gravity4ai-keyword-research-competitors.md` — SEO/AEO/GEO keyword research + real competitor teardown
-2. `gravity4ai-homepage-content.md` — full homepage copy + tags, built on your 7-step framework
-3. `gravity4ai-landing-pages.md` — the 3 service landing pages (AI Voice Agents / Website Development / Agentic AI Systems), same 7-step framework, each with distinct Stakes/Plan/Price sections
-4. `gravity4ai-city-pages.md` — city-based landing pages using a shorter version of the same framework
+1. `gravityforai-keyword-research-competitors.md` — SEO/AEO/GEO keyword research + real competitor teardown
+2. `gravityforai-homepage-content.md` — full homepage copy + tags, built on your 7-step framework
+3. `gravityforai-landing-pages.md` — the 3 service landing pages (AI Voice Agents / Website Development / Agentic AI Systems), same 7-step framework, each with distinct Stakes/Plan/Price sections
+4. `gravityforai-city-pages.md` — city-based landing pages using a shorter version of the same framework
 
 ## How the 7-step framework is applied throughout
 Every page in this package (home + every landing page) follows this exact order — I'm using your section names and numbering verbatim so you can map straight from your brief to the content files:

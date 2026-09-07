@@ -45,7 +45,7 @@ export function ContactForm({ initialService = 'AI Audit' }: { initialService?: 
         </div>
         <div className="pt-4 border-t border-[#E4E2DC]">
           <p className="text-xs text-[#6B7280]">
-            Direct email: <span className="text-[#122C57] font-medium">contact@gravity4ai.com</span> · Mansa, Punjab
+            Direct email: <span className="text-[#122C57] font-medium">contact@gravityforai.com</span> · Mansa, Punjab
           </p>
         </div>
       </div>

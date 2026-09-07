@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Privacy Policy | Gravity For AI',
   description: 'Privacy Policy and data governance practices of Gravity For AI.',
   alternates: {
-    canonical: 'https://gravity4ai.com/privacy-policy',
+    canonical: 'https://gravityforai.com/privacy-policy',
   },
 };
 
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-3">
             <h2 className="font-serif text-2xl text-[#122C57]">4. Contact Us</h2>
             <p>
-              If you have any questions about this Privacy Policy or your data, please contact our data team at <span className="font-medium text-[#122C57]">contact@gravity4ai.com</span>.
+              If you have any questions about this Privacy Policy or your data, please contact our data team at <span className="font-medium text-[#122C57]">contact@gravityforai.com</span>.
             </p>
           </section>
         </div>

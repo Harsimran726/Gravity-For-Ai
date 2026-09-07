@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     'Explore our clear, transparent pricing packages for AI Voice Agents, conversion websites, and custom agentic workflows. Built for local businesses in Punjab and beyond.',
   alternates: {
-    canonical: 'https://gravity4ai.com/pricing',
+    canonical: 'https://gravityforai.com/pricing',
   },
 };
 

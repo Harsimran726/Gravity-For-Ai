@@ -42,8 +42,8 @@ export const BLOG_POSTS_SEED: BlogPostSeed[] = [
     title: 'AI Voice Agent vs Hiring a Receptionist in 2026: Cost, ROI & Setup Guide for Indian Businesses',
     metaDescription:
       'Compare the real monthly cost, coverage hours, and booking rates of AI voice agents vs full-time front-desk staff for local clinics and businesses in India.',
-    canonicalUrl: 'https://gravity4ai.com/blog/ai-voice-agent-vs-receptionist-cost-india-2026',
-    ogImage: 'https://gravity4ai.com/og/voice-agent-vs-receptionist.jpg',
+    canonicalUrl: 'https://gravityforai.com/blog/ai-voice-agent-vs-receptionist-cost-india-2026',
+    ogImage: 'https://gravityforai.com/og/voice-agent-vs-receptionist.jpg',
     category: 'AI Voice Agents',
     primaryKeyword: 'AI voice agent vs hiring a receptionist',
     secondaryKeywords: [
@@ -108,8 +108,8 @@ export const BLOG_POSTS_SEED: BlogPostSeed[] = [
     title: 'What is Agentic AI and How Does It Actually Automate Small Business Workflows?',
     metaDescription:
       'Understand the practical difference between basic chatbots and multi-step agentic AI systems that complete back-office tasks from start to finish.',
-    canonicalUrl: 'https://gravity4ai.com/blog/what-is-agentic-ai-small-business-guide',
-    ogImage: 'https://gravity4ai.com/og/what-is-agentic-ai.jpg',
+    canonicalUrl: 'https://gravityforai.com/blog/what-is-agentic-ai-small-business-guide',
+    ogImage: 'https://gravityforai.com/og/what-is-agentic-ai.jpg',
     category: 'Agentic AI',
     primaryKeyword: 'what is agentic AI and how does it work',
     secondaryKeywords: [
@@ -174,8 +174,8 @@ export const BLOG_POSTS_SEED: BlogPostSeed[] = [
     title: 'Why Fast Mobile Websites Dominate Local Search in Punjab (Core Web Vitals Guide)',
     metaDescription:
       'Learn why sub-2s website load times and LocalBusiness schema determine local search rankings in Punjab cities like Mansa, Bathinda, and Ludhiana.',
-    canonicalUrl: 'https://gravity4ai.com/blog/fast-loading-website-local-seo-punjab',
-    ogImage: 'https://gravity4ai.com/og/fast-website-local-seo.jpg',
+    canonicalUrl: 'https://gravityforai.com/blog/fast-loading-website-local-seo-punjab',
+    ogImage: 'https://gravityforai.com/og/fast-website-local-seo.jpg',
     category: 'Website Development',
     primaryKeyword: 'fast loading website design agency',
     secondaryKeywords: [

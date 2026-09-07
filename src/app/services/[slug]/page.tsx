@@ -25,7 +25,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     title: service.title,
     description: service.metaDescription,
     alternates: {
-      canonical: `https://gravity4ai.com/services/${service.slug}`,
+      canonical: `https://gravityforai.com/services/${service.slug}`,
     },
   };
 }
