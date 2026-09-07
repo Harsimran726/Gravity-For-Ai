@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 import { getBookingSettingsAction } from '@/actions/settings-actions';
 
 export default async function ContactPage() {

@@ -4,16 +4,30 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function getBookingSettingsAction() {
-  let settings = await prisma.siteSettings.findFirst();
-  if (!settings) {
-    settings = await prisma.siteSettings.create({
-      data: {},
-    });
+  try {
+    if (!process.env.DATABASE_URL) {
+      return {
+        bookingTimeSlots: ['10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM', '05:00 PM'],
+        customDateSlots: {},
+      };
+    }
+    let settings = await prisma.siteSettings.findFirst();
+    if (!settings) {
+      settings = await prisma.siteSettings.create({
+        data: {},
+      });
+    }
+    return {
+      bookingTimeSlots: settings.bookingTimeSlots,
+      customDateSlots: (settings.customDateSlots as Record<string, string[]>) || {},
+    };
+  } catch (err) {
+    console.warn('[SETTINGS] Database not reachable during build or request, using fallback settings');
+    return {
+      bookingTimeSlots: ['10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM', '05:00 PM'],
+      customDateSlots: {},
+    };
   }
-  return {
-    bookingTimeSlots: settings.bookingTimeSlots,
-    customDateSlots: (settings.customDateSlots as Record<string, string[]>) || {},
-  };
 }
 
 export async function updateBookingTimeSlotsAction(newTimeSlots: string[]) {
