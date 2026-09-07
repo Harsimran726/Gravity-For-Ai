@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { SectionWrapper } from '@/components/ui/section-wrapper';
-import { OrbitAura } from '@/components/ui/orbit-aura';
+import { GravitationalLoopVisual } from '@/components/visuals/gravitational-loop-visual';
 import { ScrollReveal, ParallaxLayer } from '@/components/ui/physics-effects';
 
 export function PhilosophySection() {
   return (
-    <SectionWrapper variant="black" id="philosophy" className="py-28 sm:py-36 lg:py-44 text-center">
-      <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+    <SectionWrapper variant="black" id="philosophy" className="py-24 sm:py-32 lg:py-40 text-center overflow-hidden">
+      <div className="relative z-10 max-w-5xl mx-auto space-y-8">
         <ScrollReveal>
           <span className="font-mono text-xs tracking-widest uppercase text-[#C99A44]">
             The Presence
@@ -24,9 +24,9 @@ export function PhilosophySection() {
           </p>
         </ParallaxLayer>
 
-        {/* Orbit Aura Presence */}
-        <div className="pt-8 flex justify-center">
-          <OrbitAura size={300} variant="philosophy" isDark />
+        {/* Mesmerizing Gravitational Convergence Visual */}
+        <div className="pt-10 flex justify-center w-full">
+          <GravitationalLoopVisual />
         </div>
       </div>
     </SectionWrapper>
