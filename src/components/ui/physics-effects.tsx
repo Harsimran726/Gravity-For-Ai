@@ -43,6 +43,26 @@ export function ZeroGravity({
   );
 }
 
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = React.useState(false);
+
+  React.useEffect(() => {
+    const check = () => {
+      setIsTouch(
+        typeof window !== 'undefined' &&
+        (window.innerWidth < 768 ||
+         window.matchMedia('(pointer: coarse)').matches ||
+         'ontouchstart' in window)
+      );
+    };
+    check();
+    window.addEventListener('resize', check, { passive: true });
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  return isTouch;
+}
+
 // ─────────────────────────────────────────────
 // 2. HEAVY DRAGGABLE (drag + falling spring snap)
 // ─────────────────────────────────────────────
@@ -53,6 +73,13 @@ export function HeavyDraggable({
   children: React.ReactNode; 
   className?: string;
 }) {
+  const isTouch = useIsTouchDevice();
+
+  // On mobile touch devices, disable drag completely to allow native, effortless vertical scrolling
+  if (isTouch) {
+    return <div className={`touch-pan-y ${className}`}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={`cursor-grab active:cursor-grabbing ${className}`}
@@ -168,6 +195,13 @@ export function GravityPull({
   children: React.ReactNode;
   className?: string;
 }) {
+  const isTouch = useIsTouchDevice();
+
+  // On mobile touch devices, disable hover and tap animations so boxes do not jump or conflict with scrolling
+  if (isTouch) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

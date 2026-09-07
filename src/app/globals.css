@@ -57,3 +57,27 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Mobile Touch Scroll Optimization: Disable box hover animations on mobile only */
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Disable box hover jumping, scale, and transform on touch screens */
+  .hover\:border-\[\#122C57\]:hover,
+  .hover\:border-\[\#C99A44\]:hover,
+  .hover\:-translate-y-1:hover,
+  .hover\:scale-105:hover,
+  .group:hover .group-hover\:scale-105 {
+    transform: none !important;
+  }
+
+  /* Ensure native vertical touch scrolling is never blocked by cards or containers */
+  .touch-pan-y,
+  article,
+  section,
+  div {
+    touch-action: pan-y pinch-zoom;
+  }
+}
