@@ -1,0 +1,200 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  passwordHash  String
+  name          String?
+  role          Role        @default(EDITOR)
+  twoFAEnabled  Boolean     @default(false)
+  twoFASecret   String?
+  bio           String?     // E-E-A-T author bio
+  title         String?     // e.g. "Founder & AI Engineer"
+  avatarUrl     String?     // Author image for JSON-LD & byline
+  posts         BlogPost[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model BlogPost {
+  id              String         @id @default(cuid())
+  title           String
+  slug            String         @unique
+  metaDescription String
+  canonicalUrl    String?
+  ogImage         String?
+  bodyContent     String
+  status          PostStatus     @default(DRAFT)
+  publishedAt     DateTime?
+  
+  // SEO & GEO specific fields
+  primaryKeyword  String?        // 🟢 Transactional target
+  secondaryKeywords String[]     // 🟡 Commercial investigation
+  geoTargetCity   String?        // Target location (e.g. "Mansa, Punjab")
+  geoAnswer       String?        // 40-60 word quotable direct-answer paragraph for LLM citation
+  readingTime     Int?           // Estimated reading time in minutes
+  
+  authorId        String
+  author          User           @relation(fields: [authorId], references: [id])
+  
+  categoryId      String?
+  category        Category?      @relation(fields: [categoryId], references: [id])
+  
+  tags            BlogPostTag[]
+  faqs            FaqItem[]
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([status])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  posts       BlogPost[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Tag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  slug      String        @unique
+  posts     BlogPostTag[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model BlogPostTag {
+  blogPostId String
+  tagId      String
+  blogPost   BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([blogPostId, tagId])
+}
+
+model FaqItem {
+  id          String    @id @default(cuid())
+  question    String
+  answer      String
+  order       Int       @default(0)
+  blogPostId  String?
+  blogPost    BlogPost? @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  pageContext String?   // e.g. "homepage", "services/ai-voice-agents", "locations/mansa"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  name            String
+  businessName    String?
+  email           String
+  phone           String?
+  serviceInterest String?    // e.g. "AI Voice Agents", "Web Development", "Agentic AI", "AI Audit"
+  message         String?
+  status          LeadStatus @default(NEW)
+  notes           String?
+  ipAddress       String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  clientName   String
+  businessName String?
+  role         String?
+  city         String?  // e.g. "Mansa", "Bathinda"
+  quote        String
+  rating       Int      @default(5)
+  logoUrl      String?
+  avatarUrl    String?
+  featured     Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PricingTier {
+  id           String   @id @default(cuid())
+  name         String   // Starter, Growth, Custom
+  priceLabel   String   // e.g. "Starting at ₹25,000" or "Custom Quote"
+  description  String?
+  featuresList String[] // Array of bullet features
+  isCustom     Boolean  @default(false)
+  isPopular    Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSettings {
+  id                String   @id @default(cuid())
+  siteName          String   @default("Gravity For AI")
+  companyName       String   @default("Gravity For AI")
+  tagline           String   @default("AI Voice Agents, Websites & Agentic Systems")
+  contactEmail      String   @default("contact@gravity4ai.com")
+  contactPhone      String?
+  addressLocality   String   @default("Mansa")
+  addressRegion     String   @default("Punjab")
+  postalCode        String?
+  addressCountry    String   @default("IN")
+  googleMapsUrl     String?
+  linkedinUrl       String?
+  instagramUrl      String?
+  maintenanceMode   Boolean  @default(false)
+  bookingTimeSlots  String[] @default(["10:00 AM", "11:30 AM", "01:30 PM", "03:00 PM", "04:30 PM"])
+  customDateSlots   Json?    @default("{}") // e.g. { "2026-09-05": ["09:00 AM", "10:00 AM"] }
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String   // e.g. "CREATE", "UPDATE", "DELETE", "LOGIN", "PUBLISH"
+  entityType String   // e.g. "BLOG_POST", "LEAD", "PRICING_TIER"
+  entityId   String?
+  details    String?
+  ipAddress  String?
+  timestamp  DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([userId])
+}

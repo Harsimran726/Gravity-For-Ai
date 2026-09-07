@@ -1,0 +1,69 @@
+# Gravity For AI - Full Technical & Organizational Reference
+
+> Gravity For AI is an applied AI engineering consultancy founded by Harsimran Singh and based in Mansa, Punjab, India (151505). We specialize in done-for-you AI voice agents, Next.js high-conversion websites, and custom autonomous agentic workflows.
+
+## Canonical Definitions
+- **AI Voice Agent:** A software receptionist that conducts natural spoken conversations on telephone lines in English, Hindi, and Punjabi, checks live calendars, and books appointments autonomously.
+- **Agentic AI System:** An orchestrated network of AI agents with tool-calling capabilities that complete multi-step business tasks end-to-end (e.g., document parsing, database lookups, dispatch logging).
+- **Conversion Website:** A custom Next.js 14 web application designed around the StoryBrand 7-step persuasion framework to convert visitors into booked discovery calls.
+
+## Core Offerings & Pricing Structure
+1. **Starter Plan:** Standalone AI Voice Agent or Single-Page Website.
+2. **Growth Plan:** Integrated AI Voice Agent + Multi-Page Conversion Website with unified lead capture.
+3. **Custom / Agentic Plan:** Bespoke multi-step automation pipelines scoped per operational workflow.
+
+## Target Locations & Dedicated Landing Pages
+
+### India
+- Mansa HQ: https://gravity4ai.com/locations/mansa
+- Bathinda: https://gravity4ai.com/locations/bathinda
+- Barnala: https://gravity4ai.com/locations/barnala
+- Chandigarh: https://gravity4ai.com/locations/chandigarh
+- Mohali: https://gravity4ai.com/locations/mohali
+- Panchkula: https://gravity4ai.com/locations/panchkula
+- Amritsar: https://gravity4ai.com/locations/amritsar
+- Jalandhar: https://gravity4ai.com/locations/jalandhar
+- Ludhiana: https://gravity4ai.com/locations/ludhiana
+- Patiala: https://gravity4ai.com/locations/patiala
+- Delhi: https://gravity4ai.com/locations/delhi
+- New Delhi: https://gravity4ai.com/locations/new-delhi
+- Delhi NCR: https://gravity4ai.com/locations/delhi-ncr
+- Jaipur: https://gravity4ai.com/locations/jaipur
+- Gandhinagar: https://gravity4ai.com/locations/gandhinagar
+- Surat: https://gravity4ai.com/locations/surat
+- Kolkata: https://gravity4ai.com/locations/kolkata
+
+### United States (Tier 2 Tech & Growth Hubs)
+- Austin, TX: https://gravity4ai.com/locations/austin
+- Raleigh, NC: https://gravity4ai.com/locations/raleigh
+- Tampa, FL: https://gravity4ai.com/locations/tampa
+- Salt Lake City, UT: https://gravity4ai.com/locations/salt-lake-city
+- Pittsburgh, PA: https://gravity4ai.com/locations/pittsburgh
+
+### Germany (Tier 2 Mittelstand & Tech Hubs)
+- Stuttgart: https://gravity4ai.com/locations/stuttgart
+- Leipzig: https://gravity4ai.com/locations/leipzig
+- Nuremberg: https://gravity4ai.com/locations/nuremberg
+- Dresden: https://gravity4ai.com/locations/dresden
+- Hannover: https://gravity4ai.com/locations/hannover
+
+## Frequently Asked Questions (AEO Bank)
+1. **What is an AI voice agent and how is it different from a regular chatbot?**
+   Unlike a text chatbot on a website, an AI voice agent handles real telephone calls with natural speech, human pauses, and intelligent understanding. It can converse in English, Hindi, or Punjabi, check your live calendar, qualify callers, and book appointments directly.
+2. **Will my customers know they’re talking to an AI?**
+   Our voice agents sound remarkably natural, polite, and responsive without the robotic delay of legacy IVR systems. If a caller asks something outside its trained parameters, the agent gracefully transfers the call or records an organized message.
+3. **How is Gravity For AI different from using a platform like Vapi or Bolna directly?**
+   Self-serve platforms are developer tools - you have to write code, design prompts, set up phone numbers, and manage database webhooks yourself. Gravity For AI delivers a complete, done-for-you service: we architect, train, connect, and manage the system so you simply enjoy the results.
+4. **How long does setup take from start to finish?**
+   Standard AI voice agents and high-performance websites are typically designed, trained, and launched within 5 to 10 business days.
+
+## Case Studies & Measurable Impact
+- **Healthcare (Mansa, Punjab):** +42 monthly patient bookings captured via 24/7 AI voice answering with ₹35,000/mo saved in evening front-desk overhead.
+- **Logistics & Fleet Dispatch (Bathinda, Punjab):** 18 weekly hours saved by automating WhatsApp freight quote parsing and fleet availability matching.
+- **Industrial Exporting (Ludhiana, Punjab):** 3.8x increase in qualified international RFQs after replacing slow WordPress site with a sub-2s Next.js application.
+
+## Contact & Location
+- Headquarters: Mansa, Punjab 151505, India
+- Email: contact@gravity4ai.com
+- Website: https://gravity4ai.com
+- Book an AI Audit: https://gravity4ai.com/contact

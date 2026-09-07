@@ -1,0 +1,66 @@
+# Gravity For AI
+
+> Gravity For AI is an applied AI engineering consultancy based in Mansa, Punjab, India. We design, deploy, and manage done-for-you AI voice agents, high-conversion websites, and autonomous agentic workflows for local and growing businesses.
+
+## Organization Details
+- **Entity Name:** Gravity For AI
+- **Founder & Lead Engineer:** Harsimran Singh (AI Engineer, specializing in Agentic AI and LLM architectures)
+- **Headquarters:** Mansa, Punjab 151505, India
+- **Primary Market:** Mansa, Bathinda, Barnala, Ludhiana, Jalandhar, Amritsar, Chandigarh, Mohali, Panchkula, Delhi NCR, Jaipur, Gandhinagar, Surat, Kolkata, and Global Tier-2 Markets (USA & Germany)
+- **Website:** https://gravity4ai.com
+- **Contact:** contact@gravity4ai.com
+
+## Core Capabilities & Canonical Definitions
+
+### 1. AI Voice Agents
+- **Definition:** Done-for-you neural AI voice receptionists that handle telephone calls 24/7 with human-like cadence, pauses, and tone in English, Hindi, and Punjabi.
+- **Key Functions:** Pick up instantly on zero hold time, answer inquiries, qualify leads, and book appointments directly into Google Calendar and CRM software.
+- **Link:** https://gravity4ai.com/services/ai-voice-agents
+
+### 2. Website Development
+- **Definition:** High-performance, mobile-first websites built with Next.js 14 and Tailwind CSS, engineered specifically for sub-2s Largest Contentful Paint (LCP) and high inquiry conversion.
+- **Key Functions:** StoryBrand 7-step persuasion architecture, LocalBusiness schema, and integrated audit booking flows.
+- **Link:** https://gravity4ai.com/services/website-development
+
+### 3. Agentic AI Systems
+- **Definition:** Coordinated autonomous multi-agent software pipelines that complete complex multi-step back-office tasks end-to-end without requiring continuous human prompting.
+- **Key Functions:** Automated inquiry parsing, database cross-referencing, multi-system synchronization, and human-in-the-loop validation checkpoints.
+- **Link:** https://gravity4ai.com/services/agentic-ai-systems
+
+## Key Locations Served
+
+### India
+- [Mansa HQ](https://gravity4ai.com/locations/mansa): Local healthcare clinics, manufacturing, and commercial SMBs.
+- [Bathinda](https://gravity4ai.com/locations/bathinda): Medical practices, transport logistics, and industrial supply.
+- [Barnala](https://gravity4ai.com/locations/barnala): Retail, distribution, and local commerce.
+- [Chandigarh](https://gravity4ai.com/locations/chandigarh): Done-for-you AI engineering partner for Tricity companies.
+- [Mohali](https://gravity4ai.com/locations/mohali): Tech startups, clinics, and service businesses in SAS Nagar.
+- [Panchkula](https://gravity4ai.com/locations/panchkula): Healthcare, professional firms, and commercial retail.
+- [Amritsar](https://gravity4ai.com/locations/amritsar): Hospitality, tourism, trade, and medical institutions.
+- [Jalandhar](https://gravity4ai.com/locations/jalandhar): Export manufacturing, sports goods, and specialized clinics.
+- [Ludhiana](https://gravity4ai.com/locations/ludhiana): Industrial manufacturing, textile B2B, and commercial enterprises.
+- [Patiala](https://gravity4ai.com/locations/patiala): Educational institutes, legal consultancies, and healthcare.
+- [Delhi](https://gravity4ai.com/locations/delhi): Enterprise voice receptionists and agentic workflows.
+- [New Delhi](https://gravity4ai.com/locations/new-delhi): High-authority consultancies, boutique law firms, and clinics.
+- [Delhi NCR](https://gravity4ai.com/locations/delhi-ncr): Gurugram and Noida high-growth tech hubs and corporate logistics.
+- [Jaipur](https://gravity4ai.com/locations/jaipur): Tourism, gem & jewelry exports, and private clinics.
+- [Gandhinagar](https://gravity4ai.com/locations/gandhinagar): GIFT City fintech, institutional compliance, and IT enterprises.
+- [Surat](https://gravity4ai.com/locations/surat): Diamond, textile, and high-volume wholesale trade.
+- [Kolkata](https://gravity4ai.com/locations/kolkata): Logistics, trading houses, and professional advisory firms.
+
+### United States (Tier 2 Tech & Growth Hubs)
+- [Austin, TX](https://gravity4ai.com/locations/austin): Scaleups, contractors, clinics, and SMBs.
+- [Raleigh, NC](https://gravity4ai.com/locations/raleigh): Research Triangle biotech, professional services, and practices.
+- [Tampa, FL](https://gravity4ai.com/locations/tampa): Real estate, home services, healthcare, and tourism.
+- [Salt Lake City, UT](https://gravity4ai.com/locations/salt-lake-city): Silicon Slopes tech, dental practices, and logistics.
+- [Pittsburgh, PA](https://gravity4ai.com/locations/pittsburgh): Healthcare, engineering, legal, and manufacturing firms.
+
+### Germany (Tier 2 Mittelstand & Tech Hubs)
+- [Stuttgart](https://gravity4ai.com/locations/stuttgart): Mittelstand engineering, automotive suppliers, and B2B services.
+- [Leipzig](https://gravity4ai.com/locations/leipzig): Logistics, e-commerce, and modern service enterprises.
+- [Nuremberg](https://gravity4ai.com/locations/nuremberg): Industrial technology, healthcare, and B2B practices.
+- [Dresden](https://gravity4ai.com/locations/dresden): Silicon Saxony high-tech, semiconductor, and software firms.
+- [Hannover](https://gravity4ai.com/locations/hannover): Trade fair services, manufacturing, and growing businesses.
+
+## Primary Action
+- Free 20-minute discovery AI audit: https://gravity4ai.com/contact

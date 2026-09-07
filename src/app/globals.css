@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #122C57;
+  --navy-deep: #0A1B3D;
+  --gold: #C99A44;
+  --gold-bright: #E2B14E;
+  --bg: #FFFFFF;
+  --bg-warm: #F7F5F0;
+  --black: #0A0A0D;
+  --slate: #6B7280;
+  --slate-line: #E4E2DC;
+}
+
+@layer base {
+  * {
+    border-color: var(--slate-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color: var(--navy-deep);
+    background-color: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background-color: #122C57;
+    color: #F7F5F0;
+  }
+}
+
+/* Restrained gold accent rules */
+.gold-accent-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--gold);
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
