@@ -7,8 +7,8 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Fallback to avoid build-time crashes when DATABASE_URL is not yet configured in Vercel environment
-const dbUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres';
+// Fallback to avoid build-time crashes and support Vercel Postgres (POSTGRES_PRISMA_URL) natively
+const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || 'postgresql://postgres:postgres@localhost:5432/postgres';
 
 export const prisma =
   globalForPrisma.prisma ??
