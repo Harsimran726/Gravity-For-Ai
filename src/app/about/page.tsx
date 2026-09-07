@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { OrbitAura } from '@/components/ui/orbit-aura';
 import { ZeroGravity, HeavyDraggable, ScrollReveal } from '@/components/ui/physics-effects';
 import { MapPin, Code, Cpu, Shield } from 'lucide-react';
+import { FounderWorkbench } from '@/components/visuals/founder-workbench';
 
 export const metadata: Metadata = {
   title: 'About Us | Gravity For AI - Mansa, Punjab',
@@ -41,8 +42,8 @@ export default function AboutPage() {
           </div>
 
           <div className="lg:col-span-5 flex justify-center">
-            <ZeroGravity>
-              <OrbitAura size={380} variant="hero" />
+            <ZeroGravity className="w-full flex justify-center">
+              <FounderWorkbench />
             </ZeroGravity>
           </div>
         </div>

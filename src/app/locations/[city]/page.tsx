@@ -8,6 +8,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { OrbitAura } from '@/components/ui/orbit-aura';
 import { Star, ArrowRight, Mic, Globe, Cpu } from 'lucide-react';
+import { LocationOperationsCard } from '@/components/visuals/location-operations-card';
+import { CardVisualHeader } from '@/components/visuals/card-visual-header';
 
 export function generateStaticParams() {
   return Object.keys(CITIES_DATA).map((city) => ({
@@ -106,9 +108,7 @@ export default function CityPage({ params }: { params: { city: string } }) {
             </div>
 
             <div className="lg:col-span-5 relative flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-[380px] aspect-square flex items-center justify-center">
-                <OrbitAura size={400} variant="hero" />
-              </div>
+              <LocationOperationsCard cityName={city.cityName} region={city.region} />
             </div>
           </div>
         </section>
@@ -183,6 +183,7 @@ export default function CityPage({ params }: { params: { city: string } }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <Card variant="outline" className="flex flex-col justify-between space-y-6">
+              <CardVisualHeader type="voice" title="AI Voice Agents" />
               <div className="space-y-3">
                 <Mic className="w-6 h-6 text-[#122C57]" />
                 <h3 className="font-serif text-2xl text-[#122C57]">AI Voice Agents</h3>
@@ -199,6 +200,7 @@ export default function CityPage({ params }: { params: { city: string } }) {
             </Card>
 
             <Card variant="outline" className="flex flex-col justify-between space-y-6">
+              <CardVisualHeader type="web" title="Website Development" />
               <div className="space-y-3">
                 <Globe className="w-6 h-6 text-[#122C57]" />
                 <h3 className="font-serif text-2xl text-[#122C57]">Website Development</h3>
@@ -215,6 +217,7 @@ export default function CityPage({ params }: { params: { city: string } }) {
             </Card>
 
             <Card variant="outline" className="flex flex-col justify-between space-y-6">
+              <CardVisualHeader type="agentic" title="Agentic AI Systems" />
               <div className="space-y-3">
                 <Cpu className="w-6 h-6 text-[#122C57]" />
                 <h3 className="font-serif text-2xl text-[#122C57]">Agentic AI Systems</h3>

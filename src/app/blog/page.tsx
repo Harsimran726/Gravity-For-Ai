@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { HeavyDraggable, GravityPull, ScrollReveal } from '@/components/ui/physics-effects';
 import { Clock, Calendar, ArrowUpRight, User } from 'lucide-react';
+import { CardVisualHeader } from '@/components/visuals/card-visual-header';
 
 export const metadata: Metadata = {
   title: 'Blog & Technical Guides | Gravity For AI',
@@ -68,18 +69,25 @@ export default function BlogListingPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
-            {BLOG_POSTS_SEED.map((post) => (
-              <HeavyDraggable key={post.slug}>
-                <GravityPull>
-                  <Card
-                    variant="outline"
-                    className="flex flex-col justify-between hover:border-[#122C57] transition-all duration-300 group h-full"
-                  >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs font-mono text-[#6B7280]">
-                      <span className="px-2.5 py-0.5 bg-[#F7F5F0] border border-[#E4E2DC] text-[#122C57] uppercase font-semibold text-[10px]">
-                        {post.category}
-                      </span>
+            {BLOG_POSTS_SEED.map((post) => {
+              const visualType = post.category.includes('Voice')
+                ? 'voice'
+                : post.category.includes('Agentic')
+                ? 'agentic'
+                : 'web';
+              return (
+                <HeavyDraggable key={post.slug}>
+                  <GravityPull>
+                    <Card
+                      variant="outline"
+                      className="flex flex-col justify-between hover:border-[#122C57] transition-all duration-300 group h-full p-6 space-y-4"
+                    >
+                      <CardVisualHeader type={visualType} title={post.category} />
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-xs font-mono text-[#6B7280]">
+                          <span className="px-2.5 py-0.5 bg-[#F7F5F0] border border-[#E4E2DC] text-[#122C57] uppercase font-semibold text-[10px]">
+                            {post.category}
+                          </span>
                       <span className="inline-flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" /> {post.readingTime} min read
                       </span>
@@ -115,7 +123,8 @@ export default function BlogListingPage() {
                 </Card>
                 </GravityPull>
               </HeavyDraggable>
-            ))}
+              );
+            })}
           </div>
         </SectionWrapper>
 

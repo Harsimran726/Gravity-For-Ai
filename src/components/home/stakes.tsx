@@ -3,6 +3,7 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { Card } from '@/components/ui/card';
 import { PhoneMissed, Clock, LayoutGrid, AlertCircle } from 'lucide-react';
 import { ScrollReveal, StaggerReveal, GravityPull } from '@/components/ui/physics-effects';
+import { OperationalComparison } from '@/components/visuals/operational-comparison';
 
 const STAKES_ITEMS = [
   {
@@ -50,7 +51,12 @@ export function StakesSection() {
         </p>
       </ScrollReveal>
 
-      <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-12">
+      {/* Visual Operational Comparison */}
+      <ScrollReveal>
+        <OperationalComparison />
+      </ScrollReveal>
+
+      <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-8">
         {STAKES_ITEMS.map((item) => {
           const Icon = item.icon;
           return (

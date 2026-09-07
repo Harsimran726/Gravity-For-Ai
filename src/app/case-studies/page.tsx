@@ -6,6 +6,7 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
+import { CardVisualHeader } from '@/components/visuals/card-visual-header';
 
 export const metadata: Metadata = {
   title: 'Case Studies & Results | Gravity For AI',
@@ -33,13 +34,24 @@ export default function CaseStudiesPage() {
         </div>
 
         <div className="space-y-10 mt-14">
-          {CASE_STUDIES.map((study) => (
-            <Card
-              key={study.slug}
-              variant="outline"
-              className="p-8 sm:p-12 hover:border-[#122C57] transition-all duration-300"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {CASE_STUDIES.map((study) => {
+            const visualType = study.slug.includes('clinic')
+              ? 'clinic'
+              : study.slug.includes('logistics')
+              ? 'logistics'
+              : 'export';
+            return (
+              <Card
+                key={study.slug}
+                variant="outline"
+                className="p-6 sm:p-8 space-y-6 hover:border-[#122C57] transition-all duration-300"
+              >
+                <CardVisualHeader
+                  type={visualType}
+                  title={study.industry}
+                  metric={study.metrics[1]?.value ? `${study.metrics[1].value} ${study.metrics[1].label}` : study.metrics[0].value}
+                />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-8 space-y-4">
                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase text-[#6B7280]">
                     <span className="text-[#C99A44] font-semibold">{study.industry}</span>
@@ -77,7 +89,8 @@ export default function CaseStudiesPage() {
                 </div>
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
       </SectionWrapper>
 

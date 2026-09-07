@@ -7,6 +7,9 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Clock, Calendar, Github, Linkedin, CheckCircle2 } from 'lucide-react';
+import { VoiceAgentMockup } from '@/components/visuals/voice-agent-mockup';
+import { BrowserSpeedMockup } from '@/components/visuals/browser-speed-mockup';
+import { PipelineOrchestratorMockup } from '@/components/visuals/pipeline-orchestrator-mockup';
 
 export function generateStaticParams() {
   return BLOG_POSTS_SEED.map((post) => ({
@@ -237,6 +240,13 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             {/* Article Intro */}
             <div className="prose prose-lg max-w-none text-[#0A1B3D]/90 space-y-6 leading-relaxed">
               <p className="text-base sm:text-lg leading-relaxed">{post.content.intro}</p>
+
+              {/* Visual Engineering Mockup */}
+              <div className="my-8 not-prose flex justify-center w-full">
+                {post.category.includes('Voice') && <VoiceAgentMockup />}
+                {post.category.includes('Agentic') && <PipelineOrchestratorMockup />}
+                {post.category.includes('Website') && <BrowserSpeedMockup />}
+              </div>
 
               {/* Sections */}
               {post.content.sections.map((section) => (

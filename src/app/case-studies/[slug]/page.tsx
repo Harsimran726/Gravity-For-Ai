@@ -7,6 +7,9 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { VoiceAgentMockup } from '@/components/visuals/voice-agent-mockup';
+import { BrowserSpeedMockup } from '@/components/visuals/browser-speed-mockup';
+import { PipelineOrchestratorMockup } from '@/components/visuals/pipeline-orchestrator-mockup';
 
 export function generateStaticParams() {
   return CASE_STUDIES.map((study) => ({
@@ -72,6 +75,13 @@ export default function CaseStudyDetailPage({ params }: { params: { slug: string
                 <p className="text-xs text-[#6B7280] leading-snug">{metric.label}</p>
               </div>
             ))}
+          </div>
+
+          {/* Visual Architecture Simulation */}
+          <div className="my-10 flex justify-center w-full">
+            {study.slug === 'mansa-clinic-ai-receptionist' && <VoiceAgentMockup />}
+            {study.slug === 'bathinda-logistics-dispatch-automation' && <PipelineOrchestratorMockup />}
+            {study.slug === 'ludhiana-export-lead-gen-website' && <BrowserSpeedMockup />}
           </div>
 
           {/* Challenge Section */}

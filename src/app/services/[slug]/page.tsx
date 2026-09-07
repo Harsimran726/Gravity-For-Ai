@@ -7,6 +7,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { OrbitAura } from '@/components/ui/orbit-aura';
 import { Check, Star, ChevronDown, ArrowRight } from 'lucide-react';
+import { VoiceAgentMockup } from '@/components/visuals/voice-agent-mockup';
+import { BrowserSpeedMockup } from '@/components/visuals/browser-speed-mockup';
+import { PipelineOrchestratorMockup } from '@/components/visuals/pipeline-orchestrator-mockup';
 
 export function generateStaticParams() {
   return Object.keys(SERVICES_DATA).map((slug) => ({
@@ -105,9 +108,14 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             </div>
 
             <div className="lg:col-span-5 relative flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
-                <OrbitAura size={440} variant="hero" />
-              </div>
+              {params.slug === 'ai-voice-agents' && <VoiceAgentMockup />}
+              {params.slug === 'website-development' && <BrowserSpeedMockup />}
+              {params.slug === 'agentic-ai-systems' && <PipelineOrchestratorMockup />}
+              {!['ai-voice-agents', 'website-development', 'agentic-ai-systems'].includes(params.slug) && (
+                <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
+                  <OrbitAura size={440} variant="hero" />
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -221,19 +229,28 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         {/* 6. Explanatory Section (if available) */}
         {service.explainer && (
           <SectionWrapper variant="warm" id="explainer">
-            <div className="max-w-3xl space-y-6">
-              <span className="font-mono text-xs uppercase tracking-widest text-[#C99A44]">
-                Architecture & Logic
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-[#122C57] font-normal leading-tight">
-                {service.explainer.h2}
-              </h2>
-              <p className="text-base sm:text-lg text-[#0A1B3D]/90 leading-relaxed">
-                {service.explainer.paragraph}
-              </p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">
-                {service.explainer.details}
-              </p>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7 space-y-6">
+                <span className="font-mono text-xs uppercase tracking-widest text-[#C99A44]">
+                  Architecture & Logic
+                </span>
+                <h2 className="font-serif text-3xl sm:text-4xl text-[#122C57] font-normal leading-tight">
+                  {service.explainer.h2}
+                </h2>
+                <p className="text-base sm:text-lg text-[#0A1B3D]/90 leading-relaxed">
+                  {service.explainer.paragraph}
+                </p>
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  {service.explainer.details}
+                </p>
+              </div>
+              <div className="lg:col-span-5 flex justify-center">
+                {params.slug === 'website-development' ? (
+                  <PipelineOrchestratorMockup />
+                ) : (
+                  <BrowserSpeedMockup />
+                )}
+              </div>
             </div>
           </SectionWrapper>
         )}

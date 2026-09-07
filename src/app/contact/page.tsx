@@ -4,6 +4,7 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { ContactBookingTabs } from '@/components/contact/contact-booking-tabs';
 import { Card } from '@/components/ui/card';
 import { Mail, MapPin, Phone, ShieldCheck, Clock, Award } from 'lucide-react';
+import { LocationOperationsCard } from '@/components/visuals/location-operations-card';
 
 export const metadata: Metadata = {
   title: 'Book an AI Audit & Contact | Gravity For AI - Mansa, Punjab',
@@ -60,6 +61,8 @@ export default async function ContactPage() {
                   </div>
                 </div>
               </Card>
+
+              <LocationOperationsCard cityName="Mansa" region="Punjab" />
 
               <div className="p-6 bg-[#FFFFFF] border border-[#E4E2DC] space-y-3 text-xs sm:text-sm text-[#6B7280]">
                 <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { SectionWrapper } from '@/components/ui/section-wrapper';
 import { Card } from '@/components/ui/card';
 import { HeavyDraggable, ScrollReveal, ParallaxLayer } from '@/components/ui/physics-effects';
 import { Mic, Globe, Cpu, ArrowUpRight } from 'lucide-react';
+import { CardVisualHeader } from '@/components/visuals/card-visual-header';
 
 const SERVICE_PILLARS = [
   {
@@ -56,12 +57,19 @@ export function ValuePropSection() {
             <HeavyDraggable key={pillar.title}>
               <Card
                 variant="outline"
-                className="flex flex-col justify-between group hover:border-[#122C57] transition-all duration-300 h-full"
+                className="flex flex-col justify-between group hover:border-[#122C57] transition-all duration-300 h-full overflow-hidden"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-full bg-[#F7F5F0] flex items-center justify-center text-[#122C57] group-hover:bg-[#122C57] group-hover:text-[#FFFFFF] transition-colors">
-                      <Icon className="w-5 h-5" />
+                  {/* Visual Product Banner */}
+                  <CardVisualHeader
+                    type={pillar.title.includes('Voice') ? 'voice' : pillar.title.includes('Website') ? 'web' : 'agentic'}
+                    title={pillar.title}
+                    metric={pillar.badge}
+                  />
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="w-9 h-9 rounded-full bg-[#F7F5F0] flex items-center justify-center text-[#122C57] group-hover:bg-[#122C57] group-hover:text-[#FFFFFF] transition-colors">
+                      <Icon className="w-4 h-4" />
                     </div>
                     <span className="font-mono text-[11px] uppercase tracking-wider text-[#6B7280]">
                       {pillar.badge}
