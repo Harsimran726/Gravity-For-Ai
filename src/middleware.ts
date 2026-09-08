@@ -34,6 +34,7 @@ export function middleware(request: NextRequest) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       const response = NextResponse.redirect(loginUrl);
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
       // Clean up invalid session cookie
       response.cookies.delete(ADMIN_COOKIE_NAME);
       return response;

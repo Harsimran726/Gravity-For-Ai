@@ -81,6 +81,16 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };
 
@@ -93,10 +103,35 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'Gravity For AI',
+    legalName: 'Gravity For AI',
+    alternateName: ['Gravity For AI Mansa', 'Gravity For AI Punjab', 'Gravity For AI India'],
+    disambiguatingDescription:
+      'Gravity For AI is an AI engineering and automation consultancy based in Mansa, Punjab, India, founded by Harsimran Singh. Specializes in AI voice agents, autonomous agentic workflows, and conversion web platforms. Independent entity distinct from Gravity AI (NYC marketplace).',
     description:
       'Gravity For AI designs, builds, and manages AI voice agents, agentic automation, and websites for local businesses.',
     url: 'https://gravityforai.com',
     email: 'contact@gravityforai.com',
+    founder: {
+      '@type': 'Person',
+      name: 'Harsimran Singh',
+      jobTitle: 'Founder & Lead AI Engineer',
+      url: 'https://github.com/harsimran726',
+      sameAs: [
+        'https://www.linkedin.com/in/harsimransinghaiengineer/',
+        'https://github.com/harsimran726',
+      ],
+    },
+    sameAs: [
+      'https://www.linkedin.com/in/harsimransinghaiengineer/',
+      'https://github.com/harsimran726',
+    ],
+    knowsAbout: [
+      'AI Voice Agents',
+      'Agentic AI Systems',
+      'LLM Workflow Automation',
+      'Local Business Automation',
+      'Full-Stack Next.js Engineering',
+    ],
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Mansa',

@@ -59,11 +59,29 @@ const nextConfig = {
         ],
       },
       {
-        source: '/admin/(.*)',
+        source: '/admin/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
-            value: 'noindex, nofollow, noarchive',
+            value: 'noindex, nofollow, noarchive, nosnippet',
+          },
+        ],
+      },
+      {
+        source: '/admin',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow, noarchive, nosnippet',
+          },
+        ],
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow, noarchive, nosnippet',
           },
         ],
       },
