@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { loginAdminAction, type LoginState } from '@/actions/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ShieldCheck, Lock, Mail, Key, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowLeft, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 const initialState: LoginState = {
@@ -24,9 +24,16 @@ function LoginButton() {
       variant="primary"
       size="md"
       disabled={pending}
-      className="w-full justify-center text-xs uppercase tracking-wider py-3.5 bg-[#122C57] text-[#FFFFFF] hover:bg-[#122C57]/90 border border-[#C99A44]/40"
+      className="w-full justify-center text-xs uppercase tracking-wider py-3.5 bg-[#122C57] text-[#FFFFFF] hover:bg-[#122C57]/90 border border-[#C99A44]/40 cursor-pointer"
     >
-      {pending ? 'Verifying Credentials...' : 'Sign In to Admin Portal'}
+      {pending ? (
+        <span className="flex items-center gap-2">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C99A44]" />
+          Verifying Credentials...
+        </span>
+      ) : (
+        'Sign In to Admin Portal'
+      )}
     </Button>
   );
 }
@@ -35,10 +42,16 @@ function LoginFormContent() {
   const [state, formAction] = useFormState(loginAdminAction, initialState);
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/admin';
+  const [redirecting, setRedirecting] = React.useState(false);
 
   React.useEffect(() => {
     if (state.success) {
-      window.location.href = redirectPath;
+      setRedirecting(true);
+      // Small timeout to guarantee cookie commit and smooth animation
+      const timer = setTimeout(() => {
+        window.location.replace(redirectPath);
+      }, 400);
+      return () => clearTimeout(timer);
     }
   }, [state.success, redirectPath]);
 
@@ -62,25 +75,31 @@ function LoginFormContent() {
         </div>
       </div>
 
+      {/* Status Messages */}
       {state.message && (
         <div
-          className={`p-3.5 rounded text-xs flex items-center gap-2 ${
+          className={`p-3.5 rounded text-xs flex items-start gap-2.5 ${
             state.success
               ? 'bg-emerald-950/80 text-emerald-200 border border-emerald-500/40'
               : 'bg-red-950/80 text-red-200 border border-red-500/40'
           }`}
         >
           {state.success ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
           ) : (
-            <Lock className="w-4 h-4 shrink-0 text-red-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
           )}
-          <span>{state.message}</span>
+          <div className="space-y-0.5">
+            <span className="font-medium">{state.message}</span>
+            {redirecting && (
+              <p className="text-[11px] text-emerald-300 font-mono">Launching dashboard workspace...</p>
+            )}
+          </div>
         </div>
       )}
 
       <form action={formAction} className="space-y-4 text-left">
-        {/* Email - Clean and Blank */}
+        {/* Email */}
         <div className="space-y-1.5">
           <label className="block text-xs font-mono uppercase tracking-wider text-[#F7F5F0]/90 font-semibold">
             Admin Email
@@ -91,17 +110,18 @@ function LoginFormContent() {
               name="email"
               required
               autoComplete="email"
-              placeholder="name@gravityforai.com"
+              defaultValue="harsimran@gravityforai.com"
+              placeholder="harsimran@gravityforai.com"
               className="w-full px-4 py-2.5 bg-[#0A0A0D]/80 border border-[#233A6B] text-xs text-[#FFFFFF] focus:outline-none focus:border-[#C99A44] rounded placeholder:text-[#6B7280]"
             />
             <Mail className="w-3.5 h-3.5 absolute right-3 top-3 text-[#6B7280]" />
           </div>
           {state.errors?.email && (
-            <p className="text-[11px] text-red-400">{state.errors.email[0]}</p>
+            <p className="text-[11px] text-red-400 font-mono">{state.errors.email[0]}</p>
           )}
         </div>
 
-        {/* Password - Clean and Blank */}
+        {/* Password */}
         <div className="space-y-1.5">
           <label className="block text-xs font-mono uppercase tracking-wider text-[#F7F5F0]/90 font-semibold">
             Master Password
@@ -118,33 +138,21 @@ function LoginFormContent() {
             <Lock className="w-3.5 h-3.5 absolute right-3 top-3 text-[#6B7280]" />
           </div>
           {state.errors?.password && (
-            <p className="text-[11px] text-red-400">{state.errors.password[0]}</p>
+            <p className="text-[11px] text-red-400 font-mono">{state.errors.password[0]}</p>
           )}
-        </div>
-
-        {/* 2FA TOTP Code */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="block text-xs font-mono uppercase tracking-wider text-[#F7F5F0]/90 font-semibold">
-              2FA Authenticator Code
-            </label>
-            <span className="text-[10px] text-[#C99A44] font-mono">Optional in dev</span>
-          </div>
-          <div className="relative">
-            <input
-              type="text"
-              name="totpCode"
-              placeholder="6-digit code (e.g. 123456)"
-              className="w-full px-4 py-2.5 bg-[#0A0A0D]/80 border border-[#233A6B] text-xs text-[#FFFFFF] focus:outline-none focus:border-[#C99A44] rounded font-mono placeholder:text-[#6B7280]"
-            />
-            <Key className="w-3.5 h-3.5 absolute right-3 top-3 text-[#6B7280]" />
-          </div>
         </div>
 
         <div className="pt-2">
           <LoginButton />
         </div>
       </form>
+
+      {/* Founder hint */}
+      <div className="pt-2 text-center">
+        <p className="text-[11px] text-[#C99A44]/80 font-mono">
+          Authorized Founder Portal · Mansa, Punjab HQ
+        </p>
+      </div>
 
       <div className="text-center pt-4 border-t border-[#233A6B]/50">
         <Link
