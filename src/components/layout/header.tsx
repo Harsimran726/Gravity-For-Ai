@@ -9,8 +9,9 @@ import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { label: 'Services', href: '/#services' },
-  { label: 'How It Works', href: '/#how-it-works' },
+  { label: 'Services', href: '/services' },
+  { label: 'Mansa HQ & Hubs', href: '/locations/mansa' },
+  { label: 'Case Studies', href: '/case-studies' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
   { label: 'Blog', href: '/blog' },

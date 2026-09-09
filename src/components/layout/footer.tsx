@@ -18,7 +18,7 @@ export function Footer() {
       <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-16 pb-12 border-b border-[#E4E2DC]">
           {/* Brand Info & NAP */}
-          <div className="md:col-span-6 space-y-4">
+          <div className="md:col-span-4 space-y-4">
             <Link
               href="/"
               className="inline-flex items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-[#C99A44]"
@@ -40,7 +40,9 @@ export function Footer() {
             {/* NAP (Name, Address, Phone) structured for local search */}
             <div className="pt-2 text-xs text-[#6B7280] space-y-1 font-sans">
               <p className="font-medium text-[#0A1B3D]">Headquarters:</p>
-              <p>Mansa, Punjab 151505, India</p>
+              <Link href="/locations/mansa" className="text-[#122C57] hover:text-[#C99A44] font-medium flex items-center gap-1 transition-colors">
+                Mansa, Punjab 151505, India (HQ) →
+              </Link>
               <p>contact@gravityforai.com</p>
             </div>
           </div>
@@ -65,20 +67,62 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-[#122C57] transition-colors">
-                  Pricing & Packages
+                <Link href="/services" className="hover:text-[#122C57] transition-colors font-medium text-[#122C57]">
+                  All Services Overview →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Regional Hubs Column */}
+          <div className="md:col-span-3 space-y-3">
+            <p className="text-xs font-mono tracking-wider uppercase text-[#122C57] font-semibold">Regional Hubs</p>
+            <ul className="space-y-2 text-xs sm:text-sm text-[#6B7280]">
+              <li>
+                <Link href="/locations/mansa" className="text-[#122C57] font-semibold hover:text-[#C99A44] transition-colors flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C99A44]" /> Mansa (Primary HQ)
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/bathinda" className="hover:text-[#122C57] transition-colors">
+                  Bathinda Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/ludhiana" className="hover:text-[#122C57] transition-colors">
+                  Ludhiana Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/chandigarh" className="hover:text-[#122C57] transition-colors">
+                  Chandigarh Tricity
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations" className="hover:text-[#122C57] transition-colors font-medium text-[#122C57]">
+                  All 27 City Hubs →
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Company & Legal */}
-          <div className="md:col-span-3 space-y-3">
+          <div className="md:col-span-2 space-y-3">
             <p className="text-xs font-mono tracking-wider uppercase text-[#122C57] font-semibold">Company</p>
             <ul className="space-y-2 text-xs sm:text-sm text-[#6B7280]">
               <li>
                 <Link href="/about" className="hover:text-[#122C57] transition-colors">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link href="/case-studies" className="hover:text-[#122C57] transition-colors">
+                  Case Studies
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="hover:text-[#122C57] transition-colors">
+                  Pricing
                 </Link>
               </li>
               <li>
@@ -89,11 +133,6 @@ export function Footer() {
               <li>
                 <Link href="/privacy-policy" className="hover:text-[#122C57] transition-colors">
                   Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms-of-service" className="hover:text-[#122C57] transition-colors">
-                  Terms of Service
                 </Link>
               </li>
             </ul>

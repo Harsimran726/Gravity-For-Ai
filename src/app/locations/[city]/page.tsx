@@ -101,8 +101,8 @@ export default function CityPage({ params }: { params: { city: string } }) {
                 <Button href="/contact" size="lg" variant="primary">
                   Book a Local AI Audit
                 </Button>
-                <Button href="#services" size="lg" variant="ghost">
-                  Explore Services ↓
+                <Button href="/services" size="lg" variant="ghost">
+                  Explore All Services →
                 </Button>
               </div>
             </div>

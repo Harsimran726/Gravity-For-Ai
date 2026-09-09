@@ -101,8 +101,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
                 <Button href="/contact" size="lg" variant="primary">
                   Book an AI Audit
                 </Button>
-                <Button href="#plan" size="lg" variant="ghost">
-                  How It Works ↓
+                <Button href="/case-studies" size="lg" variant="ghost">
+                  View Real Case Studies →
                 </Button>
               </div>
             </div>

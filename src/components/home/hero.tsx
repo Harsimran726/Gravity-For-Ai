@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ZeroGravity } from '@/components/ui/physics-effects';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -13,11 +14,14 @@ export function HeroSection() {
       <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
         {/* Narrative Column */}
         <div className="lg:col-span-7 space-y-8 z-10">
-          {/* Location Badge */}
-          <div className="inline-flex items-center gap-2.5 px-3 py-1 bg-[#F7F5F0] border border-[#E4E2DC] text-xs font-mono tracking-wider uppercase text-[#122C57]">
+          {/* Location Badge linking to Mansa Hub */}
+          <Link
+            href="/locations/mansa"
+            className="inline-flex items-center gap-2.5 px-3 py-1 bg-[#F7F5F0] border border-[#E4E2DC] text-xs font-mono tracking-wider uppercase text-[#122C57] hover:border-[#C99A44] transition-colors"
+          >
             <span className="w-2 h-2 rounded-full bg-[#C99A44]" />
-            <span>Mansa, Punjab & Beyond</span>
-          </div>
+            <span>Mansa, Punjab &amp; Beyond (HQ) →</span>
+          </Link>
 
           {/* Primary H1 */}
           <motion.h1
@@ -49,8 +53,8 @@ export function HeroSection() {
             <Button href="/contact" size="lg" variant="primary">
               Book an AI Audit
             </Button>
-            <Button href="#how-it-works" size="lg" variant="ghost">
-              See How It Works ↓
+            <Button href="/services" size="lg" variant="ghost">
+              Explore Services &amp; AI Stack →
             </Button>
           </motion.div>
         </div>
