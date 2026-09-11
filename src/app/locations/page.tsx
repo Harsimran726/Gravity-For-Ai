@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/locations',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/locations',
+    title: 'Locations & Regional AI Deployment Hubs | Gravity For AI',
+    description:
+      'Browse Gravity For AI service locations across Punjab, India & global markets. Mansa HQ, Bathinda, Ludhiana, Chandigarh, and beyond. Custom local AI automation.',
+  },
 };
 
 export default function LocationsDirectoryPage() {

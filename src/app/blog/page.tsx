@@ -16,6 +16,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/blog',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/blog',
+    title: 'Blog & Technical Guides | Gravity For AI',
+    description:
+      'Practical guides, ROI teardowns, and architecture insights on AI voice agents, Next.js web development, and agentic AI systems for growing businesses.',
+  },
 };
 
 export default function BlogListingPage() {

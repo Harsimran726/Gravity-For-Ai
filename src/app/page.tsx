@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com',
   },
+  openGraph: {
+    url: 'https://gravityforai.com',
+    title: 'Gravity For AI - AI Voice Agents, Websites & Agentic Systems | Mansa, Punjab',
+    description:
+      'Gravity For AI builds AI voice agents, agentic AI systems, and premium websites for local businesses in Punjab, India & beyond. Book a free AI audit.',
+  },
 };
 
 export default function HomePage() {

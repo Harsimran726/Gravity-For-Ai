@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/contact',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/contact',
+    title: 'Book an AI Audit & Contact | Gravity For AI - Mansa, Punjab',
+    description:
+      'Schedule a live 20-minute AI audit call on our interactive calendar or send a message to Gravity For AI in Mansa, Punjab.',
+  },
 };
 
 export const dynamic = 'force-dynamic';

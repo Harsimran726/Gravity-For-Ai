@@ -58,7 +58,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://gravityforai.com',
     siteName: 'Gravity For AI',
     title: 'Gravity For AI - AI Voice Agents & Business Automation',
     description:

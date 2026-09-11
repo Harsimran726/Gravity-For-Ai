@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/privacy-policy',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/privacy-policy',
+    title: 'Privacy Policy | Gravity For AI',
+    description: 'Privacy Policy and data governance practices of Gravity For AI.',
+  },
 };
 
 export default function PrivacyPolicyPage() {

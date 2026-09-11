@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/about',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/about',
+    title: 'About Us | Gravity For AI - Mansa, Punjab',
+    description:
+      'Meet Gravity For AI, founded by Harsimran Singh in Mansa, Punjab. We build custom AI voice agents, high-performance websites, and agentic workflows for growing businesses.',
+  },
 };
 
 export default function AboutPage() {

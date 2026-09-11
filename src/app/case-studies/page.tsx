@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/case-studies',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/case-studies',
+    title: 'Case Studies & Results | Gravity For AI',
+    description:
+      'Real results and measurable outcomes from our AI Voice Agent, Next.js website, and agentic workflow deployments in Punjab.',
+  },
 };
 
 export default function CaseStudiesPage() {

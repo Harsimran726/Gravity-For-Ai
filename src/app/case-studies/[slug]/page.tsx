@@ -27,6 +27,11 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     alternates: {
       canonical: `https://gravityforai.com/case-studies/${study.slug}`,
     },
+    openGraph: {
+      url: `https://gravityforai.com/case-studies/${study.slug}`,
+      title: `${study.title} | Gravity For AI Case Study`,
+      description: study.summary,
+    },
   };
 }
 

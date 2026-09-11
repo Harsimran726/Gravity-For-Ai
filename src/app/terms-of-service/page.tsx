@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/terms-of-service',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/terms-of-service',
+    title: 'Terms of Service | Gravity For AI',
+    description: 'Terms of service and engagement terms of Gravity For AI.',
+  },
 };
 
 export default function TermsOfServicePage() {

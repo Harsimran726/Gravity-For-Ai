@@ -27,6 +27,11 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     alternates: {
       canonical: `https://gravityforai.com/services/${service.slug}`,
     },
+    openGraph: {
+      url: `https://gravityforai.com/services/${service.slug}`,
+      title: service.title,
+      description: service.metaDescription,
+    },
   };
 }
 

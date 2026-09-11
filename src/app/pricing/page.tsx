@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/pricing',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/pricing',
+    title: 'Transparent Pricing & Packages | Gravity For AI',
+    description:
+      'Explore our clear, transparent pricing packages for AI Voice Agents, conversion websites, and custom agentic workflows. Built for local businesses in Punjab and beyond.',
+  },
 };
 
 const ALL_TIERS = [

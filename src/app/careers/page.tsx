@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/careers',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/careers',
+    title: 'Careers & Engineering Team | Gravity For AI',
+    description: 'Join the engineering team at Gravity For AI in Mansa, Punjab building next-generation agentic AI and voice systems.',
+  },
 };
 
 export default function CareersPage() {

@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://gravityforai.com/services',
   },
+  openGraph: {
+    url: 'https://gravityforai.com/services',
+    title: 'AI Services & Enterprise Automation Solutions | Gravity For AI',
+    description:
+      'Explore Gravity For AI services: 24/7 multilingual AI Voice Agents, custom high-speed Next.js websites, and autonomous Agentic AI workflows built for local and growing businesses.',
+  },
 };
 
 const SERVICE_ICONS: Record<string, React.ElementType> = {
