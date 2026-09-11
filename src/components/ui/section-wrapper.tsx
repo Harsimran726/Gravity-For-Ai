@@ -64,10 +64,10 @@ export function SectionWrapper({
         variantStyles[variant],
         className
       )}
-      initial={{ opacity: 0, y: 14 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true, margin: '-40px 0px' }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
     >
       {content}
     </motion.section>
