@@ -100,7 +100,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/locations" className="hover:text-[#122C57] transition-colors font-medium text-[#122C57]">
-                  All 27 City Hubs →
+                  All Location Hubs →
                 </Link>
               </li>
             </ul>

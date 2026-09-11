@@ -29,6 +29,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/locations/punjab-regional`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/locations/india-remote`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
+    {
+      url: `${baseUrl}/locations/united-states`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
+    {
+      url: `${baseUrl}/locations/europe`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.65,
+    },
+    {
       url: `${baseUrl}/pricing`,
       lastModified: now,
       changeFrequency: 'weekly',

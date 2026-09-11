@@ -27,6 +27,11 @@ export function generateMetadata({ params }: { params: { city: string } }): Meta
     alternates: {
       canonical: `https://gravityforai.com/locations/${city.citySlug}`,
     },
+    openGraph: {
+      url: `https://gravityforai.com/locations/${city.citySlug}`,
+      title: city.title,
+      description: city.metaDescription,
+    },
   };
 }
 

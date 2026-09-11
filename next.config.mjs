@@ -23,6 +23,38 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Tricity merges → /locations/chandigarh
+      { source: '/locations/mohali', destination: '/locations/chandigarh', permanent: true },
+      { source: '/locations/panchkula', destination: '/locations/chandigarh', permanent: true },
+      // Punjab regional merges → /locations/punjab-regional
+      { source: '/locations/barnala', destination: '/locations/punjab-regional', permanent: true },
+      { source: '/locations/amritsar', destination: '/locations/punjab-regional', permanent: true },
+      { source: '/locations/jalandhar', destination: '/locations/punjab-regional', permanent: true },
+      { source: '/locations/patiala', destination: '/locations/punjab-regional', permanent: true },
+      // Delhi merges → /locations/delhi
+      { source: '/locations/new-delhi', destination: '/locations/delhi', permanent: true },
+      { source: '/locations/delhi-ncr', destination: '/locations/delhi', permanent: true },
+      // India remote → /locations/india-remote
+      { source: '/locations/gandhinagar', destination: '/locations/india-remote', permanent: true },
+      { source: '/locations/surat', destination: '/locations/india-remote', permanent: true },
+      { source: '/locations/jaipur', destination: '/locations/india-remote', permanent: true },
+      { source: '/locations/kolkata', destination: '/locations/india-remote', permanent: true },
+      // US cities → /locations/united-states
+      { source: '/locations/austin', destination: '/locations/united-states', permanent: true },
+      { source: '/locations/raleigh', destination: '/locations/united-states', permanent: true },
+      { source: '/locations/tampa', destination: '/locations/united-states', permanent: true },
+      { source: '/locations/salt-lake-city', destination: '/locations/united-states', permanent: true },
+      { source: '/locations/pittsburgh', destination: '/locations/united-states', permanent: true },
+      // Germany cities → /locations/europe
+      { source: '/locations/stuttgart', destination: '/locations/europe', permanent: true },
+      { source: '/locations/leipzig', destination: '/locations/europe', permanent: true },
+      { source: '/locations/nuremberg', destination: '/locations/europe', permanent: true },
+      { source: '/locations/dresden', destination: '/locations/europe', permanent: true },
+      { source: '/locations/hannover', destination: '/locations/europe', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
