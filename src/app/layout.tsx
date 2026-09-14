@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { OrbitScrollThread } from '@/components/ui/orbit-thread';
 import { Analytics } from '@/components/analytics/analytics';
+import { MetaPixel } from '@/components/analytics/meta-pixel';
 import { SkipToContent } from '@/components/ui/skip-to-content';
 import { MainContentWrapper } from '@/components/layout/main-content-wrapper';
 
@@ -165,6 +166,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-[#FFFFFF] text-[#0A1B3D] min-h-screen flex flex-col selection:bg-[#122C57] selection:text-[#F7F5F0]">
         <SkipToContent />
         <Analytics />
+        <MetaPixel />
         <Header />
         <OrbitScrollThread />
         <MainContentWrapper>{children}</MainContentWrapper>
