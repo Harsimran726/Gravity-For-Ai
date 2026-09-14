@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendContactInquiryEmail } from '@/lib/mail';
 import { revalidatePath } from 'next/cache';
+import { buildMetaLeadEventPayload, sendMetaConversionsApiEvent } from '@/lib/meta-conversions';
 
 const LeadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -54,8 +55,9 @@ export async function submitLeadAction(
   }
 
   // 3. Persist to PostgreSQL FIRST
+  let createdLeadId: string | null = null;
   try {
-    await prisma.lead.create({
+    const createdLead = await prisma.lead.create({
       data: {
         name: validated.data.name,
         email: validated.data.email,
@@ -66,6 +68,7 @@ export async function submitLeadAction(
         status: 'NEW',
       },
     });
+    createdLeadId = createdLead.id;
 
     revalidatePath('/admin/leads');
     revalidatePath('/admin');
@@ -90,6 +93,27 @@ export async function submitLeadAction(
   } catch (emailErr) {
     // Non-critical - lead is already saved in DB
     console.error('[LEAD] Email notification failed (inquiry still saved):', emailErr);
+  }
+
+  // 5. Send Meta Conversions API (CAPI) Server-Side Lead event
+  try {
+    await sendMetaConversionsApiEvent(
+      buildMetaLeadEventPayload({
+        email: validated.data.email,
+        phone: validated.data.phone,
+        leadId: createdLeadId || undefined,
+        actionSource: 'system_generated',
+        eventSource: 'crm',
+        leadEventSource: 'Gravity For AI CRM',
+        customData: {
+          service_interest: validated.data.serviceInterest,
+          business_name: validated.data.businessName || '',
+        },
+      })
+    );
+  } catch (capiErr) {
+    // Non-critical - Meta CAPI failure must never block form success
+    console.error('[LEAD] Meta CAPI dispatch error (lead still saved):', capiErr);
   }
 
   return {

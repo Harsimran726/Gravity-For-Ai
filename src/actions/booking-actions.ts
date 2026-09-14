@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { sendBookingEmails } from '@/lib/mail';
 import { revalidatePath } from 'next/cache';
+import { buildMetaLeadEventPayload, sendMetaConversionsApiEvent } from '@/lib/meta-conversions';
 
 const BookingSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -123,6 +124,28 @@ export async function createBookingAction(
   } catch (emailErr) {
     // Email failure is non-critical - booking is already saved in DB
     console.error('[BOOKING] Email dispatch failed (booking still saved). Lead ID:', leadId, emailErr);
+  }
+
+  // 6. Send Meta Conversions API (CAPI) Server-Side Lead event
+  try {
+    await sendMetaConversionsApiEvent(
+      buildMetaLeadEventPayload({
+        email,
+        phone,
+        leadId: leadId || undefined,
+        actionSource: 'system_generated',
+        eventSource: 'crm',
+        leadEventSource: 'Gravity For AI CRM',
+        customData: {
+          meeting_date: meetingDate,
+          time_slot: timeSlot,
+          service_interest: serviceInterest,
+          business_name: businessName || '',
+        },
+      })
+    );
+  } catch (capiErr) {
+    console.error('[BOOKING] Meta CAPI dispatch failed (booking still saved):', capiErr);
   }
 
   return {
