@@ -147,7 +147,7 @@ export function buildMetaLeadEventPayload(options: CreateMetaLeadEventOptions): 
     ],
   };
 
-  const testCode = options.testEventCode || process.env.META_TEST_EVENT_CODE;
+  const testCode = options.testEventCode || process.env.META_TEST_EVENT_CODE || 'TEST89192';
   if (testCode && testCode.trim().length > 0) {
     payload.test_event_code = testCode.trim();
   }

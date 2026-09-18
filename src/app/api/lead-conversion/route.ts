@@ -36,7 +36,9 @@ export async function POST(request: NextRequest) {
 
     const normalizedPhone = phone ? normalizePhone(phone) : '';
 
-    const payload = {
+    const testEventCode = process.env.META_TEST_EVENT_CODE || 'TEST89192';
+
+    const payload: any = {
       data: [
         {
           event_name: 'Lead',
@@ -56,6 +58,10 @@ export async function POST(request: NextRequest) {
         },
       ],
     };
+
+    if (testEventCode && testEventCode.trim().length > 0) {
+      payload.test_event_code = testEventCode.trim();
+    }
 
     const res = await fetch(
       `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${encodeURIComponent(accessToken)}`,
