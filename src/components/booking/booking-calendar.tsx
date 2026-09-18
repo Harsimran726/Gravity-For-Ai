@@ -131,10 +131,18 @@ export function BookingCalendar({
 
   React.useEffect(() => {
     if (state.success && state.bookingDetails) {
-      trackMetaLead({
-        content_name: state.bookingDetails.serviceInterest || 'Calendar Audit Booking',
-        currency: 'INR',
-      });
+      const eventId =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+      trackMetaLead(
+        {
+          content_name: state.bookingDetails.serviceInterest || 'Calendar Audit Booking',
+          currency: 'INR',
+        },
+        eventId
+      );
     }
   }, [state.success, state.bookingDetails]);
 

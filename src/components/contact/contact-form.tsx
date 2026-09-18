@@ -34,10 +34,18 @@ export function ContactForm({ initialService = 'AI Audit' }: { initialService?: 
 
   React.useEffect(() => {
     if (state.success) {
-      trackMetaLead({
-        content_name: initialService || 'Contact Audit Request',
-        currency: 'INR',
-      });
+      const eventId =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+      trackMetaLead(
+        {
+          content_name: initialService || 'Contact Audit Request',
+          currency: 'INR',
+        },
+        eventId
+      );
     }
   }, [state.success, initialService]);
 

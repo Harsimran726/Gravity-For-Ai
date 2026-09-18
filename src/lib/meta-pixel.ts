@@ -19,17 +19,25 @@ export function trackMetaPageView() {
 /**
  * Fires Meta Pixel Lead conversion event
  */
-export function trackMetaLead(data?: {
-  content_name?: string;
-  value?: number;
-  currency?: string;
-}) {
+export function trackMetaLead(
+  data?: {
+    content_name?: string;
+    value?: number;
+    currency?: string;
+  },
+  eventId?: string
+) {
   if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('track', 'Lead', {
+    const payload = {
       content_name: data?.content_name || 'AI Call Agent Inquiry',
       currency: data?.currency || 'INR',
       ...(data?.value ? { value: data.value } : {}),
-    });
+    };
+    if (eventId) {
+      window.fbq('track', 'Lead', payload, { eventID: eventId });
+    } else {
+      window.fbq('track', 'Lead', payload);
+    }
   }
 }
 

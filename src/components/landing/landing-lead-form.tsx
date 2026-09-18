@@ -29,17 +29,39 @@ export function LandingLeadForm({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const email = String(formData.get('email') || '');
+    const phone = String(formData.get('phone') || '');
+    const eventId =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     startTransition(async () => {
       const result = await submitLeadAction({}, formData);
       setFormState(result);
       if (result.success) {
         setSubmitted(true);
-        // Fire Meta Pixel Lead conversion event
-        trackMetaLead({
-          content_name: `AI Voice Agent - ${nicheBadge}`,
-          currency: 'INR',
-        });
+
+        // 1. Send server-side Conversions API event with eventId
+        fetch('/api/lead-conversion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            phone,
+            eventId,
+            serviceInterest: `AI Voice Agent - ${nicheBadge}`,
+          }),
+        }).catch((err) => console.warn('[Meta CAPI] client dispatch notice:', err));
+
+        // 2. Fire client-side Meta Pixel Lead event with matching eventID for deduplication
+        trackMetaLead(
+          {
+            content_name: `AI Voice Agent - ${nicheBadge}`,
+            currency: 'INR',
+          },
+          eventId
+        );
       }
     });
   };
