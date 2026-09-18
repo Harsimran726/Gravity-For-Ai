@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -152,6 +153,8 @@ export default function RootLayout({
     ],
   };
 
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-KGBMFDBJ';
+
   return (
     <html
       lang="en"
@@ -164,6 +167,27 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-[#FFFFFF] text-[#0A1B3D] min-h-screen flex flex-col selection:bg-[#122C57] selection:text-[#F7F5F0]">
+        {/* Google Tag Manager */}
+        <Script
+          id="google-tag-manager"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`,
+          }}
+        />
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <SkipToContent />
         <Analytics />
         <MetaPixel />
