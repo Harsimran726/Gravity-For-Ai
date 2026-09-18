@@ -199,6 +199,8 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
             nicheTitle={data.nicheTitle}
             reelEmbedUrl={data.solutionSection.reelEmbedUrl}
             audioDemo={data.solutionSection.audioDemo}
+            slug={data.slug}
+            audioFileUrl={`/audio/${data.slug}-demo.mp3`}
           />
         </SectionWrapper>
 

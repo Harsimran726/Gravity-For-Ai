@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { createBookingAction, type BookingState } from '@/actions/booking-actions';
+import { trackMetaLead } from '@/lib/meta-pixel';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -127,6 +128,15 @@ export function BookingCalendar({
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
+
+  React.useEffect(() => {
+    if (state.success && state.bookingDetails) {
+      trackMetaLead({
+        content_name: state.bookingDetails.serviceInterest || 'Calendar Audit Booking',
+        currency: 'INR',
+      });
+    }
+  }, [state.success, state.bookingDetails]);
 
   if (state.success && state.bookingDetails) {
     return (

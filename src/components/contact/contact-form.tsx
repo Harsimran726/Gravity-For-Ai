@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitLeadAction, type FormState } from '@/actions/lead-actions';
+import { trackMetaLead } from '@/lib/meta-pixel';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -30,6 +31,15 @@ function SubmitButton() {
 
 export function ContactForm({ initialService = 'AI Audit' }: { initialService?: string }) {
   const [state, formAction] = useFormState(submitLeadAction, initialState);
+
+  React.useEffect(() => {
+    if (state.success) {
+      trackMetaLead({
+        content_name: initialService || 'Contact Audit Request',
+        currency: 'INR',
+      });
+    }
+  }, [state.success, initialService]);
 
   if (state.success) {
     return (

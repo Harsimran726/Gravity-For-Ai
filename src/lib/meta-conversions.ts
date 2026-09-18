@@ -163,7 +163,7 @@ export async function sendMetaConversionsApiEvent(payload: MetaCapiPayload): Pro
   result?: any;
   error?: string;
 }> {
-  const pixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const pixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || '2111062089501666';
   const accessToken = process.env.META_CONVERSIONS_API_TOKEN || process.env.META_ACCESS_TOKEN;
 
   if (!pixelId || !accessToken) {
