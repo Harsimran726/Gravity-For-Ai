@@ -337,6 +337,28 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
             </div>
           </div>
         </SectionWrapper>
+
+        {/* Legal Footer for Meta & Google Ads Compliance */}
+        <footer className="py-8 text-center text-xs text-[#9CA3AF] bg-[#020617] border-t border-[#1E293B]">
+          <div className="max-w-4xl mx-auto px-4 space-y-2">
+            <div className="flex items-center justify-center gap-4 text-xs">
+              <Link href="/privacy-policy" className="hover:text-white underline underline-offset-4 transition-colors">
+                Privacy Policy
+              </Link>
+              <span className="text-[#475569]">&middot;</span>
+              <Link href="/terms-of-service" className="hover:text-white underline underline-offset-4 transition-colors">
+                Terms of Service
+              </Link>
+              <span className="text-[#475569]">&middot;</span>
+              <Link href="/" className="hover:text-white transition-colors">
+                Gravity For AI
+              </Link>
+            </div>
+            <p className="text-[11px] text-[#64748B]">
+              &copy; 2026 Gravity For AI &middot; Mansa, Punjab 151505, India. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </div>
     </>
   );

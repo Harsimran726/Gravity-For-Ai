@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.ampproject.org;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.ampproject.org https://connect.facebook.net;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' blob: data: https://github.com https://avatars.githubusercontent.com https://gravityforai.com https://www.google-analytics.com;
+  img-src 'self' blob: data: https://github.com https://avatars.githubusercontent.com https://gravityforai.com https://www.google-analytics.com https://www.facebook.com https://connect.facebook.net;
+  connect-src 'self' https://graph.facebook.com https://www.facebook.com https://www.google-analytics.com https://www.googletagmanager.com;
+  frame-src 'self' https://www.googletagmanager.com https://www.facebook.com;
   font-src 'self' https://fonts.gstatic.com data:;
   object-src 'none';
   base-uri 'self';
@@ -25,6 +27,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Direct alias for privacy policy
+      { source: '/privacy', destination: '/privacy-policy', permanent: true },
       // Tricity merges → /locations/chandigarh
       { source: '/locations/mohali', destination: '/locations/chandigarh', permanent: true },
       { source: '/locations/panchkula', destination: '/locations/chandigarh', permanent: true },
