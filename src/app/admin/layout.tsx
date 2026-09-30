@@ -1,6 +1,7 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { AdminShell } from './admin-shell';
+import { getAdminSession } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Admin Panel | Gravity For AI',
@@ -22,6 +23,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AdminShell>{children}</AdminShell>;
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await getAdminSession();
+  return (
+    <AdminShell session={session ? { name: session.name, email: session.email, role: session.role } : undefined}>
+      {children}
+    </AdminShell>
+  );
 }
+

@@ -63,12 +63,20 @@ export async function loginAdminAction(
         isMatch = password === 'Admin@Gravity2026!' || (await verifyPassword(password, FOUNDER_MASTER_HASH));
       }
 
-      if (isMatch && dbUser.role === 'ADMIN') {
+      // Check the password hash is a real bcrypt hash (not an INVITE: placeholder)
+      const isActivated = !dbUser.passwordHash.startsWith('INVITE:');
+
+      if (isMatch && isActivated) {
         authenticatedUser = {
           id: dbUser.id,
-          name: dbUser.name || 'Harsimran Singh',
+          name: dbUser.name || 'Team Member',
           email: dbUser.email,
-          role: 'ADMIN',
+          role: dbUser.role as 'ADMIN' | 'EDITOR' | 'VIEWER',
+        };
+      } else if (isMatch && !isActivated) {
+        return {
+          success: false,
+          message: 'Your invitation is pending. Please check your email for the invitation link to activate your account.',
         };
       }
     }
@@ -76,6 +84,7 @@ export async function loginAdminAction(
     // Non-fatal: Log database query error and proceed to emergency founder fallback check
     console.error('[AUTH] Database query encountered an issue, checking fallback credentials:', err);
   }
+
 
   // 3. Resilient Founder Master Fallback
   // Guarantees Harsimran Singh is NEVER locked out, even if the database is

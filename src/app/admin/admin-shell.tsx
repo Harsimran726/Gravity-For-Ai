@@ -14,6 +14,7 @@ import {
   ShieldAlert,
   LogOut,
   ExternalLink,
+  UsersRound,
 } from 'lucide-react';
 import { logoutAdminAction } from '@/actions/auth-actions';
 
@@ -23,21 +24,28 @@ const NAV_ITEMS = [
   { label: 'Blog / CMS', href: '/admin/blog', icon: FileText },
   { label: 'Leads & Inquiries', href: '/admin/leads', icon: Users },
   { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },
+  { label: 'Team Members', href: '/admin/team', icon: UsersRound, adminOnly: true },
   { label: 'Site Settings', href: '/admin/settings', icon: Settings },
   { label: 'Security & Audit', href: '/admin/audit-log', icon: ShieldAlert },
 ];
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+
+export function AdminShell({ children, session }: { children: React.ReactNode; session?: { name: string; email: string; role: string } }) {
   const pathname = usePathname();
 
-  // On Login Page: Show ONLY the dedicated authentication UI (NO sidebar, NO navigation)
-  if (pathname === '/admin/login') {
+  // On Login Page / Accept Invite: Show ONLY the dedicated authentication UI (NO sidebar, NO navigation)
+  if (pathname === '/admin/login' || pathname === '/admin/accept-invite') {
     return (
       <div className="min-h-screen bg-[#0A0A0D] text-[#F7F5F0] flex items-center justify-center p-4 w-full">
         {children}
       </div>
     );
   }
+
+  const isAdmin = !session || session.role === 'ADMIN';
+  const initials = session?.name
+    ? session.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'HS';
 
   // On Authenticated Admin Pages: Show the full admin sidebar & dashboard workspace
   return (
@@ -66,6 +74,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           {/* Navigation Links */}
           <nav className="p-4 space-y-1">
             {NAV_ITEMS.map((item) => {
+              // Hide admin-only items for non-admins
+              if ((item as { adminOnly?: boolean }).adminOnly && !isAdmin) return null;
               const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
@@ -90,11 +100,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-[#233A6B] space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-[#122C57] border border-[#C99A44] flex items-center justify-center text-xs font-mono font-semibold text-[#FFFFFF]">
-              HS
+              {initials}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-medium text-[#F7F5F0] truncate">Harsimran Singh</p>
-              <p className="text-[10px] font-mono text-[#C99A44] uppercase">Role: Super Admin</p>
+              <p className="text-xs font-medium text-[#F7F5F0] truncate">{session?.name || 'Harsimran Singh'}</p>
+              <p className="text-[10px] font-mono text-[#C99A44] uppercase">Role: {session?.role || 'Admin'}</p>
             </div>
           </div>
 
