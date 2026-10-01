@@ -15,6 +15,7 @@ import {
   LogOut,
   ExternalLink,
   UsersRound,
+  Mail,
 } from 'lucide-react';
 import { logoutAdminAction } from '@/actions/auth-actions';
 
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { label: 'Leads & Inquiries', href: '/admin/leads', icon: Users },
   { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },
   { label: 'Team Members', href: '/admin/team', icon: UsersRound, adminOnly: true },
+  { label: 'Email Outreach', href: '/admin/outreach', icon: Mail, adminOnly: true },
   { label: 'Site Settings', href: '/admin/settings', icon: Settings },
   { label: 'Security & Audit', href: '/admin/audit-log', icon: ShieldAlert },
 ];

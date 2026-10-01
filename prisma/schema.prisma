@@ -198,3 +198,39 @@ model AuditLog {
   @@index([timestamp])
   @@index([userId])
 }
+
+model OutreachCampaign {
+  id          String             @id @default(cuid())
+  name        String
+  subject     String
+  body        String             @db.Text
+  dailyLimit  Int                @default(100)
+  status      String             @default("DRAFT") // DRAFT | ACTIVE | PAUSED | COMPLETED
+  totalSent   Int                @default(0)
+  totalFailed Int                @default(0)
+  sentToday   Int                @default(0)
+  lastSentAt  DateTime?
+  lastResetAt DateTime?          // When sentToday was last reset to 0
+  createdById String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  prospects   OutreachProspect[]
+
+  @@index([status])
+}
+
+model OutreachProspect {
+  id         String           @id @default(cuid())
+  campaignId String
+  campaign   OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name       String
+  email      String
+  company    String?
+  status     String           @default("PENDING") // PENDING | SELECTED | SENT | FAILED | SKIPPED
+  sentAt     DateTime?
+  error      String?
+  createdAt  DateTime         @default(now())
+
+  @@index([campaignId, status])
+  @@index([campaignId])
+}
