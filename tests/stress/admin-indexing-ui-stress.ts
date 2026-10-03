@@ -210,7 +210,14 @@ async function executeAdminIndexingStressHarness() {
 
   await runTest('E2E_S4', 'S4-TC3', 'Lifecycle: VIEWER and EDITOR roles rejected with HTTP 401', async () => {
     for (const role of ['VIEWER', 'EDITOR'] as const) {
-      const token = signSession({ id: `user-${role}`, email: `${role.toLowerCase()}@gravityforai.com`, role });
+      const token = signSession({ 
+        id: `user-${role}`, 
+        email: `${role.toLowerCase()}@gravityforai.com`, 
+        role,
+        name: `${role} User`,
+        twoFAVerified: false,
+        loginTime: new Date().toISOString()
+      });
       const req = new Request('http://localhost:3000/api/admin/request-indexing', {
         method: 'POST',
         headers: {
@@ -225,7 +232,14 @@ async function executeAdminIndexingStressHarness() {
   });
 
   await runTest('E2E_S4', 'S4-TC4', 'Lifecycle: Admin authenticated request with missing GSC credentials returns 200 with setupRequired: true', async () => {
-    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN' });
+    const adminToken = signSession({ 
+      id: 'admin-stress', 
+      email: 'admin@gravityforai.com', 
+      role: 'ADMIN',
+      name: 'Admin User',
+      twoFAVerified: false,
+      loginTime: new Date().toISOString()
+    });
     const req = new Request('http://localhost:3000/api/admin/request-indexing', {
       method: 'POST',
       headers: {
@@ -243,7 +257,7 @@ async function executeAdminIndexingStressHarness() {
   });
 
   await runTest('E2E_S4', 'S4-TC5', 'Adversarial URL boundaries: javascript: scheme rejected with HTTP 400', async () => {
-    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN' });
+    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN', name: 'Admin', twoFAVerified: false, loginTime: new Date().toISOString() });
     const req = new Request('http://localhost:3000/api/admin/request-indexing', {
       method: 'POST',
       headers: {
@@ -259,7 +273,7 @@ async function executeAdminIndexingStressHarness() {
   });
 
   await runTest('E2E_S4', 'S4-TC6', 'Adversarial URL boundaries: file:// and data: schemes rejected with HTTP 400', async () => {
-    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN' });
+    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN', name: 'Admin', twoFAVerified: false, loginTime: new Date().toISOString() });
     for (const badSchemeUrl of ['file:///etc/passwd', 'data:text/html,<script>evil()</script>']) {
       const req = new Request('http://localhost:3000/api/admin/request-indexing', {
         method: 'POST',
@@ -275,7 +289,7 @@ async function executeAdminIndexingStressHarness() {
   });
 
   await runTest('E2E_S4', 'S4-TC7', 'Adversarial URL boundaries: malformed syntax rejected with HTTP 400', async () => {
-    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN' });
+    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN', name: 'Admin', twoFAVerified: false, loginTime: new Date().toISOString() });
     for (const malformed of ['not a valid url', 'https://', '   ', '']) {
       const req = new Request('http://localhost:3000/api/admin/request-indexing', {
         method: 'POST',
@@ -291,7 +305,7 @@ async function executeAdminIndexingStressHarness() {
   });
 
   await runTest('E2E_S4', 'S4-TC8', 'GET /api/admin/request-indexing status inspection endpoint', async () => {
-    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN' });
+    const adminToken = signSession({ id: 'admin-stress', email: 'admin@gravityforai.com', role: 'ADMIN', name: 'Admin', twoFAVerified: false, loginTime: new Date().toISOString() });
     const req = new Request('http://localhost:3000/api/admin/request-indexing', {
       method: 'GET',
       headers: {
