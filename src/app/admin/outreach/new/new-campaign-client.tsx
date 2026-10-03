@@ -45,7 +45,7 @@ export function NewCampaignClient() {
   const [fileType, setFileType] = React.useState<'csv' | 'excel' | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
   const [parsing, setParsing] = React.useState(false);
-  const [dailyLimit, setDailyLimit] = React.useState(100);
+  const [dailyLimit, setDailyLimit] = React.useState(20);
 
   const fileRef = React.useRef<HTMLInputElement>(null);
 
@@ -135,7 +135,7 @@ export function NewCampaignClient() {
           <input
             name="name"
             required
-            placeholder="e.g. Punjab Clinics Outreach — Oct 2026"
+            placeholder="e.g. Property enquiries — October 2026"
             className="w-full px-3 py-2.5 border border-[#E4E2DC] text-sm text-[#0A1B3D] focus:outline-none focus:border-[#122C57] bg-[#F7F5F0]"
           />
           {state.errors?.name && <p className="text-[11px] text-red-500">{state.errors.name[0]}</p>}
@@ -148,16 +148,16 @@ export function NewCampaignClient() {
             <span className="font-mono text-sm font-semibold text-[#122C57]">{dailyLimit} emails/day</span>
           </div>
           <input
-            type="range" min={10} max={300} step={10}
+            type="range" min={1} max={100} step={1}
             value={dailyLimit}
             onChange={(e) => setDailyLimit(Number(e.target.value))}
             className="w-full accent-[#122C57]"
           />
           <div className="flex justify-between text-[10px] font-mono text-[#9CA3AF]">
-            <span>10 (Safe)</span><span>100 (Recommended)</span><span>300 (Aggressive)</span>
+            <span>1 / day</span><span>20 / day</span><span>100 campaign ceiling</span>
           </div>
           <p className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
-            <Info className="w-3 h-3" /> Keep at 50–150/day with Resend for best inbox placement.
+            <Info className="w-3 h-3" /> The shared mailbox ramp is lower: 5, then 10, then 20 total messages/day. Inbox placement is not guaranteed.
           </p>
         </div>
 
@@ -310,6 +310,18 @@ export function NewCampaignClient() {
           )}
         </div>
 
+        <div className="space-y-3 border border-[#E4E2DC] p-4">
+          <label className="block text-sm">Campaign type
+            <select name="purpose" className="block border p-2 mt-1"><option value="CAMPAIGN">Prospect campaign</option><option value="TEST">Delivery test — trusted recipients only</option></select>
+          </label>
+          <label className="block text-sm">First follow-up (optional, 4 business days after first send)
+            <textarea name="followup1Body" rows={4} className="block w-full border p-2 mt-1" />
+          </label>
+          <label className="block text-sm">Second follow-up (optional, 5 business days after first follow-up)
+            <textarea name="followup2Body" rows={4} className="block w-full border p-2 mt-1" />
+          </label>
+          <p className="text-xs text-[#6B7280]">Upload only imports records. Approve permission and start the campaign separately. Replies stop the sequence. Plain-text messages only; emails without names use “there”.</p>
+        </div>
         {/* Email Subject — shown as default, skipped per-row if column present */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -348,12 +360,12 @@ export function NewCampaignClient() {
           />
           {state.errors?.body && <p className="text-[11px] text-red-500">{state.errors.body[0]}</p>}
           <Card variant="outline" className="p-3 bg-[#F7F5F0]">
-            <p className="text-[11px] font-semibold text-[#122C57] mb-1">💡 Anti-Spam Tips</p>
+            <p className="text-[11px] font-semibold text-[#122C57] mb-1">Sending notes</p>
             <ul className="text-[11px] text-[#6B7280] space-y-0.5 list-disc list-inside">
-              <li>Personalise with <code className="bg-white px-1 font-mono">{'{{name}}'}</code> — generic blasts get flagged</li>
+              <li>Use a real name with <code className="bg-white px-1 font-mono">{'{{name}}'}</code> — check the preview before sending</li>
               <li>Keep subject under 60 characters and avoid CAPS</li>
-              <li>Avoid spam words: FREE, URGENT, GUARANTEED, CLICK HERE</li>
-              <li>Each email is sent with a 45–120s random delay (set on send page)</li>
+              <li>Use clear claims and only email recipients permitted by your provider policy</li>
+              <li>The server enforces mailbox caps and at least two minutes between attempts</li>
               <li>Add a <strong>subject</strong> or <strong>body</strong> column in Excel/CSV for fully custom per-row emails</li>
             </ul>
           </Card>

@@ -21,7 +21,8 @@ export async function verifyPassword(plainText: string, hash: string): Promise<b
 // craft a fake session because they don't have the NEXTAUTH_SECRET.
 
 function getSessionSecret(): string {
-  const secret = process.env.NEXTAUTH_SECRET || 'gravityforai-super-secure-production-secret-token-32chars';
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret || secret.length < 32) throw new Error('Configure NEXTAUTH_SECRET with at least 32 characters.');
   return secret;
 }
 

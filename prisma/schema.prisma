@@ -200,6 +200,13 @@ model AuditLog {
 }
 
 model OutreachCampaign {
+  automationEnabled Boolean @default(false)
+  followup1Body String? @db.Text
+  followup2Body String? @db.Text
+  followup1Days Int @default(4)
+  followup2Days Int @default(5)
+  purpose String @default("CAMPAIGN")
+  messages OutreachMessage[]
   id          String             @id @default(cuid())
   name        String
   subject     String
@@ -220,6 +227,11 @@ model OutreachCampaign {
 }
 
 model OutreachProspect {
+  permissionGranted Boolean @default(false)
+  permissionNote String?
+  repliedAt DateTime?
+  replySubject String?
+  messages OutreachMessage[]
   id            String           @id @default(cuid())
   campaignId    String
   campaign      OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
@@ -235,4 +247,35 @@ model OutreachProspect {
 
   @@index([campaignId, status])
   @@index([campaignId])
+}
+
+model OutreachMessage {
+  id String @id @default(cuid())
+  campaignId String
+  campaign OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  prospectId String
+  prospect OutreachProspect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  step Int
+  status String
+  messageId String @unique
+  sentAt DateTime?
+  error String?
+  createdAt DateTime @default(now())
+  @@unique([prospectId, step])
+  @@index([campaignId, sentAt])
+  @@index([createdAt, status])
+}
+model OutreachSuppression {
+  email String @id
+  reason String
+  createdAt DateTime @default(now())
+}
+model OutreachMailbox {
+  id String @id
+  lockToken String?
+  lockUntil DateTime?
+  nextSendAt DateTime?
+  rampStartedAt DateTime?
+  lastInboxSyncAt DateTime?
+  lastError String?
 }
