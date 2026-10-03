@@ -21,6 +21,7 @@ export default async function AdminBlogListPage() {
       category: post.category?.name || 'Uncategorized',
       primaryKeyword: post.primaryKeyword || 'N/A',
       status: post.status,
+      isDbPost: true,
     })),
     ...BLOG_POSTS_SEED.map((post) => ({
       slug: post.slug,
@@ -28,6 +29,7 @@ export default async function AdminBlogListPage() {
       category: post.category,
       primaryKeyword: post.primaryKeyword,
       status: 'PUBLISHED',
+      isDbPost: false,
     }))
   ];
 
@@ -82,7 +84,15 @@ export default async function AdminBlogListPage() {
                     <Zap className="w-3 h-3 text-[#C99A44]" /> AMP Active
                   </Link>
                 </td>
-                <td className="p-3.5 text-right space-x-2">
+                <td className="p-3.5 text-right space-x-3">
+                  {post.isDbPost && (
+                    <Link
+                      href={`/admin/blog/${post.slug}/edit`}
+                      className="inline-flex items-center gap-1 font-mono text-[11px] text-[#C99A44] hover:underline"
+                    >
+                      Edit <Edit3 className="w-3 h-3" />
+                    </Link>
+                  )}
                   <Link
                     href={`/blog/${post.slug}`}
                     target="_blank"

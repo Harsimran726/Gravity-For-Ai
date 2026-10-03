@@ -1,5 +1,7 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
@@ -207,7 +209,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {/* Article Intro */}
             <div className="prose prose-lg max-w-none text-[#0A1B3D]/90 space-y-6 leading-relaxed">
               {isDbPost ? (
-                <div dangerouslySetInnerHTML={{ __html: post.bodyContent }} />
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.bodyContent}</ReactMarkdown>
               ) : (
                 <>
                   <p className="text-base sm:text-lg leading-relaxed">{post.content.intro}</p>

@@ -1,5 +1,7 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { notFound } from 'next/navigation';
 import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 import { prisma } from '@/lib/prisma';
@@ -143,7 +145,7 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
         </div>
 
         {isDbPost ? (
-          <div dangerouslySetInnerHTML={{ __html: post.bodyContent }} />
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.bodyContent}</ReactMarkdown>
         ) : (
           <>
             <p>{post.content.intro}</p>
