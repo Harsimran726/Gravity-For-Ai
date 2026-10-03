@@ -3,124 +3,124 @@ import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 import { CASE_STUDIES } from '@/data/case-studies-data';
 import { CITIES_DATA } from '@/data/city-data';
 import { SERVICES_DATA } from '@/data/services-data';
+import { prisma } from '@/lib/prisma';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://gravityforai.com';
-  const now = new Date();
 
-  // Core static marketing pages
+  // Core static marketing pages with verified historical first-published dates
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/services`,
-      lastModified: now,
+      lastModified: new Date('2026-09-09T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/locations`,
-      lastModified: now,
+      lastModified: new Date('2026-09-09T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/locations/punjab-regional`,
-      lastModified: now,
+      lastModified: new Date('2026-09-11T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.75,
     },
     {
       url: `${baseUrl}/locations/india-remote`,
-      lastModified: now,
+      lastModified: new Date('2026-09-11T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.65,
     },
     {
       url: `${baseUrl}/locations/united-states`,
-      lastModified: now,
+      lastModified: new Date('2026-09-11T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.65,
     },
     {
       url: `${baseUrl}/locations/europe`,
-      lastModified: now,
+      lastModified: new Date('2026-09-11T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.65,
     },
     {
       url: `${baseUrl}/lp`,
-      lastModified: now,
+      lastModified: new Date('2026-09-14T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/lp/real-estate`,
-      lastModified: now,
+      lastModified: new Date('2026-09-14T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/lp/clinics`,
-      lastModified: now,
+      lastModified: new Date('2026-09-14T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/lp/immigration`,
-      lastModified: now,
+      lastModified: new Date('2026-09-14T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/pricing`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/case-studies`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/privacy-policy`,
-      lastModified: now,
+      lastModified: new Date('2026-09-19T00:00:00.000Z'),
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/terms-of-service`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/careers`,
-      lastModified: now,
+      lastModified: new Date('2026-09-07T00:00:00.000Z'),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
@@ -129,7 +129,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Service landing pages
   const servicePages: MetadataRoute.Sitemap = Object.keys(SERVICES_DATA).map((slug) => ({
     url: `${baseUrl}/services/${slug}`,
-    lastModified: now,
+    lastModified: new Date('2026-09-07T00:00:00.000Z'),
     changeFrequency: 'weekly',
     priority: 0.9,
   }));
@@ -137,7 +137,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Localized city pages
   const cityPages: MetadataRoute.Sitemap = Object.keys(CITIES_DATA).map((city) => ({
     url: `${baseUrl}/locations/${city}`,
-    lastModified: now,
+    lastModified: new Date('2026-09-07T00:00:00.000Z'),
     changeFrequency: 'weekly',
     priority: city === 'mansa' ? 0.9 : 0.8,
   }));
@@ -145,17 +145,54 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Case study pages
   const caseStudyPages: MetadataRoute.Sitemap = CASE_STUDIES.map((study) => ({
     url: `${baseUrl}/case-studies/${study.slug}`,
-    lastModified: now,
+    lastModified: new Date('2026-09-07T00:00:00.000Z'),
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
 
-  // Blog posts
-  const blogPages: MetadataRoute.Sitemap = BLOG_POSTS_SEED.map((post) => ({
+  // Unified Blog Posts: Merge seed posts with published database posts, deduplicated by slug
+  const postMap = new Map<string, { slug: string; lastModified: Date }>();
+
+  for (const post of BLOG_POSTS_SEED) {
+    postMap.set(post.slug, {
+      slug: post.slug,
+      lastModified: new Date(post.publishedAt),
+    });
+  }
+
+  try {
+    const dbPosts = await prisma.blogPost.findMany({
+      where: { status: 'PUBLISHED' },
+      select: { slug: true, publishedAt: true, updatedAt: true },
+    });
+
+    for (const post of dbPosts) {
+      const lastModified = post.publishedAt || post.updatedAt || new Date('2026-09-07T00:00:00.000Z');
+      postMap.set(post.slug, {
+        slug: post.slug,
+        lastModified: new Date(lastModified),
+      });
+    }
+  } catch (error) {
+    console.error('Failed to query published posts for sitemap, falling back to seed posts:', error);
+  }
+
+  const allPosts = Array.from(postMap.values());
+
+  // Canonical Blog Pages
+  const blogPages: MetadataRoute.Sitemap = allPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt),
+    lastModified: post.lastModified,
     changeFrequency: 'monthly',
     priority: 0.8,
+  }));
+
+  // AMP Blog Pages
+  const ampBlogPages: MetadataRoute.Sitemap = allPosts.map((post) => ({
+    url: `${baseUrl}/amp/blog/${post.slug}`,
+    lastModified: post.lastModified,
+    changeFrequency: 'monthly',
+    priority: 0.5,
   }));
 
   return [
@@ -164,5 +201,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...cityPages,
     ...caseStudyPages,
     ...blogPages,
+    ...ampBlogPages,
   ];
 }

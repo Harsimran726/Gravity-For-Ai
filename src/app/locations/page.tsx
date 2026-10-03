@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     description:
       'Browse Gravity For AI service locations across Punjab, India & global markets. Mansa HQ, Bathinda, Ludhiana, Chandigarh, and beyond. Custom local AI automation.',
   },
+  other: {
+    'geo.region': 'IN-PB',
+    'geo.placename': 'Mansa, Punjab, India',
+    'ICBM': '29.9975, 75.3983',
+  },
 };
 
 export default function LocationsDirectoryPage() {

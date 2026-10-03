@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     title: 'AI Voice Agents & Automation - United States Remote Delivery',
     description: 'Done-for-you AI voice agents and agentic systems for US businesses - Austin, Raleigh, Tampa, Salt Lake City, Pittsburgh, and beyond.',
   },
+  other: {
+    'geo.region': 'US',
+    'geo.placename': 'United States',
+  },
 };
 
 const cities = [

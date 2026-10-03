@@ -18,6 +18,7 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
         orderBy: { createdAt: 'asc' },
         select: {
           id: true, name: true, email: true, company: true,
+          customSubject: true, customBody: true,
           status: true, sentAt: true, error: true,
         },
       },

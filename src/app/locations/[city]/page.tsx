@@ -17,9 +17,39 @@ export function generateStaticParams() {
   }));
 }
 
+const CITY_GEO_DATA: Record<string, { region: string; placename: string; icbm: string }> = {
+  mansa: {
+    region: 'IN-PB',
+    placename: 'Mansa, Punjab, India',
+    icbm: '29.9975, 75.3983',
+  },
+  bathinda: {
+    region: 'IN-PB',
+    placename: 'Bathinda, Punjab, India',
+    icbm: '30.2110, 74.9455',
+  },
+  chandigarh: {
+    region: 'IN-PB',
+    placename: 'Chandigarh, Punjab, India',
+    icbm: '30.7333, 76.7794',
+  },
+  ludhiana: {
+    region: 'IN-PB',
+    placename: 'Ludhiana, Punjab, India',
+    icbm: '30.9010, 75.8573',
+  },
+  delhi: {
+    region: 'IN-DL',
+    placename: 'Delhi, India',
+    icbm: '28.6139, 77.2090',
+  },
+};
+
 export function generateMetadata({ params }: { params: { city: string } }): Metadata {
   const city = CITIES_DATA[params.city];
   if (!city) return { title: 'Location Not Found | Gravity For AI' };
+
+  const geoData = CITY_GEO_DATA[params.city] || CITY_GEO_DATA[city.citySlug];
 
   return {
     title: city.title,
@@ -32,6 +62,13 @@ export function generateMetadata({ params }: { params: { city: string } }): Meta
       title: city.title,
       description: city.metaDescription,
     },
+    ...(geoData && {
+      other: {
+        'geo.region': geoData.region,
+        'geo.placename': geoData.placename,
+        'ICBM': geoData.icbm,
+      },
+    }),
   };
 }
 

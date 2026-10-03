@@ -28,6 +28,5 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: 'https://gravityforai.com/sitemap.xml',
-    host: 'https://gravityforai.com',
   };
 }

@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     description:
       'AI voice agents and business automation for Barnala, Amritsar, Jalandhar, Patiala, and surrounding Punjab districts. Engineered and managed from Mansa, Punjab.',
   },
+  other: {
+    'geo.region': 'IN-PB',
+    'geo.placename': 'Punjab, India',
+  },
 };
 
 const cities = [

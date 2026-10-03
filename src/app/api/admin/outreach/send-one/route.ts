@@ -178,15 +178,17 @@ export async function POST(request: Request) {
       });
     }
 
-    // 6. Personalise email
+    // 6. Personalise — per-row override takes priority over campaign defaults
     const vars = {
       name: prospect.name,
       company: prospect.company || '',
       email: prospect.email,
       firstname: prospect.name.split(' ')[0],
     };
-    const subject = personalise(campaign.subject, vars);
-    const html = personalise(campaign.body, vars);
+    const subjectTemplate = prospect.customSubject || campaign.subject;
+    const bodyTemplate    = (prospect.customBody    || campaign.body);
+    const subject = personalise(subjectTemplate, vars);
+    const html    = personalise(bodyTemplate, vars);
     const messageId = crypto.randomBytes(16).toString('hex');
 
     // 7. Send

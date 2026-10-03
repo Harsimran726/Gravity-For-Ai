@@ -1,16 +1,28 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
+import { prisma } from '@/lib/prisma';
 
-export function generateStaticParams() {
-  return BLOG_POSTS_SEED.map((post) => ({
-    slug: post.slug,
-  }));
-}
+export const dynamic = 'force-dynamic';
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const dbPost = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
+  
+  if (dbPost && dbPost.status === 'PUBLISHED') {
+    return {
+      title: `${dbPost.title} (AMP) | Gravity For AI`,
+      description: dbPost.metaDescription,
+      alternates: {
+        canonical: dbPost.canonicalUrl || `https://gravityforai.com/blog/${dbPost.slug}`,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+    };
+  }
+
   const post = BLOG_POSTS_SEED.find((p) => p.slug === params.slug);
   if (!post) return { title: 'AMP Article Not Found | Gravity For AI' };
 
@@ -27,18 +39,44 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function AmpBlogPostPage({ params }: { params: { slug: string } }) {
-  const post = BLOG_POSTS_SEED.find((p) => p.slug === params.slug);
+export default async function AmpBlogPostPage({ params }: { params: { slug: string } }) {
+  let dbPost = await prisma.blogPost.findUnique({ 
+    where: { slug: params.slug },
+    include: { author: true, category: true }
+  });
+
+  let post: any = null;
+  let isDbPost = false;
+
+  if (dbPost && dbPost.status === 'PUBLISHED') {
+    post = {
+      ...dbPost,
+      category: dbPost.category?.name || 'General',
+      author: {
+        name: dbPost.author?.name || 'Gravity Team',
+        role: dbPost.author?.title || 'Author',
+      },
+      content: { intro: '', sections: [] },
+      publishedAt: dbPost.publishedAt?.toISOString() || new Date().toISOString(),
+      readingTime: dbPost.readingTime || 5,
+    };
+    isDbPost = true;
+  } else {
+    post = BLOG_POSTS_SEED.find((p) => p.slug === params.slug);
+  }
+
   if (!post) {
     notFound();
   }
+
+  const canonicalUrl = isDbPost ? (post.canonicalUrl || `https://gravityforai.com/blog/${post.slug}`) : post.canonicalUrl;
 
   const ampSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': post.canonicalUrl,
+      '@id': canonicalUrl,
     },
     headline: post.title,
     description: post.metaDescription,
@@ -64,7 +102,7 @@ export default function AmpBlogPostPage({ params }: { params: { slug: string } }
   return (
     <>
       <head>
-        <link rel="canonical" href={post.canonicalUrl} />
+        <link rel="canonical" href={canonicalUrl} />
         <style
           dangerouslySetInnerHTML={{
             __html: `
@@ -94,24 +132,29 @@ export default function AmpBlogPostPage({ params }: { params: { slug: string } }
       </header>
 
       <main className="amp-container">
-        <span className="amp-badge">{post.category} · {post.readingTime} min read</span>
+        <span className="amp-badge">{post.category} • {post.readingTime} min read</span>
         <h1 className="amp-title">{post.title}</h1>
         <div className="amp-meta">
-          By {post.author.name} · Published {new Date(post.publishedAt).toLocaleDateString('en-US')} · Mansa, Punjab
+          By {post.author.name} • Published {new Date(post.publishedAt).toLocaleDateString('en-US')} • Mansa, Punjab
         </div>
 
         <div className="amp-takeaway">
           <strong>Key Takeaway:</strong> {post.geoAnswer}
         </div>
 
-        <p>{post.content.intro}</p>
-
-        {post.content.sections.map((section) => (
-          <div key={section.heading}>
-            <h2 className="amp-h2">{section.heading}</h2>
-            <p>{section.body}</p>
-          </div>
-        ))}
+        {isDbPost ? (
+          <div dangerouslySetInnerHTML={{ __html: post.bodyContent }} />
+        ) : (
+          <>
+            <p>{post.content.intro}</p>
+            {post.content.sections.map((section: any) => (
+              <div key={section.heading}>
+                <h2 className="amp-h2">{section.heading}</h2>
+                <p>{section.body}</p>
+              </div>
+            ))}
+          </>
+        )}
 
         <div style={{ marginTop: '32px', padding: '20px', background: '#F7F5F0', border: '1px solid #E4E2DC' }}>
           <h3 style={{ margin: '0 0 8px', fontFamily: 'Georgia, serif', color: '#122C57' }}>Schedule Your 20-Minute AI Audit</h3>
@@ -123,7 +166,7 @@ export default function AmpBlogPostPage({ params }: { params: { slug: string } }
       </main>
 
       <footer className="amp-footer">
-        © {new Date().getFullYear()} Gravity For AI · Mansa, Punjab 151505, India · <a href={post.canonicalUrl} style={{ color: '#122C57' }}>View Canonical Version</a>
+        © {new Date().getFullYear()} Gravity For AI • Mansa, Punjab 151505, India • <a href={canonicalUrl} style={{ color: '#122C57' }}>View Canonical Version</a>
       </footer>
     </>
   );

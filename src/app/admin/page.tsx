@@ -14,6 +14,7 @@ import {
   Video,
   Inbox,
 } from 'lucide-react';
+import { RequestIndexingCard } from './request-indexing-card';
 
 // Server Component - all data fetched from PostgreSQL at render time
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,8 @@ export default async function AdminDashboardPage() {
   } catch (err) {
     console.error('[ADMIN DASHBOARD] Failed to fetch metrics from database:', err);
   }
+
+  const isGoogleIndexingConfigured = Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
 
   return (
     <div className="space-y-8">
@@ -119,6 +122,9 @@ export default async function AdminDashboardPage() {
           <p className="text-[11px] text-emerald-700">LCP 1.2s · INP 45ms · CLS 0.0</p>
         </Card>
       </div>
+
+      {/* Google Search Console Request Indexing Tool */}
+      <RequestIndexingCard isConfigured={isGoogleIndexingConfigured} />
 
       {/* Upcoming Bookings */}
       <div className="space-y-4">

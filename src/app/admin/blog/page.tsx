@@ -4,8 +4,33 @@ import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, ExternalLink, Zap, Edit3 } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
 
-export default function AdminBlogListPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function AdminBlogListPage() {
+  const dbPosts = await prisma.blogPost.findMany({
+    include: { category: true },
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  const mergedPosts = [
+    ...dbPosts.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      category: post.category?.name || 'Uncategorized',
+      primaryKeyword: post.primaryKeyword || 'N/A',
+      status: post.status,
+    })),
+    ...BLOG_POSTS_SEED.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      category: post.category,
+      primaryKeyword: post.primaryKeyword,
+      status: 'PUBLISHED',
+    }))
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E4E2DC]">
@@ -35,7 +60,7 @@ export default function AdminBlogListPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E4E2DC]">
-            {BLOG_POSTS_SEED.map((post) => (
+            {mergedPosts.map((post) => (
               <tr key={post.slug} className="hover:bg-[#F7F5F0]/50 transition-colors">
                 <td className="p-3.5 font-medium text-[#122C57] max-w-xs">
                   {post.title}
@@ -44,8 +69,8 @@ export default function AdminBlogListPage() {
                 <td className="p-3.5 text-[#0A1B3D]">{post.category}</td>
                 <td className="p-3.5 font-mono text-[#6B7280]">{post.primaryKeyword}</td>
                 <td className="p-3.5">
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-mono text-[10px] uppercase font-semibold">
-                    Published
+                  <span className={`px-2 py-0.5 font-mono text-[10px] uppercase font-semibold ${post.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {post.status}
                   </span>
                 </td>
                 <td className="p-3.5">

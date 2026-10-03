@@ -1,10 +1,9 @@
 'use server';
 
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { getAdminSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-
-const prisma = new PrismaClient();
 
 const BlogPostSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters').max(80, 'Title should be under 80 characters for optimal SEO'),
@@ -14,7 +13,7 @@ const BlogPostSchema = z.object({
   primaryKeyword: z.string().min(3, 'Primary target keyword is required for SEO/GEO indexing'),
   geoAnswer: z.string().min(30, 'GEO direct answer paragraph must be at least 30 characters for LLM citation'),
   readingTime: z.number().min(1, 'Reading time must be at least 1 minute'),
-  bodyContent: z.string().min(100, 'Article body content must be at least 100 characters'),
+  bodyContent: z.string().min(10, 'Article body content must be at least 10 characters'),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
 });
 
@@ -28,6 +27,11 @@ export async function saveBlogPostAction(
   prevState: BlogActionState,
   formData: FormData
 ): Promise<BlogActionState> {
+  const session = await getAdminSession();
+  if (!session) {
+    return { success: false, message: 'Unauthorized. Please log in.' };
+  }
+
   const status = String(formData.get('status') || 'DRAFT') as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   
   const rawData = {
@@ -55,10 +59,43 @@ export async function saveBlogPostAction(
   }
 
   try {
-    // Record in database or acknowledge
+    const postData = {
+      title: rawData.title,
+      slug: rawData.slug,
+      metaDescription: rawData.metaDescription,
+      canonicalUrl: `https://gravityforai.com/blog/${rawData.slug}`,
+      bodyContent: rawData.bodyContent,
+      status: rawData.status,
+      // Only update publishedAt if it's currently being published and wasn't before, or just keep setting it to now. 
+      // A better way is to leave it to DB default or just new Date().
+      publishedAt: rawData.status === 'PUBLISHED' ? new Date() : null,
+      primaryKeyword: rawData.primaryKeyword,
+      geoAnswer: rawData.geoAnswer,
+      readingTime: rawData.readingTime,
+      author: { connect: { id: session.id } },
+      category: rawData.category ? {
+        connectOrCreate: {
+          where: { name: rawData.category },
+          create: {
+            name: rawData.category,
+            slug: rawData.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          }
+        }
+      } : undefined,
+    };
+
+    await prisma.blogPost.upsert({
+      where: { slug: rawData.slug },
+      update: postData,
+      create: postData,
+    });
+
     revalidatePath('/blog');
     revalidatePath(`/blog/${rawData.slug}`);
     revalidatePath(`/amp/blog/${rawData.slug}`);
+    revalidatePath('/admin/blog');
+    // Also revalidate the homepage or other places where blog posts might be listed
+    revalidatePath('/');
 
     return {
       success: true,

@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createCampaignAction } from '@/actions/outreach-actions';
 import type { OutreachActionState } from '@/actions/outreach-actions';
-import { parseCSV } from '@/lib/csv-parser';
+import { parseProspectFile } from '@/lib/csv-parser';
 import type { ParsedProspect } from '@/lib/csv-parser';
 import { Card } from '@/components/ui/card';
 import {
   Upload, FileText, X, ChevronRight, Info, ArrowLeft,
-  CheckCircle2, AlertCircle, Tag,
+  AlertCircle, Tag, CheckCircle2, TableProperties,
 } from 'lucide-react';
 
 const initialState: OutreachActionState = {};
@@ -33,12 +33,20 @@ function SubmitBtn() {
 export function NewCampaignClient() {
   const router = useRouter();
   const [state, formAction] = useFormState(createCampaignAction, initialState);
-  const [csvData, setCsvData] = React.useState('');
-  const [preview, setPreview] = React.useState<ParsedProspect[]>([]);
+
+  // Parsed data
+  const [prospects, setProspects] = React.useState<ParsedProspect[]>([]);
   const [parseErrors, setParseErrors] = React.useState<string[]>([]);
-  const [isDragging, setIsDragging] = React.useState(false);
+  const [hasCustomSubject, setHasCustomSubject] = React.useState(false);
+  const [hasCustomBody, setHasCustomBody] = React.useState(false);
+
+  // UI state
   const [fileName, setFileName] = React.useState('');
+  const [fileType, setFileType] = React.useState<'csv' | 'excel' | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [parsing, setParsing] = React.useState(false);
   const [dailyLimit, setDailyLimit] = React.useState(100);
+
   const fileRef = React.useRef<HTMLInputElement>(null);
 
   // Redirect on success
@@ -48,21 +56,32 @@ export function NewCampaignClient() {
     }
   }, [state, router]);
 
-  const handleFile = (file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setParseErrors(['Please upload a .csv file.']);
+  const handleFile = async (file: File) => {
+    const name = file.name.toLowerCase();
+    const isExcel = name.endsWith('.xlsx') || name.endsWith('.xls');
+    const isCsv = name.endsWith('.csv') || name.endsWith('.txt') || name.endsWith('.tsv');
+    if (!isExcel && !isCsv) {
+      setParseErrors(['Unsupported file type. Please upload a .csv or .xlsx/.xls file.']);
       return;
     }
+
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = String(e.target?.result || '');
-      setCsvData(text);
-      const { prospects, errors } = parseCSV(text);
-      setPreview(prospects.slice(0, 5));
-      setParseErrors(errors.slice(0, 5));
-    };
-    reader.readAsText(file);
+    setFileType(isExcel ? 'excel' : 'csv');
+    setParsing(true);
+    setParseErrors([]);
+    setProspects([]);
+
+    try {
+      const result = await parseProspectFile(file);
+      setProspects(result.prospects);
+      setParseErrors(result.errors);
+      setHasCustomSubject(result.hasCustomSubject);
+      setHasCustomBody(result.hasCustomBody);
+    } catch (err) {
+      setParseErrors([`Failed to parse file: ${String(err)}`]);
+    } finally {
+      setParsing(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -71,6 +90,18 @@ export function NewCampaignClient() {
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   };
+
+  const clearFile = () => {
+    setFileName('');
+    setFileType(null);
+    setProspects([]);
+    setParseErrors([]);
+    setHasCustomSubject(false);
+    setHasCustomBody(false);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const preview = prospects.slice(0, 5);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -81,7 +112,7 @@ export function NewCampaignClient() {
         </Link>
         <div>
           <h1 className="font-serif text-3xl text-[#122C57]">New Outreach Campaign</h1>
-          <p className="text-xs text-[#6B7280]">Upload a CSV, compose your email, set daily limit.</p>
+          <p className="text-xs text-[#6B7280]">Upload CSV or Excel, compose your email, set daily limit.</p>
         </div>
       </div>
 
@@ -94,8 +125,8 @@ export function NewCampaignClient() {
       )}
 
       <form action={formAction} className="space-y-6">
-        {/* Hidden CSV field */}
-        <input type="hidden" name="csvData" value={csvData} />
+        {/* Hidden: pre-parsed prospects as JSON so server action doesn't need to re-parse */}
+        <input type="hidden" name="prospectsJson" value={JSON.stringify(prospects)} />
         <input type="hidden" name="dailyLimit" value={dailyLimit} />
 
         {/* Campaign Name */}
@@ -126,13 +157,17 @@ export function NewCampaignClient() {
             <span>10 (Safe)</span><span>100 (Recommended)</span><span>300 (Aggressive)</span>
           </div>
           <p className="text-[11px] text-[#9CA3AF] flex items-center gap-1">
-            <Info className="w-3 h-3" /> Keep at 50–150/day with Resend. Higher risk of spam folder above 200.
+            <Info className="w-3 h-3" /> Keep at 50–150/day with Resend for best inbox placement.
           </p>
         </div>
 
-        {/* CSV Upload */}
+        {/* File Upload */}
         <div className="space-y-3">
-          <label className="text-xs font-mono text-[#6B7280] uppercase">Prospects CSV *</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-mono text-[#6B7280] uppercase">Prospects File *</label>
+            <span className="text-[10px] font-mono text-[#9CA3AF]">CSV · Excel (.xlsx / .xls)</span>
+          </div>
+
           <div
             className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
               isDragging ? 'border-[#122C57] bg-[#122C57]/5' : 'border-[#E4E2DC] hover:border-[#122C57]'
@@ -145,19 +180,34 @@ export function NewCampaignClient() {
             <input
               ref={fileRef}
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls,.txt,.tsv"
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
             />
-            {fileName ? (
-              <div className="space-y-1">
+
+            {parsing ? (
+              <div className="space-y-2">
+                <div className="w-8 h-8 border-2 border-[#122C57] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-sm text-[#6B7280]">Parsing {fileType === 'excel' ? 'Excel' : 'CSV'} file…</p>
+              </div>
+            ) : fileName ? (
+              <div className="space-y-2">
                 <FileText className="w-8 h-8 text-[#C99A44] mx-auto" />
                 <p className="text-sm font-medium text-[#122C57]">{fileName}</p>
-                <p className="text-xs text-[#6B7280]">{preview.length > 0 ? `${preview.length}+ valid rows detected` : 'Parsing...'}</p>
+                <p className="text-xs text-[#6B7280]">
+                  {prospects.length} valid prospect{prospects.length !== 1 ? 's' : ''} detected
+                  {fileType === 'excel' && <span className="ml-1 text-emerald-600 font-medium">· Excel file</span>}
+                </p>
+                {(hasCustomSubject || hasCustomBody) && (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-mono rounded-full">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Per-row {hasCustomSubject && 'subject'}{hasCustomSubject && hasCustomBody && ' + '}{hasCustomBody && 'body'} detected
+                  </div>
+                )}
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); setCsvData(''); setFileName(''); setPreview([]); setParseErrors([]); }}
-                  className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-700 mt-2"
+                  onClick={(e) => { e.stopPropagation(); clearFile(); }}
+                  className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-700 mt-1"
                 >
                   <X className="w-3 h-3" /> Remove file
                 </button>
@@ -165,8 +215,12 @@ export function NewCampaignClient() {
             ) : (
               <div className="space-y-2">
                 <Upload className="w-8 h-8 text-[#6B7280] mx-auto" />
-                <p className="text-sm text-[#6B7280]">Drag & drop your CSV or <span className="text-[#122C57] font-semibold underline">browse</span></p>
-                <p className="text-[11px] font-mono text-[#9CA3AF]">Required columns: email · Optional: name, company</p>
+                <p className="text-sm text-[#6B7280]">
+                  Drag & drop or <span className="text-[#122C57] font-semibold underline">browse</span>
+                </p>
+                <p className="text-[11px] font-mono text-[#9CA3AF]">
+                  Accepts: <strong>.csv</strong> · <strong>.xlsx</strong> · <strong>.xls</strong>
+                </p>
               </div>
             )}
           </div>
@@ -174,43 +228,95 @@ export function NewCampaignClient() {
           {/* Parse errors */}
           {parseErrors.length > 0 && (
             <div className="space-y-1">
-              {parseErrors.map((e, i) => (
-                <p key={i} className="text-[11px] text-amber-600 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {e}</p>
+              {parseErrors.slice(0, 5).map((e, i) => (
+                <p key={i} className="text-[11px] text-amber-600 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" /> {e}
+                </p>
               ))}
+              {parseErrors.length > 5 && (
+                <p className="text-[11px] text-[#9CA3AF]">…and {parseErrors.length - 5} more warnings</p>
+              )}
             </div>
           )}
+
+          {/* Column format guide */}
+          <Card variant="outline" className="p-3 bg-[#F7F5F0]">
+            <div className="flex items-center gap-1.5 mb-2">
+              <TableProperties className="w-3.5 h-3.5 text-[#C99A44]" />
+              <p className="text-[11px] font-semibold text-[#122C57]">Supported Columns</p>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              {[
+                { col: 'email', desc: 'Required', required: true },
+                { col: 'name', desc: 'Optional (falls back to email prefix)', required: false },
+                { col: 'company', desc: 'Optional', required: false },
+                { col: 'subject', desc: 'Optional — overrides campaign subject per row', required: false },
+                { col: 'body', desc: 'Optional — overrides campaign body per row', required: false },
+              ].map(({ col, desc, required }) => (
+                <div key={col} className="flex items-start gap-1.5">
+                  <code className={`text-[10px] px-1 py-0.5 rounded font-mono ${required ? 'bg-[#122C57] text-white' : 'bg-white border border-[#E4E2DC] text-[#122C57]'}`}>
+                    {col}
+                  </code>
+                  <span className="text-[10px] text-[#6B7280]">{desc}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
 
           {/* Preview table */}
           {preview.length > 0 && (
             <div className="border border-[#E4E2DC] overflow-hidden">
-              <div className="bg-[#F7F5F0] px-3 py-1.5 text-[10px] font-mono text-[#6B7280] uppercase">
-                Preview (first 5 rows)
+              <div className="bg-[#F7F5F0] px-3 py-1.5 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-[#6B7280] uppercase">
+                  Preview — first {preview.length} of {prospects.length} rows
+                </span>
+                {fileType === 'excel' && (
+                  <span className="text-[10px] font-mono text-emerald-600">📊 Excel</span>
+                )}
               </div>
-              <table className="w-full text-xs">
-                <thead className="bg-[#F7F5F0] border-b border-[#E4E2DC]">
-                  <tr>
-                    <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Name</th>
-                    <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Email</th>
-                    <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Company</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.map((p, i) => (
-                    <tr key={i} className="border-b border-[#F3F4F6] last:border-0">
-                      <td className="px-3 py-2 text-[#122C57]">{p.name}</td>
-                      <td className="px-3 py-2 text-[#6B7280]">{p.email}</td>
-                      <td className="px-3 py-2 text-[#6B7280]">{p.company || '—'}</td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs min-w-[400px]">
+                  <thead className="bg-[#F7F5F0] border-b border-[#E4E2DC]">
+                    <tr>
+                      <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Name</th>
+                      <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Email</th>
+                      <th className="text-left px-3 py-2 font-mono text-[#6B7280]">Company</th>
+                      {hasCustomSubject && <th className="text-left px-3 py-2 font-mono text-emerald-600">Subject ✓</th>}
+                      {hasCustomBody && <th className="text-left px-3 py-2 font-mono text-emerald-600">Body ✓</th>}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {preview.map((p, i) => (
+                      <tr key={i} className="border-b border-[#F3F4F6] last:border-0">
+                        <td className="px-3 py-2 text-[#122C57]">{p.name}</td>
+                        <td className="px-3 py-2 text-[#6B7280]">{p.email}</td>
+                        <td className="px-3 py-2 text-[#6B7280]">{p.company || '—'}</td>
+                        {hasCustomSubject && (
+                          <td className="px-3 py-2 text-emerald-700 max-w-[120px] truncate">
+                            {p.customSubject || <span className="text-[#9CA3AF]">using default</span>}
+                          </td>
+                        )}
+                        {hasCustomBody && (
+                          <td className="px-3 py-2 text-emerald-700 max-w-[120px] truncate">
+                            {p.customBody ? `${p.customBody.slice(0, 40)}…` : <span className="text-[#9CA3AF]">using default</span>}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Email Subject */}
+        {/* Email Subject — shown as default, skipped per-row if column present */}
         <div className="space-y-2">
-          <label className="text-xs font-mono text-[#6B7280] uppercase">Email Subject *</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-mono text-[#6B7280] uppercase">
+              Default Subject Line {hasCustomSubject && <span className="text-emerald-600">(per-row overrides active)</span>}
+            </label>
+          </div>
           <input
             name="subject"
             required
@@ -218,7 +324,6 @@ export function NewCampaignClient() {
             className="w-full px-3 py-2.5 border border-[#E4E2DC] text-sm text-[#0A1B3D] focus:outline-none focus:border-[#122C57] bg-[#F7F5F0]"
           />
           {state.errors?.subject && <p className="text-[11px] text-red-500">{state.errors.subject[0]}</p>}
-          {/* Token chips */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] text-[#9CA3AF] font-mono">Tokens:</span>
             {['{{name}}', '{{firstname}}', '{{company}}', '{{email}}'].map((t) => (
@@ -231,23 +336,25 @@ export function NewCampaignClient() {
 
         {/* Email Body */}
         <div className="space-y-2">
-          <label className="text-xs font-mono text-[#6B7280] uppercase">Email Body (HTML supported) *</label>
+          <label className="text-xs font-mono text-[#6B7280] uppercase">
+            Default Email Body {hasCustomBody && <span className="text-emerald-600">(per-row overrides active)</span>}
+          </label>
           <textarea
             name="body"
             required
             rows={10}
-            placeholder={`Hi {{name}},\n\nI came across {{company}} and wanted to share how Gravity For AI has helped similar businesses automate their operations...\n\n[Your message here]\n\nBest regards,\nHarsimran Singh\nFounder, Gravity For AI\ncontact@gravityforai.com`}
+            placeholder={`Hi {{name}},\n\nI came across {{company}} and wanted to reach out...\n\n[Your message]\n\nBest,\nHarsimran Singh\nFounder, Gravity For AI`}
             className="w-full px-3 py-2.5 border border-[#E4E2DC] text-sm text-[#0A1B3D] focus:outline-none focus:border-[#122C57] bg-[#F7F5F0] font-mono leading-relaxed resize-y"
           />
           {state.errors?.body && <p className="text-[11px] text-red-500">{state.errors.body[0]}</p>}
-          <Card variant="outline" className="p-3 bg-[#F7F5F0] space-y-1">
-            <p className="text-[11px] font-semibold text-[#122C57]">💡 Anti-Spam Tips</p>
+          <Card variant="outline" className="p-3 bg-[#F7F5F0]">
+            <p className="text-[11px] font-semibold text-[#122C57] mb-1">💡 Anti-Spam Tips</p>
             <ul className="text-[11px] text-[#6B7280] space-y-0.5 list-disc list-inside">
-              <li>Personalise with <code className="font-mono bg-white px-1">{'{{name}}'}</code> and <code className="font-mono bg-white px-1">{'{{company}}'}</code> — generic blasts get flagged</li>
-              <li>Keep subject line under 60 characters</li>
+              <li>Personalise with <code className="bg-white px-1 font-mono">{'{{name}}'}</code> — generic blasts get flagged</li>
+              <li>Keep subject under 60 characters and avoid CAPS</li>
               <li>Avoid spam words: FREE, URGENT, GUARANTEED, CLICK HERE</li>
-              <li>Include a plain-text reason why you're emailing them</li>
               <li>Each email is sent with a 45–120s random delay (set on send page)</li>
+              <li>Add a <strong>subject</strong> or <strong>body</strong> column in Excel/CSV for fully custom per-row emails</li>
             </ul>
           </Card>
         </div>

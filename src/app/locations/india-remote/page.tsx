@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     title: 'AI Voice Agents & Automation - India Remote Delivery',
     description: 'Done-for-you AI systems delivered remotely to businesses across India - Gandhinagar, Surat, Jaipur, Kolkata, and beyond.',
   },
+  other: {
+    'geo.region': 'IN',
+    'geo.placename': 'India',
+  },
 };
 
 const cities = [

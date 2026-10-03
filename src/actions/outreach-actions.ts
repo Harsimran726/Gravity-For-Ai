@@ -41,13 +41,16 @@ export async function createCampaignAction(
     return { success: false, errors: validated.error.flatten().fieldErrors, message: 'Please fix the errors below.' };
   }
 
-  const csvText = String(formData.get('csvData') || '');
-  if (!csvText.trim()) return { success: false, message: 'Please upload a CSV file with prospects.' };
-
-  const { prospects, errors } = parseCSV(csvText);
-  if (prospects.length === 0) {
-    return { success: false, message: `No valid prospects found. ${errors.join(' ')}` };
+  // Client sends pre-parsed prospects as JSON (handles both CSV and Excel)
+  const prospectsJson = String(formData.get('prospectsJson') || '[]');
+  let prospects: Array<{ name: string; email: string; company?: string; customSubject?: string; customBody?: string }> = [];
+  try {
+    prospects = JSON.parse(prospectsJson);
+  } catch {
+    return { success: false, message: 'Failed to parse prospect data. Please re-upload your file.' };
   }
+
+  if (!prospects.length) return { success: false, message: 'Please upload a CSV or Excel file with at least one valid prospect.' };
 
   try {
     const campaign = await prisma.outreachCampaign.create({
@@ -58,7 +61,9 @@ export async function createCampaignAction(
           create: prospects.map((p) => ({
             name: p.name,
             email: p.email,
-            company: p.company,
+            company: p.company ?? undefined,
+            customSubject: p.customSubject ?? undefined,
+            customBody: p.customBody ?? undefined,
             status: 'PENDING',
           })),
         },
@@ -68,7 +73,7 @@ export async function createCampaignAction(
     revalidatePath('/admin/outreach');
     return {
       success: true,
-      message: `Campaign created with ${prospects.length} prospects.${errors.length > 0 ? ` (${errors.length} rows skipped)` : ''}`,
+      message: `Campaign created with ${prospects.length} prospects.`,
       campaignId: campaign.id,
     };
   } catch (err) {

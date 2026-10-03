@@ -220,16 +220,18 @@ model OutreachCampaign {
 }
 
 model OutreachProspect {
-  id         String           @id @default(cuid())
-  campaignId String
-  campaign   OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  name       String
-  email      String
-  company    String?
-  status     String           @default("PENDING") // PENDING | SELECTED | SENT | FAILED | SKIPPED
-  sentAt     DateTime?
-  error      String?
-  createdAt  DateTime         @default(now())
+  id            String           @id @default(cuid())
+  campaignId    String
+  campaign      OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name          String
+  email         String
+  company       String?
+  customSubject String?          // Per-row subject override (overrides campaign subject)
+  customBody    String?          @db.Text // Per-row body override (overrides campaign body)
+  status        String           @default("PENDING") // PENDING | SELECTED | SENT | FAILED | SKIPPED
+  sentAt        DateTime?
+  error         String?
+  createdAt     DateTime         @default(now())
 
   @@index([campaignId, status])
   @@index([campaignId])

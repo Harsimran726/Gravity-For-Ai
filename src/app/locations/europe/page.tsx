@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     title: 'AI Voice Agents & Automation - Europe Remote Delivery',
     description: 'Done-for-you AI phone agents and web platforms for European businesses - Germany and beyond, delivered remotely.',
   },
+  other: {
+    'geo.region': 'DE',
+    'geo.placename': 'Germany',
+  },
 };
 
 const cities = [

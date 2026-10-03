@@ -102,7 +102,7 @@ export default function RootLayout({
 }>) {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
+    '@type': ['LocalBusiness', 'ProfessionalService'],
     name: 'Gravity For AI',
     legalName: 'Gravity For AI',
     alternateName: ['Gravity For AI Mansa', 'Gravity For AI Punjab', 'Gravity For AI India'],
@@ -112,6 +112,27 @@ export default function RootLayout({
       'Gravity For AI designs, builds, and manages AI voice agents, agentic automation, and websites for local businesses.',
     url: 'https://gravityforai.com',
     email: 'contact@gravityforai.com',
+    hasMap: 'https://maps.google.com/?q=Mansa,Punjab,India',
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 29.9975,
+      longitude: 75.3983,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+        ],
+        opens: '09:00',
+        closes: '18:00',
+      },
+    ],
     founder: {
       '@type': 'Person',
       name: 'Harsimran Singh',

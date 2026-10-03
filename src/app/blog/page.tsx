@@ -24,7 +24,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogListingPage() {
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+
+export default async function BlogListingPage() {
+  const dbPosts = await prisma.blogPost.findMany({
+    where: { status: 'PUBLISHED' },
+    include: { author: true, category: true },
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  const mergedPosts = [
+    ...dbPosts.map(post => ({
+      slug: post.slug,
+      title: post.title,
+      metaDescription: post.metaDescription,
+      canonicalUrl: post.canonicalUrl || `https://gravityforai.com/blog/${post.slug}`,
+      publishedAt: post.publishedAt?.toISOString() || new Date().toISOString(),
+      category: post.category?.name || 'General',
+      readingTime: post.readingTime || 5,
+      author: {
+        name: post.author?.name || 'Gravity Team',
+      },
+    })),
+    ...BLOG_POSTS_SEED
+  ];
+
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -43,7 +69,7 @@ export default function BlogListingPage() {
         addressCountry: 'IN',
       },
     },
-    hasPart: BLOG_POSTS_SEED.map((post) => ({
+    hasPart: mergedPosts.map((post) => ({
       '@type': 'Article',
       headline: post.title,
       url: post.canonicalUrl,
@@ -75,7 +101,7 @@ export default function BlogListingPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
-            {BLOG_POSTS_SEED.map((post) => {
+            {mergedPosts.map((post) => {
               const visualType = post.category.includes('Voice')
                 ? 'voice'
                 : post.category.includes('Agentic')
