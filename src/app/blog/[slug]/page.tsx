@@ -209,7 +209,23 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {/* Article Intro */}
             <div className="prose prose-lg max-w-none text-[#0A1B3D]/90 space-y-6 leading-relaxed">
               {isDbPost ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.bodyContent}</ReactMarkdown>
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({node, ...props}) => <h1 className="font-serif text-3xl sm:text-4xl text-[#122C57] font-normal leading-snug mt-12 mb-6" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="font-serif text-2xl sm:text-3xl text-[#122C57] font-normal leading-snug mt-10 mb-4" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="font-serif text-xl sm:text-2xl text-[#122C57] font-medium leading-snug mt-8 mb-4" {...props} />,
+                    p: ({node, ...props}) => <p className="leading-relaxed mb-6" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 mt-4 mb-6 text-[#0A1B3D]/80" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-2 mt-4 mb-6 text-[#0A1B3D]/80" {...props} />,
+                    li: ({node, ...props}) => <li className="pl-2" {...props} />,
+                    a: ({node, ...props}) => <a className="text-[#C99A44] hover:underline font-medium" {...props} />,
+                    strong: ({node, ...props}) => <strong className="font-semibold text-[#0A1B3D]" {...props} />,
+                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-[#C99A44] pl-4 italic my-6 text-[#122C57]/80" {...props} />,
+                  }}
+                >
+                  {post.bodyContent}
+                </ReactMarkdown>
               ) : (
                 <>
                   <p className="text-base sm:text-lg leading-relaxed">{post.content.intro}</p>

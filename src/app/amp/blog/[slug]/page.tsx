@@ -145,7 +145,23 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
         </div>
 
         {isDbPost ? (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.bodyContent}</ReactMarkdown>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({node, ...props}) => <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', color: '#122C57', marginTop: '32px', marginBottom: '16px', fontWeight: 'normal' }} {...props} />,
+              h2: ({node, ...props}) => <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#122C57', marginTop: '32px', marginBottom: '16px', fontWeight: 'normal' }} {...props} />,
+              h3: ({node, ...props}) => <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '20px', color: '#122C57', marginTop: '24px', marginBottom: '12px', fontWeight: 'normal' }} {...props} />,
+              p: ({node, ...props}) => <p style={{ lineHeight: '1.6', marginBottom: '16px', color: '#333' }} {...props} />,
+              ul: ({node, ...props}) => <ul style={{ paddingLeft: '20px', marginBottom: '16px', lineHeight: '1.6', color: '#333' }} {...props} />,
+              ol: ({node, ...props}) => <ol style={{ paddingLeft: '20px', marginBottom: '16px', lineHeight: '1.6', color: '#333' }} {...props} />,
+              li: ({node, ...props}) => <li style={{ marginBottom: '8px' }} {...props} />,
+              a: ({node, ...props}) => <a style={{ color: '#C99A44', textDecoration: 'underline' }} {...props} />,
+              strong: ({node, ...props}) => <strong style={{ fontWeight: 'bold', color: '#0A1B3D' }} {...props} />,
+              blockquote: ({node, ...props}) => <blockquote style={{ borderLeft: '4px solid #C99A44', paddingLeft: '16px', fontStyle: 'italic', margin: '24px 0', color: '#555' }} {...props} />,
+            }}
+          >
+            {post.bodyContent}
+          </ReactMarkdown>
         ) : (
           <>
             <p>{post.content.intro}</p>
