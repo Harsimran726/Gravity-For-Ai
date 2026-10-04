@@ -22,7 +22,8 @@ export async function verifyPassword(plainText: string, hash: string): Promise<b
 
 function getSessionSecret(): string {
   const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret || secret.length < 32) throw new Error('Configure NEXTAUTH_SECRET with at least 32 characters.');
+  // Preserve existing configured keys byte-for-byte; key rotation is a separate operation.
+  if (!secret || !secret.trim()) throw new Error('Configure NEXTAUTH_SECRET.');
   return secret;
 }
 

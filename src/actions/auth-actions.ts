@@ -25,6 +25,15 @@ export async function loginAdminAction(
   prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
+  // Configuration failure must not become an unhandled server-action exception.
+  if (!process.env.NEXTAUTH_SECRET || !process.env.NEXTAUTH_SECRET.trim()) {
+    console.error('[AUTH_CONFIG] NEXTAUTH_SECRET must be configured.');
+    return {
+      success: false,
+      message: 'Sign-in is temporarily unavailable because server authentication is not configured. Please contact the site administrator.',
+    };
+  }
+
   const rawEmail = String(formData.get('email') || '').trim();
   const rawPassword = String(formData.get('password') || '').trim();
 
