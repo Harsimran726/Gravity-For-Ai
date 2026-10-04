@@ -3,7 +3,8 @@ import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 import { CASE_STUDIES } from '@/data/case-studies-data';
 import { CITIES_DATA } from '@/data/city-data';
 import { SERVICES_DATA } from '@/data/services-data';
-import { prisma } from '@/lib/prisma';
+// Refresh database-backed entries without requiring a database at build time.
+export const revalidate = 300;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://gravityforai.com';
@@ -161,6 +162,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
+    // Include client initialization in the fallback boundary, not module scope.
+    const { prisma } = await import('@/lib/prisma');
     const dbPosts = await prisma.blogPost.findMany({
       where: { status: 'PUBLISHED' },
       select: { slug: true, publishedAt: true, updatedAt: true },
@@ -173,8 +176,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(lastModified),
       });
     }
-  } catch (error) {
-    console.error('Failed to query published posts for sitemap, falling back to seed posts:', error);
+  } catch {
+    console.warn('Sitemap: database unavailable; using published seed posts. Check the server database configuration.');
   }
 
   const allPosts = Array.from(postMap.values());

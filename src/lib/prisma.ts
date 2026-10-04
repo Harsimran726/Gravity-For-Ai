@@ -13,11 +13,9 @@ const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || pro
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: {
-      db: {
-        url: dbUrl,
-      },
-    },
+    // Omit the override when unset. Prisma rejects an explicit undefined URL
+    // during import, before callers can handle a missing database gracefully.
+    ...(dbUrl ? { datasources: { db: { url: dbUrl } } } : {}),
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
 
