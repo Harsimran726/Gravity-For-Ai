@@ -52,8 +52,10 @@ export async function markOutreachResponseAction(id:string,status:'REPLIED'|'UNS
  const p=await prisma.outreachProspect.findUniqueOrThrow({where:{id}});await stopAddress(p.email,status,'Recorded by administrator');refresh();return {success:true};
 }
 export async function syncOutreachAction():Promise<OutreachActionState>{await admin();try{const n=await syncOutreachInbox();refresh();return {success:true,message:`Inbox checked; ${n} new responding contacts stopped.`};}catch(e){return {success:false,message:e instanceof Error?e.message:'Inbox check failed'};}}
-export async function getOutreachAnalytics(){
- await admin();const now=new Date(),start=istDayStart(now);
+export async function getOutreachAnalytics(session?:Awaited<ReturnType<typeof getAdminSession>>){
+ const s=session||await getAdminSession();
+ if(!s) throw new Error('Unauthorized');
+ const now=new Date(),start=istDayStart(now);
  const data=await prisma.outreachCampaign.findMany({include:{prospects:{include:{messages:true}},messages:true},orderBy:{createdAt:'desc'}});
  const campaigns=data.map(c=>{
  const accepted=c.messages.filter(m=>m.status==='ACCEPTED');

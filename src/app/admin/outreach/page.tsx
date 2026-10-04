@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import {redirect} from 'next/navigation';
+import {getAdminSession} from '@/lib/auth';
 import {getOutreachAnalytics} from '@/actions/outreach-actions';
 export const dynamic='force-dynamic';
 export default async function OutreachDashboardPage(){
- const a=await getOutreachAnalytics();
+ const session=await getAdminSession();
+ if(!session) redirect('/admin/login');
+ const isAdmin=session.role==='ADMIN';
+ const a=await getOutreachAnalytics(session);
  const cards=[['Sent today · IST',a.sentToday],['Sent before today',a.previousSent],['Total sent',a.totalSent],['First follow-up due',a.followup1],['Second follow-up due',a.followup2],['Responding contacts',a.replies],['Needs dispatch review',a.totalFailed],['Delivery tests sent',a.testSent]];
  return <div className="space-y-6 text-[#122C57]">
   <div className="flex justify-between items-center"><div><h1 className="font-serif text-3xl">Email campaigns</h1><p className="text-sm text-slate-500 mt-2">Hostinger · contact@gravityforai.com · campaign totals exclude delivery tests</p></div><Link href="/admin/outreach/new" className="bg-[#122C57] text-white px-4 py-3">New campaign</Link></div>
