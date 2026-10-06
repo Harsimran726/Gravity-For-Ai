@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createCampaignAction } from '@/actions/outreach-actions';
 import type { OutreachActionState } from '@/actions/outreach-actions';
-import { parseProspectFile } from '@/lib/csv-parser';
-import type { ParsedProspect } from '@/lib/csv-parser';
+import { readProspectFile, suggestColumnMapping, mapProspectTable } from '@/lib/csv-parser';
+import type { ProspectTable, ColumnMapping, ImportField } from '@/lib/csv-parser';
 import { Card } from '@/components/ui/card';
 import {
   Upload, FileText, X, ChevronRight, Info, ArrowLeft,
@@ -16,12 +16,12 @@ import {
 
 const initialState: OutreachActionState = {};
 
-function SubmitBtn() {
+function SubmitBtn({disabled}: {disabled:boolean}) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="inline-flex items-center gap-2 bg-[#122C57] text-white text-xs font-semibold px-6 py-3 hover:bg-[#0A1B3D] disabled:opacity-60 transition-colors"
     >
       <ChevronRight className="w-4 h-4" />
@@ -34,11 +34,15 @@ export function NewCampaignClient() {
   const router = useRouter();
   const [state, formAction] = useFormState(createCampaignAction, initialState);
 
-  // Parsed data
-  const [prospects, setProspects] = React.useState<ParsedProspect[]>([]);
-  const [parseErrors, setParseErrors] = React.useState<string[]>([]);
-  const [hasCustomSubject, setHasCustomSubject] = React.useState(false);
-  const [hasCustomBody, setHasCustomBody] = React.useState(false);
+  const [table,setTable]=React.useState<ProspectTable|null>(null);
+  const [mapping,setMapping]=React.useState<ColumnMapping>(suggestColumnMapping([]));
+  const [fileError,setFileError]=React.useState<string[]>([]);
+  const parsed=React.useMemo(()=>table?mapProspectTable(table,mapping):null,[table,mapping]);
+  const prospects=parsed?.prospects||[];
+  const parseErrors=[...fileError,...(parsed?.errors||[])];
+  const hasCustomSubject=parsed?.hasCustomSubject||false;
+  const hasCustomBody=parsed?.hasCustomBody||false;
+  const uploadVersion=React.useRef(0);
 
   // UI state
   const [fileName, setFileName] = React.useState('');
@@ -57,30 +61,33 @@ export function NewCampaignClient() {
   }, [state, router]);
 
   const handleFile = async (file: File) => {
+    const version=++uploadVersion.current;
+    setTable(null);
+    setMapping(suggestColumnMapping([]));
+    setFileError([]);
     const name = file.name.toLowerCase();
     const isExcel = name.endsWith('.xlsx') || name.endsWith('.xls');
     const isCsv = name.endsWith('.csv') || name.endsWith('.txt') || name.endsWith('.tsv');
     if (!isExcel && !isCsv) {
-      setParseErrors(['Unsupported file type. Please upload a .csv or .xlsx/.xls file.']);
+      setFileError(['Unsupported file type. Please upload a .csv or .xlsx/.xls file.']);
+      setFileName(''); setFileType(null); setParsing(false);
       return;
     }
 
     setFileName(file.name);
     setFileType(isExcel ? 'excel' : 'csv');
     setParsing(true);
-    setParseErrors([]);
-    setProspects([]);
+    setFileError([]);
 
     try {
-      const result = await parseProspectFile(file);
-      setProspects(result.prospects);
-      setParseErrors(result.errors);
-      setHasCustomSubject(result.hasCustomSubject);
-      setHasCustomBody(result.hasCustomBody);
+      const result = await readProspectFile(file);
+      if(version!==uploadVersion.current)return;
+      setTable(result);
+      setMapping(suggestColumnMapping(result.headers));
     } catch (err) {
-      setParseErrors([`Failed to parse file: ${String(err)}`]);
+      if(version===uploadVersion.current)setFileError([`Failed to parse file: ${String(err)}`]);
     } finally {
-      setParsing(false);
+      if(version===uploadVersion.current)setParsing(false);
     }
   };
 
@@ -94,10 +101,8 @@ export function NewCampaignClient() {
   const clearFile = () => {
     setFileName('');
     setFileType(null);
-    setProspects([]);
-    setParseErrors([]);
-    setHasCustomSubject(false);
-    setHasCustomBody(false);
+    ++uploadVersion.current;
+    setTable(null); setMapping(suggestColumnMapping([])); setFileError([]); setParsing(false);
     if (fileRef.current) fileRef.current.value = '';
   };
 
@@ -225,6 +230,24 @@ export function NewCampaignClient() {
             )}
           </div>
 
+          {table && table.headers.length>0 && (
+            <fieldset className="border border-[#E4E2DC] p-4 space-y-3">
+              <legend className="px-1 font-semibold text-sm text-[#122C57]">Match your file columns</legend>
+              <p className="text-xs text-[#6B7280]">Choose the file column for each field. Email is required; the others are optional. Excel uses the first worksheet. Check the preview below before saving.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {([['email','Email *'],['name','Name'],['company','Company'],['subject','Subject'],['body','Body / message']] as [ImportField,string][]).map(([field,label])=>(
+                  <label key={field} className="text-xs text-[#122C57]">{label}
+                    <select aria-label={label+' column'} value={mapping[field]} onChange={event=>setMapping(current=>({...current,[field]:Number(event.target.value)}))} className="block w-full border border-[#E4E2DC] bg-white p-2 mt-1">
+                      <option value={-1}>{field==='email'?'Select email column':field==='subject'||field==='body'?'Use campaign default':'Do not import'}</option>
+                      {table.headers.map((header,index)=><option key={index} value={index}>{index+1}. {header||'(unnamed column)'}</option>)}
+                    </select>
+                    {mapping[field]>=0 && <span className="block mt-1 text-[#6B7280] break-words">Sample: {(table.rows.find(row=>row[mapping[field]]?.trim())?.[mapping[field]]||'(empty)').slice(0,120)}</span>}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-[#6B7280]">A mapped subject or message overrides the first email for that recipient. Empty cells use the defaults below. Follow-ups use the campaign follow-up messages.</p>
+            </fieldset>
+          )}
           {/* Parse errors */}
           {parseErrors.length > 0 && (
             <div className="space-y-1">
@@ -248,7 +271,7 @@ export function NewCampaignClient() {
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               {[
                 { col: 'email', desc: 'Required', required: true },
-                { col: 'name', desc: 'Optional (falls back to email prefix)', required: false },
+                { col: 'name', desc: 'Optional (uses “there” when empty)', required: false },
                 { col: 'company', desc: 'Optional', required: false },
                 { col: 'subject', desc: 'Optional — overrides campaign subject per row', required: false },
                 { col: 'body', desc: 'Optional — overrides campaign body per row', required: false },
@@ -373,7 +396,7 @@ export function NewCampaignClient() {
 
         {/* Submit */}
         <div className="flex items-center gap-4 pt-2">
-          <SubmitBtn />
+          <SubmitBtn disabled={parsing || prospects.length===0} />
           <Link href="/admin/outreach" className="text-xs text-[#6B7280] hover:text-[#122C57] transition-colors">
             Cancel
           </Link>

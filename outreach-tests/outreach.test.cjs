@@ -104,3 +104,35 @@ test('mailbox cap applies across campaigns',async()=>{
 test('disabled sending fails before inbox or SMTP access',async()=>{
  const h=harness();h.env.OUTREACH_SENDING_ENABLED='false';await assert.rejects(h.engine.runOutreachTick());assert.equal(h.calls(),0);assert.equal(h.syncs(),0);
 });
+
+test('manual mapping supports arbitrary and duplicate header names by position',()=>{
+ const table=parser.readCSVTable('Contact,Contact,Pitch,Copy\nAnne,a@example.com,Hello,"Line one\nLine two"');
+ const r=parser.mapProspectTable(table,{email:1,name:0,company:-1,subject:2,body:3});
+ assert.equal(r.prospects[0].name,'Anne');assert.equal(r.prospects[0].email,'a@example.com');
+ assert.equal(r.prospects[0].customSubject,'Hello');assert.equal(r.prospects[0].customBody,'Line one\nLine two');
+});
+test('remapping recalculates recipients instead of retaining old parsed rows',()=>{
+ const table=parser.readCSVTable('Primary,Secondary\na@example.com,b@example.com');
+ const mapping={email:0,name:-1,company:-1,subject:-1,body:-1};
+ assert.equal(parser.mapProspectTable(table,mapping).prospects[0].email,'a@example.com');
+ assert.equal(parser.mapProspectTable(table,{...mapping,email:1}).prospects[0].email,'b@example.com');
+});
+test('mapping requires email and rejects reused or out of bounds columns',()=>{
+ const table=parser.readCSVTable('Who,Address\nAnne,a@example.com'),mapping={email:1,name:0,company:-1,subject:-1,body:-1};
+ for(const change of [{email:-1},{email:9},{subject:1}])assert.equal(parser.mapProspectTable(table,{...mapping,...change}).prospects.length,0);
+});
+test('empty custom values fall back and ignored columns are not imported',()=>{
+ const table=parser.readCSVTable('email,subject,message\na@example.com,,\nb@example.com,Custom,Personalized');
+ const mapping=parser.suggestColumnMapping(table.headers),r=parser.mapProspectTable(table,mapping);
+ assert.equal(r.prospects[0].customSubject,undefined);assert.equal(r.prospects[0].customBody,undefined);
+ assert.equal(r.prospects[1].customBody,'Personalized');
+ assert.equal(parser.mapProspectTable(table,{...mapping,body:-1}).prospects[1].customBody,undefined);
+});
+test('Excel supports manual mapping and keeps personalized messages',async()=>{
+ const XLSX=require('xlsx'),book=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(book,XLSX.utils.aoa_to_sheet([['Person','Destination','Pitch','Copy'],['Anne','a@example.com','Hello','Personalized message']]),'Prospects');
+ const bytes=XLSX.write(book,{type:'buffer',bookType:'xlsx'});
+ const table=await parser.readExcelTable(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));
+ const r=parser.mapProspectTable(table,{name:0,email:1,subject:2,body:3,company:-1});
+ assert.equal(r.prospects[0].customBody,'Personalized message');
+});
