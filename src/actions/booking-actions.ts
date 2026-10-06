@@ -1,6 +1,8 @@
 'use server';
 
 import { z } from 'zod';
+import {callbackRecord,safelyDispatchCallback} from '@/lib/ai-callbacks';
+import {normalizeCallbackPhone} from '@/lib/ai-callback-policy';
 import { prisma } from '@/lib/prisma';
 import { sendBookingEmails } from '@/lib/mail';
 import { revalidatePath } from 'next/cache';
@@ -37,6 +39,7 @@ export async function createBookingAction(
   prevState: BookingState,
   formData: FormData
 ): Promise<BookingState> {
+  const callbackConsent=formData.get('callbackConsent')==='yes';
   const rawData = {
     name: String(formData.get('name') || ''),
     email: String(formData.get('email') || ''),
@@ -67,6 +70,8 @@ export async function createBookingAction(
       message: 'Please review and complete the highlighted fields.',
     };
   }
+
+  if(callbackConsent&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number.']}};
 
   const {
     name, email, phone, businessName,
@@ -99,6 +104,7 @@ export async function createBookingAction(
         serviceInterest: `[BOOKING] ${serviceInterest} - ${meetingDate} at ${timeSlot} ${timezone}`,
         message: notes,
         status: 'NEW',
+        callback:{create:callbackRecord('BOOKING',rawData.phone,callbackConsent)},
       },
     });
     leadId = lead.id;
@@ -114,6 +120,10 @@ export async function createBookingAction(
         'We were unable to save your booking at this time. Please try again or contact us directly at contact@gravityforai.com.',
     };
   }
+
+  // Await the bounded dispatch; never fire and forget in a serverless function.
+  if(leadId)await safelyDispatchCallback(leadId);
+  revalidatePath('/admin/callbacks');
 
   // 5. Send confirmation emails AFTER database write
   try {

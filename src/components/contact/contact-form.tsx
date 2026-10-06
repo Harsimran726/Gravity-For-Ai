@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import {CallbackConsent} from '@/components/contact/callback-consent';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitLeadAction, type FormState } from '@/actions/lead-actions';
 import { trackMetaLead } from '@/lib/meta-pixel';
@@ -196,6 +197,7 @@ export function ContactForm({ initialService = 'AI Audit' }: { initialService?: 
         )}
       </div>
 
+      <CallbackConsent />
       {/* Submit Button */}
       <div className="pt-2">
         <SubmitButton />

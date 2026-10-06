@@ -1,6 +1,8 @@
 'use server';
 
 import { z } from 'zod';
+import {callbackRecord,safelyDispatchCallback} from '@/lib/ai-callbacks';
+import {normalizeCallbackPhone} from '@/lib/ai-callback-policy';
 import { prisma } from '@/lib/prisma';
 import { sendContactInquiryEmail } from '@/lib/mail';
 import { revalidatePath } from 'next/cache';
@@ -26,6 +28,7 @@ export async function submitLeadAction(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const callbackConsent=formData.get('callbackConsent')==='yes';
   const rawData = {
     name: String(formData.get('name') || ''),
     email: String(formData.get('email') || ''),
@@ -54,6 +57,8 @@ export async function submitLeadAction(
     };
   }
 
+  if(callbackConsent&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number, for example +91 98765 43210.']}};
+
   // 3. Persist to PostgreSQL FIRST
   let createdLeadId: string | null = null;
   try {
@@ -66,6 +71,7 @@ export async function submitLeadAction(
         serviceInterest: validated.data.serviceInterest,
         message: validated.data.message,
         status: 'NEW',
+        callback:{create:callbackRecord('CONTACT',rawData.phone,callbackConsent)},
       },
     });
     createdLeadId = createdLead.id;
@@ -79,6 +85,10 @@ export async function submitLeadAction(
       message: 'We were unable to save your inquiry at this time. Please email us directly at contact@gravityforai.com.',
     };
   }
+
+  // Await the bounded dispatch; never fire and forget in a serverless function.
+  if(createdLeadId)await safelyDispatchCallback(createdLeadId);
+  revalidatePath('/admin/callbacks');
 
   // 4. Send email notification AFTER DB save
   try {

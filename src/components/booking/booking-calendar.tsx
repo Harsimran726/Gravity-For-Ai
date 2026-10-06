@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import {CallbackConsent} from '@/components/contact/callback-consent';
 import { useFormState, useFormStatus } from 'react-dom';
 import { createBookingAction, type BookingState } from '@/actions/booking-actions';
 import { trackMetaLead } from '@/lib/meta-pixel';
@@ -511,6 +512,7 @@ export function BookingCalendar({
           </div>
         </div>
 
+      <CallbackConsent />
         <BookingSubmitButton />
       </form>
     </Card>

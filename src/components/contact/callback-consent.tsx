@@ -1,0 +1,2 @@
+import {CALLBACK_CONSENT} from '@/lib/callback-consent-copy';
+export function CallbackConsent(){return <div className="space-y-2 text-sm text-[#122C57]"><label className="flex items-start gap-3"><input type="checkbox" name="callbackConsent" value="yes" className="mt-1"/><span>{CALLBACK_CONSENT}</span></label><p className="text-xs text-[#6B7280]">Optional. Enter your phone number with country code (for example +91). You can submit without requesting a call.</p></div>;}

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import {CallbackConsent} from '@/components/contact/callback-consent';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { submitLeadAction, FormState } from '@/actions/lead-actions';
@@ -207,6 +208,7 @@ export function LandingLeadForm({
           </p>
         )}
 
+        <CallbackConsent />
         <Button
           type="submit"
           disabled={isPending}
