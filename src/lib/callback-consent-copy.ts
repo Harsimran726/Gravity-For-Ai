@@ -1,1 +1,1 @@
-export const CALLBACK_CONSENT='Please call me about this enquiry or booking using Gravity For AI’s AI voice assistant. I confirm this is my number. The call may be transcribed for follow-up.';
+export const CALLBACK_CONSENT='By submitting this form with your phone number, you request a callback from Gravity For AI’s AI voice assistant about your enquiry or booking and confirm this is your number. The call may be transcribed for follow-up. Automatic callbacks are available for US and Indian numbers.';

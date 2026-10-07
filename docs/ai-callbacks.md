@@ -1,6 +1,10 @@
+## Country routing and automatic form requests
+
+New forms show a callback notice instead of a checkbox. Submitting with a phone number requests a callback; a hidden notice version records which form flow was submitted. Country codes are required. US numbers use Twilio-Hars-07e635a2-c64a / +14436455768 / agent v11. Indian numbers retain the Indian connection / +917971442620 / v9. Phone metadata distinguishes US from Canada and other NANP regions. Unsupported or invalid regional numbers are saved for manual follow-up without dialing. Existing cooldown, daily cap, and no-uncertain-retry safeguards remain. Prior submissions are not backfilled.
+
 # Website AI callbacks
 
-New contact and booking submissions create a callback record in the same database write as the lead. Only visitors selecting the optional AI-callback checkbox are eligible. Existing leads are not backfilled. Bookings remain saved when Sarvam fails. This does not verify appointment availability or change the existing booking rules.
+New contact and booking submissions create a callback record in the same database write as the lead. New forms display an automatic callback notice; submission with a supported phone number requests the call. Existing leads are not backfilled. Bookings remain saved when Sarvam fails. This does not verify appointment availability or change the existing booking rules.
 
 ## Production setup
 1. Apply prisma/ai-callback-upgrade.sql transactionally to the existing database (additive; never reset or db push).

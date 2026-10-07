@@ -28,7 +28,7 @@ export async function submitLeadAction(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
-  const callbackConsent=formData.get('callbackConsent')==='yes';
+  const callbackConsent=formData.get('callbackNotice')==='automatic-v1'||formData.get('callbackConsent')==='yes';
   const rawData = {
     name: String(formData.get('name') || ''),
     email: String(formData.get('email') || ''),
@@ -57,7 +57,7 @@ export async function submitLeadAction(
     };
   }
 
-  if(callbackConsent&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number, for example +91 98765 43210.']}};
+  if(callbackConsent&&rawData.phone&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number, for example +91 98765 43210.']}};
 
   // 3. Persist to PostgreSQL FIRST
   let createdLeadId: string | null = null;

@@ -39,7 +39,7 @@ export async function createBookingAction(
   prevState: BookingState,
   formData: FormData
 ): Promise<BookingState> {
-  const callbackConsent=formData.get('callbackConsent')==='yes';
+  const callbackConsent=formData.get('callbackNotice')==='automatic-v1'||formData.get('callbackConsent')==='yes';
   const rawData = {
     name: String(formData.get('name') || ''),
     email: String(formData.get('email') || ''),
@@ -71,7 +71,7 @@ export async function createBookingAction(
     };
   }
 
-  if(callbackConsent&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number.']}};
+  if(callbackConsent&&rawData.phone&&!normalizeCallbackPhone(rawData.phone))return {success:false,message:'For an AI callback, enter a valid phone number with country code.',errors:{phone:['Enter a valid callback number.']}};
 
   const {
     name, email, phone, businessName,

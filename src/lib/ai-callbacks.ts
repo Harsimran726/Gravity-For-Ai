@@ -1,6 +1,6 @@
 import {randomBytes} from 'crypto';
 import {prisma} from '@/lib/prisma';
-import {callbackPayload,CALLBACK_CONSENT,hashCallbackToken,normalizeCallbackPhone} from '@/lib/ai-callback-policy';
+import {callbackRoute,callbackPayload,CALLBACK_CONSENT,hashCallbackToken,normalizeCallbackPhone} from '@/lib/ai-callback-policy';
 
 export function callbackConfiguration(){
   const missing:string[]=[];
@@ -11,8 +11,8 @@ export function callbackConfiguration(){
 // Created atomically with the lead. Existing leads are never backfilled or dialled.
 export function callbackRecord(source:'BOOKING'|'CONTACT',phone:string|undefined,consent:boolean){
   const normalized=normalizeCallbackPhone(phone),config=callbackConfiguration();
-  const status=!consent||!normalized?'SKIPPED':!config.enabled||config.missing.length?'BLOCKED':'QUEUED';
-  const reason=!consent?'AI callback not requested.':!normalized?'No valid phone number.':status==='BLOCKED'?'Callbacks disabled or configuration incomplete.':null;
+  const status=!consent||!normalized||!callbackRoute(normalized)?'SKIPPED':!config.enabled||config.missing.length?'BLOCKED':'QUEUED';
+  const reason=!consent?'AI callback not requested.':!normalized?'No valid phone number.':!callbackRoute(normalized)?'Automatic callbacks support valid US and Indian numbers only; follow up manually.':status==='BLOCKED'?'Callbacks disabled or configuration incomplete.':null;
   return {source,phone:normalized,status,consentAt:consent?new Date():null,consentText:consent?CALLBACK_CONSENT:null,error:reason};
 }
 export async function dispatchCallback(leadId:string){
@@ -24,6 +24,7 @@ export async function dispatchCallback(leadId:string){
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(74632109)`;
     const call=await tx.aiCallback.findUnique({where:{leadId},include:{lead:true}});
     if(!call||call.status!=='QUEUED'||!call.phone||!call.consentAt)return null;
+    if(!callbackRoute(call.phone)){await tx.aiCallback.update({where:{id:call.id},data:{status:'SKIPPED',error:'Unsupported callback country or invalid phone; follow up manually.'}});return null;}
     const now=new Date();
     if(now.getTime()-call.createdAt.getTime()>60*60*1000){await tx.aiCallback.update({where:{id:call.id},data:{status:'EXPIRED',error:'Callback request is over one hour old; contact manually.'}});return null;}
     const cutoff=new Date(now.getTime()-24*60*60*1000);
