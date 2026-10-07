@@ -1,7 +1,9 @@
+import {safelyProcessCallRecap} from '@/lib/callback-recap';
 import {NextResponse} from 'next/server';
 import {prisma} from '@/lib/prisma';
 import {CallbackResult,validCallbackToken} from '@/lib/ai-callback-policy';
 export const runtime='nodejs';
+export const maxDuration=120;
 export const dynamic='force-dynamic';
 export async function POST(request:Request){
   const url=new URL(request.url),id=url.searchParams.get('id')||'',token=url.searchParams.get('token')||'';
@@ -22,7 +24,9 @@ export async function POST(request:Request){
     status:data.status.toUpperCase(),attemptId:data.attempt_id,interactionId:data.interaction_id||null,duration:data.duration??null,
     disposition:text(variables.call_disposition),summary:text(variables.call_summary),
     transcript:data.interaction_transcript?.map(turn=>turn.role+': '+turn.en_text).join('\n').slice(0,60000)||null,
+    transcriptTurns:data.interaction_transcript||[],analysisStatus:data.status==='connected'?'PENDING':'NOT_APPLICABLE',recapStatus:data.status==='connected'?'PENDING':'NOT_APPLICABLE',
     error:data.failure_reason||null,completedAt:new Date(),
   }});
+  await safelyProcessCallRecap(id);
   return NextResponse.json({received:true});
 }

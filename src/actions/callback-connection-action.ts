@@ -1,0 +1,8 @@
+'use server';
+import {getAdminSession} from '@/lib/auth';
+import {analyseConversation} from '@/lib/callback-recap-analysis';
+export async function checkAnalysisConnection(_state:{message:string},_form:FormData){
+ const session=await getAdminSession();if(session?.role!=='ADMIN')return {message:'Administrator access required.'};
+ try{const result=await analyseConversation([{role:'agent',en_text:'What would you like help with?'},{role:'user',en_text:'I want a website for my bakery. Please email me a recap.'}]);return {message:result.needsReview||result.doNotContact?'Model responded but this test required review. Check configuration.':'Analysis connection works. Synthetic transcript checked; no calls or emails sent.'};}
+ catch{return {message:'Analysis connection failed. Add a Sarvam model API key as SARVAM_ANALYSIS_API_KEY in Vercel Production and redeploy. The voice-agent key may not have model API access.'};}
+}

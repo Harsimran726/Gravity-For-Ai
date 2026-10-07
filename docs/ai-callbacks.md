@@ -24,3 +24,17 @@ Public forms have a honeypot, phone validation, a per-phone cooldown and a share
 References:
 - https://docs.sarvam.ai/conversations/api/instant-outbound/create
 - https://docs.sarvam.ai/conversations/api/instant-outbound/webhook-payload
+
+## Post-call intent analysis and recap email
+
+Apply prisma/callback-recap-upgrade.sql before deployment. Existing records default to NOT_REQUESTED; they will not be analysed or emailed. New CONNECTED webhooks persist structured transcript turns and queue analysis. Both country routes share this processing. No conversation email is sent for unanswered/failed calls.
+
+Sarvam model endpoint: https://api.sarvam.ai/v1/chat/completions, model sarvam-105b. Uses SARVAM_ANALYSIS_API_KEY, falling back to SARVAM_API_KEY if model access is allowed. Voice-agent and model API permissions can differ. Use the admin connection check with a synthetic transcript to verify access; no live call or email is generated. Two model requests per eligible recap incur provider usage.
+
+Needs and requested next steps cite exact caller utterances. A second model pass checks meaning, negation, privacy and contact permission. This is AI-assisted checking, not a guarantee of truth or a human verification. Unclear, contradictory, missing or unsupported content is held for REVIEW. Intent and evidence stay internal; email contains only checked paraphrases, identifies itself as AI-prepared, and invites correction. Provider summary is retained separately and is not automatically copied into the email. Recaps are in English, based on Sarvam en_text transcript turns.
+
+Mail uses the existing SMTP settings with TLS verification, bounded timeouts and the original form email only. No transcript-supplied email or link controls recipient selection. Per-call reservations prevent duplicate sends during concurrent webhook deliveries. SENT means SMTP accepted, not delivered/read. UNKNOWN and stale SENDING require provider-log review; they are never automatically retried. No historical backfill. Suppressed contact requests do not receive recaps.
+
+The webhook awaits bounded analysis/delivery. Duplicate webhook notifications may recover PENDING work. The optional callback tick also recovers one pending recap; it must be scheduled separately if desired. PROCESSING stuck after two minutes requires inspection; there is no automatic resend or manual resend button. For REVIEW, staff should read the transcript and prepare any necessary follow-up manually.
+
+Source: https://docs.sarvam.ai/api-reference/chat/chat-completions-v1

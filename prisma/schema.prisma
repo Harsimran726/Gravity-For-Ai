@@ -300,6 +300,15 @@ model AiCallback {
   disposition String?
   summary String? @db.Text
   transcript String? @db.Text
+  transcriptTurns Json?
+  analysisStatus String @default("NOT_REQUESTED")
+  analysis Json?
+  analysisStartedAt DateTime?
+  recapStatus String @default("NOT_REQUESTED")
+  recapSubject String?
+  recapBody String? @db.Text
+  recapError String?
+  recapSentAt DateTime?
   error String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
