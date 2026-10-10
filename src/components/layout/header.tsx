@@ -35,7 +35,7 @@ export function Header() {
   }, [pathname]);
 
   // Completely hide public navigation bar on all /admin pages (especially /admin/login)
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || (pathname === '/lp/interior-websites' || pathname?.startsWith('/lp/interior-websites/'))) {
     return null;
   }
 

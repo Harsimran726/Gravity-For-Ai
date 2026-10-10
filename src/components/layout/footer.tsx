@@ -9,7 +9,7 @@ export function Footer() {
   const pathname = usePathname();
 
   // Hide footer completely on all /admin pages
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || (pathname === '/lp/interior-websites' || pathname?.startsWith('/lp/interior-websites/'))) {
     return null;
   }
 

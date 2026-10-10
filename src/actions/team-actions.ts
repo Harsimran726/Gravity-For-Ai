@@ -6,6 +6,8 @@ import { prisma } from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
+const escapeHtml = (s:string) => s.replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]!));
+
 // Schemas
 const InviteSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -31,11 +33,12 @@ async function sendTeamEmail({ to, subject, html }: { to: string; subject: strin
   const fromHeader = `"Gravity For AI" <${fromEmail}>`;
 
   if (process.env.RESEND_API_KEY) {
-    await fetch('https://api.resend.com/emails', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from: fromHeader, to: [to], subject, html }),
     });
+    if(!response.ok)throw new Error('Mail provider rejected request');
     return;
   }
 
@@ -45,10 +48,10 @@ async function sendTeamEmail({ to, subject, html }: { to: string; subject: strin
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   if (host && user && pass) {
-    const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass }, tls: { rejectUnauthorized: false } });
+    const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass }, tls: { rejectUnauthorized: true } });
     await transporter.sendMail({ from: fromHeader, to, subject, html });
   } else {
-    console.log(`[TEAM MAIL MOCK] To: ${to} | Subject: ${subject}`);
+    throw new Error('Mail is not configured');
   }
 }
 
@@ -66,23 +69,18 @@ export async function inviteTeamMemberAction(prevState: TeamActionState, formDat
   try {
     // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return { success: false, message: `A team member with email ${email} already exists.` };
+    if (existing && !existing.passwordHash.startsWith('INVITE:')) return { success: false, message: `A team member with email ${email} already exists.` };
 
     const inviteToken = crypto.randomBytes(32).toString('hex');
 
-    // Create user with invite status embedded in bio field temporarily
-    await prisma.user.create({
-      data: {
-        email,
-        name,
-        title: title || undefined,
-        role: role as 'ADMIN' | 'EDITOR' | 'VIEWER',
-        passwordHash: `INVITE:${inviteToken}`, // placeholder until they accept invite
-        bio: `INVITED_BY:${session.email}|TOKEN:${inviteToken}|STATUS:PENDING`,
-      },
-    });
+    const inviteTokenHash = crypto.createHash('sha256').update(inviteToken).digest('hex');
+    const inviteExpiresAt = new Date(Date.now()+7*24*60*60*1000);
+    const inviteData = {email,name,title:title||null,role,passwordHash:'INVITE:pending',bio:null,inviteTokenHash,inviteExpiresAt};
+    // Reissuing a pending invitation invalidates its previous token.
+    if(existing) await prisma.user.update({where:{id:existing.id},data:inviteData});
+    else await prisma.user.create({data:inviteData});
 
-    const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gravityforai.com'}/admin/accept-invite?token=${inviteToken}&email=${encodeURIComponent(email)}`;
+    const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gravityforai.com'}/admin/accept-invite#token=${inviteToken}&email=${encodeURIComponent(email)}`;
 
     const html = `
       <!DOCTYPE html>
@@ -101,8 +99,8 @@ export async function inviteTeamMemberAction(prevState: TeamActionState, formDat
           <div class="container">
             <div class="logo">Gravity For AI</div>
             <h1>You've Been Invited to the Admin Team</h1>
-            <p>Hi ${name},</p>
-            <p><strong>${session.name}</strong> has invited you to join the Gravity For AI admin panel as:</p>
+            <p>Hi ${escapeHtml(name)},</p>
+            <p><strong>${escapeHtml(session.name)}</strong> has invited you to join the Gravity For AI admin panel as:</p>
             <p><span class="role-badge">${role}</span></p>
             <div class="info-box">
               <strong>Your access level:</strong><br/>
@@ -128,7 +126,7 @@ export async function inviteTeamMemberAction(prevState: TeamActionState, formDat
     revalidatePath('/admin/team');
     return { success: true, message: `Invitation sent to ${email}. They will receive an email with a secure link to set their password.` };
   } catch (err) {
-    console.error('[TEAM] Invite error:', err);
+    console.error('[TEAM] Operation failed.');
     return { success: false, message: 'Failed to send invitation. Please try again.' };
   }
 }
@@ -200,9 +198,9 @@ export async function sendTeamOutreachAction(prevState: TeamActionState, formDat
         <body>
           <div class="container">
             <div class="logo">Gravity For AI — Internal</div>
-            <h1>${validated.data.subject}</h1>
-            <div class="message-body">${validated.data.message.replace(/\n/g, '<br/>')}</div>
-            <div class="sender">— Sent by ${session.name} (${session.email}) via Gravity CMS</div>
+            <h1>${escapeHtml(validated.data.subject)}</h1>
+            <div class="message-body">${escapeHtml(validated.data.message).replace(/\n/g, '<br/>')}</div>
+            <div class="sender">— Sent by ${escapeHtml(session.name)} (${escapeHtml(session.email)}) via Gravity CMS</div>
             <div class="footer">Gravity For AI · Admin Portal · gravityforai.com</div>
           </div>
         </body>
@@ -210,15 +208,15 @@ export async function sendTeamOutreachAction(prevState: TeamActionState, formDat
     `;
 
     const results = await Promise.allSettled(
-      members.map((m) => sendTeamEmail({ to: m.email, subject: `[Gravity Team] ${validated.data.subject}`, html }))
+      members.map((m) => sendTeamEmail({ to: m.email, subject: `[Gravity Team] ${escapeHtml(validated.data.subject)}`, html }))
     );
 
     const sent = results.filter((r) => r.status === 'fulfilled').length;
-    await prisma.auditLog.create({ data: { userId: session.id, action: 'OUTREACH_SENT', entityType: 'TEAM_OUTREACH', details: `Subject: ${validated.data.subject} | Sent to ${sent}/${members.length} members` } }).catch(() => {});
+    await prisma.auditLog.create({ data: { userId: session.id, action: 'OUTREACH_SENT', entityType: 'TEAM_OUTREACH', details: `Subject: ${escapeHtml(validated.data.subject)} | Sent to ${sent}/${members.length} members` } }).catch(() => {});
 
     return { success: true, message: `Outreach email sent successfully to ${sent} team member${sent !== 1 ? 's' : ''}.` };
   } catch (err) {
-    console.error('[TEAM] Outreach error:', err);
+    console.error('[TEAM] Operation failed.');
     return { success: false, message: 'Failed to send outreach email.' };
   }
 }
@@ -229,33 +227,25 @@ export async function acceptInviteAction(prevState: TeamActionState, formData: F
   const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
 
-  if (!token || !email || password.length < 8) {
+  if (!/^[a-f0-9]{64}$/.test(token) || !z.string().email().safeParse(email).success || password.length < 8 || Buffer.byteLength(password,'utf8') > 72) {
     return { success: false, message: 'Invalid request parameters.' };
   }
 
   try {
     const member = await prisma.user.findUnique({ where: { email } });
-    if (!member) return { success: false, message: 'No invitation found for this email.' };
-    if (!member.bio?.includes(`TOKEN:${token}`) || !member.bio?.includes('STATUS:PENDING')) {
-      return { success: false, message: 'Invalid or expired invitation token.' };
-    }
-
+    const invalid = {success:false,message:'Invalid or expired invitation. Ask your administrator for a new link.'};
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    if(!member || !member.passwordHash.startsWith('INVITE:') || !member.inviteTokenHash || member.inviteTokenHash!==tokenHash || !member.inviteExpiresAt || member.inviteExpiresAt <= new Date())return invalid;
     const bcrypt = await import('bcryptjs');
-    const hash = await bcrypt.hash(password, 12);
-
-    await prisma.user.update({
-      where: { email },
-      data: {
-        passwordHash: hash,
-        bio: member.bio.replace('STATUS:PENDING', 'STATUS:ACTIVE'),
-      },
-    });
+    const hash = await bcrypt.hash(password,12);
+    const accepted = await prisma.user.updateMany({where:{id:member.id,passwordHash:member.passwordHash,inviteTokenHash:tokenHash,inviteExpiresAt:{gt:new Date()}},data:{passwordHash:hash,inviteTokenHash:null,inviteExpiresAt:null,bio:null}});
+    if(accepted.count!==1)return invalid;
 
     await prisma.auditLog.create({ data: { userId: member.id, action: 'INVITE_ACCEPTED', entityType: 'TEAM_MEMBER', details: `${email} accepted invite and set password` } }).catch(() => {});
 
     return { success: true, message: 'Account activated successfully!' };
   } catch (err) {
-    console.error('[TEAM] Accept invite error:', err);
+    console.error('[TEAM] Operation failed.');
     return { success: false, message: 'Failed to activate account. Please try again.' };
   }
 }

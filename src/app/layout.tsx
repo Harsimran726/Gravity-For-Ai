@@ -5,8 +5,8 @@ import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { OrbitScrollThread } from '@/components/ui/orbit-thread';
-import { Analytics } from '@/components/analytics/analytics';
-import { MetaPixel } from '@/components/analytics/meta-pixel';
+import { PublicAnalytics } from '@/components/analytics/public-analytics';
+
 import { SkipToContent } from '@/components/ui/skip-to-content';
 import { MainContentWrapper } from '@/components/layout/main-content-wrapper';
 
@@ -188,30 +188,8 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-[#FFFFFF] text-[#0A1B3D] min-h-screen flex flex-col selection:bg-[#122C57] selection:text-[#F7F5F0]">
-        {/* Google Tag Manager */}
-        <Script
-          id="google-tag-manager"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');`,
-          }}
-        />
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
         <SkipToContent />
-        <Analytics />
-        <MetaPixel />
+        <PublicAnalytics gtmId={gtmId}/>
         <Header />
         <OrbitScrollThread />
         <MainContentWrapper>{children}</MainContentWrapper>

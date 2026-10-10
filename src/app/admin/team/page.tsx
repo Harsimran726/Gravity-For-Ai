@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { redirect } from 'next/navigation';
 import { getAdminSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -17,15 +17,16 @@ export default async function TeamManagementPage() {
     email: string;
     role: 'ADMIN' | 'EDITOR' | 'VIEWER';
     title: string | null;
-    bio: string | null;
+    pendingInvite: boolean;
     createdAt: Date;
   }> = [];
 
   try {
-    members = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, title: true, bio: true, createdAt: true },
+    const rows = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true, title: true, passwordHash: true, createdAt: true },
       orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
-    }) as typeof members;
+    });
+    members = rows.map(({passwordHash,...member})=>({...member,pendingInvite:passwordHash.startsWith('INVITE:')}));
   } catch (err) {
     console.error('[TEAM PAGE] Failed to load members:', err);
   }

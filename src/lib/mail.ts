@@ -34,7 +34,7 @@ function getTransporter() {
       secure: port === 465, // SSL on 465, STARTTLS on 587
       auth: { user, pass },
       tls: {
-        rejectUnauthorized: false, // Prevents self-signed cert failures
+        rejectUnauthorized: true, // Prevents self-signed cert failures
       },
     });
   }
@@ -281,3 +281,4 @@ export async function sendContactInquiryEmail(params: ContactEmailParams) {
 
   return { success: true };
 }
+

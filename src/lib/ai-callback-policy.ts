@@ -33,7 +33,7 @@ export const CallbackResult=z.object({
   interaction_transcript:z.array(z.object({role:z.enum(['agent','user']),en_text:z.string().max(10000)})).max(500).nullable().optional(),
   webhook_config:z.object({metadata:z.object({lead_id:z.string(),callback_id:z.string()}).passthrough().nullable().optional()}).passthrough().nullable().optional(),
 });
-export function callbackPayload(call:{id:string;leadId:string;phone:string|null;source:string},lead:{name:string;businessName:string|null;serviceInterest:string|null;message:string|null},token:string){
+export function callbackPayload(call:{id:string;leadId:string;phone:string|null;source:string},lead:{name:string;email?:string|null;businessName:string|null;serviceInterest:string|null;message:string|null},token:string){
   const route=callbackRoute(call.phone);
   if(!route)throw new Error('Unsupported callback country or invalid number');
   const origin=process.env.SARVAM_WEBHOOK_ORIGIN||'https://gravityforai.com';
@@ -42,10 +42,11 @@ export function callbackPayload(call:{id:string;leadId:string;phone:string|null;
     app_config:{
       app_id:'Conversatio-23fc2384-01a1',app_version:route.version,app_type:'agent',
       connection_config:route.connection,
-      agent_variables:{business_type:lead.businessName||lead.serviceInterest||'',call_disposition:'',call_summary:JSON.stringify({source:call.source,request:lead.serviceInterest,note:lead.message}).slice(0,4000),gender:'',prospect_name:lead.name,user_name:lead.name},
+      agent_variables:{business_type:lead.businessName||lead.serviceInterest||'',call_disposition:'',call_summary:JSON.stringify({source:call.source,prospect_name:lead.name,business_name:lead.businessName,email:lead.email,request:lead.serviceInterest,note:lead.message}).slice(0,4000),gender:'',prospect_name:lead.name,user_name:lead.name},
       app_overrides:{initial_bot_message:'Hello, may I speak with '+lead.name.slice(0,100)+'? I am the AI assistant from Gravity For AI, calling about your '+(call.source==='BOOKING'?'meeting booking':'website enquiry')+'. Is now a good time to talk?',...(state?{initial_state_name:state}:{})},
     },
     user_config:{user_phone_number:call.phone},
     webhook_config:{url:origin.replace(/\/$/,'')+'/api/callbacks/webhook?id='+encodeURIComponent(call.id)+'&token='+encodeURIComponent(token),metadata:{lead_id:call.leadId,callback_id:call.id}},
   };
 }
+

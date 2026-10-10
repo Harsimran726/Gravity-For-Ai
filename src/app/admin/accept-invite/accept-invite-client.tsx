@@ -6,18 +6,24 @@ import { useRouter } from 'next/navigation';
 import { acceptInviteAction } from '@/actions/team-actions';
 import { Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 
-interface Props {
-  token: string;
-  email: string;
-}
-
-export function AcceptInviteClient({ token, email }: Props) {
+export function AcceptInviteClient() {
+  const [invite,setInvite]=React.useState<{token:string;email:string}|null>(null);
+  const loaded=React.useRef(false);
+  React.useEffect(()=>{
+    if(loaded.current)return; loaded.current=true;
+    const q=new URLSearchParams(window.location.hash.slice(1));
+    setInvite({token:q.get('token')||'',email:q.get('email')||''});
+    window.history.replaceState(null,'',window.location.pathname);
+  },[]);
+  const {token,email}=invite||{token:'',email:''};
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
   const [showPw, setShowPw] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
+
+  if(!invite)return <p className="text-white">Checking invitation…</p>;
 
   if (!token || !email) {
     return (
@@ -157,3 +163,4 @@ export function AcceptInviteClient({ token, email }: Props) {
     </div>
   );
 }
+

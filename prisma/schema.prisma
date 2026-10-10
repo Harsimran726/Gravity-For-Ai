@@ -40,6 +40,10 @@ model User {
   bio           String?     // E-E-A-T author bio
   title         String?     // e.g. "Founder & AI Engineer"
   avatarUrl     String?     // Author image for JSON-LD & byline
+  linkedinUrl   String?
+  githubUrl     String?
+  inviteTokenHash String?
+  inviteExpiresAt DateTime?
   posts         BlogPost[]
   auditLogs     AuditLog[]
   createdAt     DateTime    @default(now())

@@ -18,9 +18,6 @@ export type LoginState = {
   errors?: Record<string, string[]>;
 };
 
-// Known master founder password hash for Admin@Gravity2026! (bcrypt 12 rounds)
-const FOUNDER_MASTER_HASH = '$2b$12$Iha5OiP5kXY3/ae8gOY8/.6HYBfQojrFVLhjBMqL9soMExnvtZrFu';
-
 export async function loginAdminAction(
   prevState: LoginState,
   formData: FormData
@@ -35,7 +32,7 @@ export async function loginAdminAction(
   }
 
   const rawEmail = String(formData.get('email') || '').trim();
-  const rawPassword = String(formData.get('password') || '').trim();
+  const rawPassword = String(formData.get('password') || '');
 
   // 1. Zod Validation
   const validated = LoginSchema.safeParse({ email: rawEmail, password: rawPassword });
@@ -67,11 +64,6 @@ export async function loginAdminAction(
       // Check against stored database hash
       let isMatch = await verifyPassword(password, dbUser.passwordHash);
 
-      // Also check against founder master password if this is a founder email
-      if (!isMatch && (email === 'harsimran@gravityforai.com' || email === 'contact@gravityforai.com')) {
-        isMatch = password === 'Admin@Gravity2026!' || (await verifyPassword(password, FOUNDER_MASTER_HASH));
-      }
-
       // Check the password hash is a real bcrypt hash (not an INVITE: placeholder)
       const isActivated = !dbUser.passwordHash.startsWith('INVITE:');
 
@@ -91,60 +83,9 @@ export async function loginAdminAction(
     }
   } catch (err) {
     // Non-fatal: Log database query error and proceed to emergency founder fallback check
-    console.error('[AUTH] Database query encountered an issue, checking fallback credentials:', err);
+    console.error('[AUTH] Database authentication unavailable.');
   }
 
-
-  // 3. Resilient Founder Master Fallback
-  // Guarantees Harsimran Singh is NEVER locked out, even if the database is
-  // sleeping, cold-starting, restarting, or has connection timeouts.
-  if (!authenticatedUser) {
-    const allowedFounderEmails = [
-      'harsimran@gravityforai.com',
-      'contact@gravityforai.com',
-      (process.env.ADMIN_EMAIL || '').trim().toLowerCase(),
-    ].filter(Boolean);
-
-    if (allowedFounderEmails.includes(email)) {
-      let isFounderMatch = false;
-
-      // Check standard master password
-      if (password === 'Admin@Gravity2026!') {
-        isFounderMatch = true;
-      } else if (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
-        isFounderMatch = true;
-      } else if (process.env.ADMIN_PASSWORD_HASH && (await verifyPassword(password, process.env.ADMIN_PASSWORD_HASH))) {
-        isFounderMatch = true;
-      } else if (await verifyPassword(password, FOUNDER_MASTER_HASH)) {
-        isFounderMatch = true;
-      }
-
-      if (isFounderMatch) {
-        authenticatedUser = {
-          id: 'founder-admin-harsimran',
-          name: 'Harsimran Singh',
-          email: email,
-          role: 'ADMIN',
-        };
-
-        // Asynchronously ensure founder record exists in DB if possible
-        prisma.user
-          .upsert({
-            where: { email },
-            update: { role: 'ADMIN' },
-            create: {
-              id: 'founder-admin-' + (email.startsWith('contact') ? 'contact' : 'harsimran'),
-              email,
-              passwordHash: FOUNDER_MASTER_HASH,
-              name: 'Harsimran Singh',
-              role: 'ADMIN',
-              title: 'Founder & Lead AI Engineer',
-            },
-          })
-          .catch(() => {});
-      }
-    }
-  }
 
   // 4. If credentials did not authenticate
   if (!authenticatedUser) {

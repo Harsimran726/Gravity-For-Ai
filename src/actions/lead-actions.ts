@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { cookies, headers } from 'next/headers';
 import {callbackRecord,safelyDispatchCallback} from '@/lib/ai-callbacks';
 import {normalizeCallbackPhone} from '@/lib/ai-callback-policy';
 import { prisma } from '@/lib/prisma';
@@ -105,19 +106,27 @@ export async function submitLeadAction(
     console.error('[LEAD] Email notification failed (inquiry still saved):', emailErr);
   }
 
+  const isWebsiteCampaign = formData.get('websiteCampaign') === 'interior-websites';
   // 5. Send Meta Conversions API (CAPI) Server-Side Lead event
   try {
     await sendMetaConversionsApiEvent(
       buildMetaLeadEventPayload({
         email: validated.data.email,
         phone: validated.data.phone,
-        leadId: createdLeadId || undefined,
-        actionSource: 'system_generated',
-        eventSource: 'crm',
+        leadId: isWebsiteCampaign ? undefined : createdLeadId || undefined,
+        eventId: createdLeadId ? `lead-${createdLeadId}` : undefined,
+        ...(isWebsiteCampaign ? {
+          eventSourceUrl: 'https://gravityforai.com/lp/interior-websites',
+          clientUserAgent: (headers().get('user-agent') || '').slice(0,1000),
+          fbp: cookies().get('_fbp')?.value.slice(0,250),
+          fbc: cookies().get('_fbc')?.value.slice(0,500),
+        } : {}),
+        actionSource: isWebsiteCampaign ? 'website' : 'system_generated',
+        eventSource: isWebsiteCampaign ? 'website' : 'crm',
         leadEventSource: 'Gravity For AI CRM',
         customData: {
           service_interest: validated.data.serviceInterest,
-          business_name: validated.data.businessName || '',
+          ...(isWebsiteCampaign ? {content_name:'Interior website consultation'} : {business_name: validated.data.businessName || ''}),
         },
       })
     );

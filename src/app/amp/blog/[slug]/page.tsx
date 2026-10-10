@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function AmpBlogPostPage({ params }: { params: { slug: string } }) {
   let dbPost = await prisma.blogPost.findUnique({ 
     where: { slug: params.slug },
-    include: { author: true, category: true }
+    include: { author: {select:{name:true,title:true}}, category: true }
   });
 
   let post: any = null;

@@ -13,11 +13,12 @@ import { VoiceAgentMockup } from '@/components/visuals/voice-agent-mockup';
 import { BrowserSpeedMockup } from '@/components/visuals/browser-speed-mockup';
 import { PipelineOrchestratorMockup } from '@/components/visuals/pipeline-orchestrator-mockup';
 import { prisma } from '@/lib/prisma';
+import {publicAuthorSelect,cleanPublicBio,socialUrl,avatarUrl} from '@/lib/public-author';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const dbPost = await prisma.blogPost.findUnique({ where: { slug: params.slug }, include: { author: true } });
+  const dbPost = await prisma.blogPost.findUnique({ where: { slug: params.slug }, include: { author: {select: publicAuthorSelect} } });
   
   if (dbPost && dbPost.status === 'PUBLISHED') {
     return {
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   let dbPost = await prisma.blogPost.findUnique({ 
     where: { slug: params.slug },
-    include: { author: true, category: true, faqs: true }
+    include: { author: {select: publicAuthorSelect}, category: true, faqs: true }
   });
 
   let post: any = null;
@@ -74,11 +75,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       category: dbPost.category?.name || 'General',
       author: {
         name: dbPost.author?.name || 'Gravity Team',
-        avatarUrl: 'https://gravityforai.com/icon.png',
+        avatarUrl: avatarUrl(dbPost.author?.avatarUrl),
         role: dbPost.author?.title || 'Author',
-        bio: dbPost.author?.bio || '',
-        linkedinUrl: '#',
-        githubUrl: '#',
+        bio: cleanPublicBio(dbPost.author?.bio),
+        linkedinUrl: socialUrl(dbPost.author?.linkedinUrl,'linkedin.com'),
+        githubUrl: socialUrl(dbPost.author?.githubUrl,'github.com'),
       },
       content: { intro: '', sections: [], conclusion: '' },
       faqs: dbPost.faqs || [],
@@ -127,7 +128,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema).replace(/</g, '\\u003c') }}
       />
 
       <div className="w-full flex flex-col">
@@ -174,7 +175,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <a
+                  {post.author.githubUrl && (<a
                     href={post.author.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -182,8 +183,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                     aria-label="Author GitHub"
                   >
                     <Github className="w-4 h-4" />
-                  </a>
-                  <a
+                  </a>)}
+                  {post.author.linkedinUrl && (<a
                     href={post.author.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -191,7 +192,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                     aria-label="Author LinkedIn"
                   >
                     <Linkedin className="w-4 h-4" />
-                  </a>
+                  </a>)}
                 </div>
               </div>
             </div>
@@ -293,22 +294,22 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 <h4 className="font-serif text-xl text-[#122C57]">{post.author.name}</h4>
                 <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">{post.author.bio}</p>
                 <div className="pt-2 flex items-center gap-3">
-                  <a
+                  {post.author.linkedinUrl && (<a
                     href={post.author.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-mono text-[#122C57] hover:underline"
                   >
                     LinkedIn Profile ↗
-                  </a>
-                  <a
+                  </a>)}
+                  {post.author.githubUrl && (<a
                     href={post.author.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-mono text-[#122C57] hover:underline"
                   >
                     GitHub ↗
-                  </a>
+                  </a>)}
                 </div>
               </div>
             </Card>

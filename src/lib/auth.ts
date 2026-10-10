@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import {prisma} from './prisma';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { ADMIN_COOKIE_NAME, type AdminSession, type Role } from './auth-constants';
@@ -62,6 +63,8 @@ export function verifySession(cookieValue: string): AdminSession | null {
     const sessionData: AdminSession = JSON.parse(
       Buffer.from(payload, 'base64url').toString('utf-8')
     );
+    const age=Date.now()-Date.parse(sessionData.loginTime);
+    if(!Number.isFinite(age)||age<0||age>7*24*60*60*1000||!sessionData.id||!sessionData.email||!['ADMIN','EDITOR','VIEWER'].includes(sessionData.role))return null;
     return sessionData;
   } catch {
     return null;
@@ -78,5 +81,11 @@ export async function getAdminSession(): Promise<AdminSession | null> {
     return null;
   }
 
-  return verifySession(sessionCookie.value);
+  const session=verifySession(sessionCookie.value);
+  if(!session)return null;
+  try {
+    const user=await prisma.user.findUnique({where:{id:session.id},select:{id:true,email:true,name:true,role:true,passwordHash:true}});
+    if(!user || user.email!==session.email || user.passwordHash.startsWith('INVITE:'))return null;
+    return {...session,name:user.name||'Team Member',role:user.role};
+  }catch{return null;}
 }

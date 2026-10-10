@@ -20,6 +20,7 @@ import {
 import { logoutAdminAction } from '@/actions/auth-actions';
 
 const NAV_ITEMS = [
+  { label: 'My profile', href: '/admin/profile', icon: Users },
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { label: 'AI Callbacks', href: '/admin/callbacks', icon: Calendar, adminOnly: true },
   { label: 'Bookings & Calls', href: '/admin/bookings', icon: Calendar },

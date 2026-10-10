@@ -26,6 +26,7 @@ export interface MetaCapiEventItem {
   event_time: number;
   user_data: MetaCapiUserData;
   event_source_url?: string;
+  event_id?: string;
 }
 
 export interface MetaCapiPayload {
@@ -87,6 +88,11 @@ export interface CreateMetaLeadEventOptions {
   leadEventSource?: string;
   customData?: Record<string, any>;
   testEventCode?: string;
+  eventId?: string;
+  eventSourceUrl?: string;
+  clientUserAgent?: string;
+  fbp?: string;
+  fbc?: string;
 }
 
 /**
@@ -129,6 +135,10 @@ export function buildMetaLeadEventPayload(options: CreateMetaLeadEventOptions): 
     userData.lead_id = formatLeadId(options.leadId);
   }
 
+  if (options.clientUserAgent) userData.client_user_agent = options.clientUserAgent;
+  if (options.fbp) userData.fbp = options.fbp;
+  if (options.fbc) userData.fbc = options.fbc;
+
   const eventTime = options.eventTime || Math.floor(Date.now() / 1000);
 
   const payload: MetaCapiPayload = {
@@ -141,13 +151,15 @@ export function buildMetaLeadEventPayload(options: CreateMetaLeadEventOptions): 
           ...(options.customData || {}),
         },
         event_name: 'Lead',
+        ...(options.eventId ? {event_id: options.eventId} : {}),
+        ...(options.eventSourceUrl ? {event_source_url: options.eventSourceUrl} : {}),
         event_time: eventTime,
         user_data: userData,
       },
     ],
   };
 
-  const testCode = options.testEventCode || process.env.META_TEST_EVENT_CODE || 'TEST89192';
+  const testCode = options.testEventCode || process.env.META_TEST_EVENT_CODE;
   if (testCode && testCode.trim().length > 0) {
     payload.test_event_code = testCode.trim();
   }
@@ -191,6 +203,7 @@ export async function sendMetaConversionsApiEvent(payload: MetaCapiPayload): Pro
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
     });
 
     const data = await res.json();

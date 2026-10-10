@@ -31,7 +31,7 @@ export const dynamic = 'force-dynamic';
 export default async function BlogListingPage() {
   const dbPosts = await prisma.blogPost.findMany({
     where: { status: 'PUBLISHED' },
-    include: { author: true, category: true },
+    include: { author: {select: {name:true}}, category: true },
     orderBy: { publishedAt: 'desc' },
   });
 

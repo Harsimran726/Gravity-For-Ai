@@ -21,7 +21,7 @@ interface TeamMember {
   email: string;
   role: 'ADMIN' | 'EDITOR' | 'VIEWER';
   title: string | null;
-  bio: string | null;
+  pendingInvite: boolean;
   createdAt: Date;
 }
 
@@ -48,9 +48,6 @@ function getInitials(name: string | null, email: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
-function isPendingInvite(bio: string | null): boolean {
-  return !!(bio && bio.includes('STATUS:PENDING'));
-}
 
 function StatusBadge({ isPending }: { isPending: boolean }) {
   if (isPending) {
@@ -81,7 +78,7 @@ function MemberCard({
   const [showRoleMenu, setShowRoleMenu] = React.useState(false);
   const RoleIcon = ROLE_ICONS[member.role];
   const isSelf = member.id === currentUserId;
-  const pending = isPendingInvite(member.bio);
+  const pending = member.pendingInvite;
 
   return (
     <Card variant="outline" className="bg-[#FFFFFF] p-5 space-y-4">
@@ -231,7 +228,7 @@ export function TeamManagementClient({ members, currentUserId }: Props) {
   const adminCount = localMembers.filter((m) => m.role === 'ADMIN').length;
   const editorCount = localMembers.filter((m) => m.role === 'EDITOR').length;
   const viewerCount = localMembers.filter((m) => m.role === 'VIEWER').length;
-  const pendingCount = localMembers.filter((m) => isPendingInvite(m.bio)).length;
+  const pendingCount = localMembers.filter((m) => m.pendingInvite).length;
 
   return (
     <div className="space-y-8">

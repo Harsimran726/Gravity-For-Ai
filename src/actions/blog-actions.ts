@@ -28,7 +28,7 @@ export async function saveBlogPostAction(
   formData: FormData
 ): Promise<BlogActionState> {
   const session = await getAdminSession();
-  if (!session) {
+  if (!session || !['ADMIN', 'EDITOR'].includes(session.role)) {
     return { success: false, message: 'Unauthorized. Please log in.' };
   }
 
@@ -109,3 +109,4 @@ export async function saveBlogPostAction(
     };
   }
 }
+
