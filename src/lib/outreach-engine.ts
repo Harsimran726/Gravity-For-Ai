@@ -12,7 +12,7 @@ export function outreachConfiguration() {
   const address=process.env.SMTP_FROM||process.env.SMTP_USER||'';
   if(!EMAIL.test(address))missing.push('SMTP_FROM must be a plain email address');
   if(process.env.OUTREACH_PUBLIC_URL && !/^https:\/\//.test(process.env.OUTREACH_PUBLIC_URL))missing.push('OUTREACH_PUBLIC_URL must use HTTPS');
-  return {missing,enabled:process.env.OUTREACH_SENDING_ENABLED==='true',address};
+  return {missing,enabled:process.env.OUTREACH_SENDING_ENABLED?.trim().toLowerCase()==='true',address};
 }
 export async function stopAddress(email:string,status:'REPLIED'|'UNSUBSCRIBED'|'BOUNCED',subject?:string) {
   email=normalizeEmail(email);

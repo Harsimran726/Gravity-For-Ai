@@ -165,3 +165,16 @@ test('manual processing refuses paused campaign and requires admin',async()=>{
 test('manual processing reports acceptance without claiming delivery',async()=>{
  const h=actionHarness();const result=await h.actions.processCampaignNextAction('c');assert.equal(h.ticks(),1);assert.match(result.message,/not confirmation of inbox delivery/);
 });
+
+test('sending flag accepts true with mixed case and whitespace',()=>{
+ for(const value of ['true','True','TRUE','  true  ','\tTrUe\n']) {
+  const h=harness();h.env.OUTREACH_SENDING_ENABLED=value;
+  assert.equal(h.engine.outreachConfiguration().enabled,true);
+ }
+});
+test('sending flag remains off for missing, false and unrecognized values',()=>{
+ for(const value of [undefined,'','false','False',' FALSE ','1','yes','tru']) {
+  const h=harness();if(value===undefined)delete h.env.OUTREACH_SENDING_ENABLED;else h.env.OUTREACH_SENDING_ENABLED=value;
+  assert.equal(h.engine.outreachConfiguration().enabled,false);
+ }
+});
