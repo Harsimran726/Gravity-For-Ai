@@ -136,3 +136,32 @@ test('Excel supports manual mapping and keeps personalized messages',async()=>{
  const r=parser.mapProspectTable(table,{name:0,email:1,subject:2,body:3,company:-1});
  assert.equal(r.prospects[0].customBody,'Personalized message');
 });
+
+function actionHarness({enabled=true,count=1,role='ADMIN',status='ACTIVE'}={}) {
+ const updates=[];let ticks=0;
+ const actions=loader({
+  '@/lib/prisma':{prisma:{outreachProspect:{count:async()=>count},outreachCampaign:{update:async q=>updates.push(q),findUnique:async()=>({status,automationEnabled:status==='ACTIVE'})}}},
+  '@/lib/auth':{getAdminSession:async()=>role?{id:'admin',role}:null},
+  'next/cache':{revalidatePath:()=>{}},
+  '@/lib/outreach-policy':policy,
+  '@/lib/outreach-engine':{outreachConfiguration:()=>({enabled,missing:[]}),runOutreachTick:async()=>{ticks++;return {sent:true,message:'Accepted'};}}
+ })('src/actions/outreach-actions.ts');
+ return {actions,updates,ticks:()=>ticks};
+}
+test('activation blocked when global sending is off without changing status',async()=>{
+ const h=actionHarness({enabled:false});const result=await h.actions.updateCampaignStatusAction('c','ACTIVE');assert.equal(result.success,false);assert.match(result.message,/OUTREACH_SENDING_ENABLED/);assert.equal(h.updates.length,0);
+});
+test('pause remains available when global sending is off',async()=>{
+ const h=actionHarness({enabled:false});assert.equal((await h.actions.updateCampaignStatusAction('c','PAUSED')).success,true);assert.equal(h.updates[0].data.automationEnabled,false);
+});
+test('activation requires approved recipients and does not send immediately',async()=>{
+ const blocked=actionHarness({count:0});assert.equal((await blocked.actions.updateCampaignStatusAction('c','ACTIVE')).success,false);
+ const h=actionHarness();assert.equal((await h.actions.updateCampaignStatusAction('c','ACTIVE')).success,true);assert.equal(h.updates[0].data.automationEnabled,true);assert.equal(h.ticks(),0);
+});
+test('manual processing refuses paused campaign and requires admin',async()=>{
+ const h=actionHarness({status:'PAUSED'});assert.equal((await h.actions.processCampaignNextAction('c')).success,false);assert.equal(h.ticks(),0);
+ const denied=actionHarness({role:'EDITOR'});await assert.rejects(()=>denied.actions.processCampaignNextAction('c'),/Unauthorized/);
+});
+test('manual processing reports acceptance without claiming delivery',async()=>{
+ const h=actionHarness();const result=await h.actions.processCampaignNextAction('c');assert.equal(h.ticks(),1);assert.match(result.message,/not confirmation of inbox delivery/);
+});

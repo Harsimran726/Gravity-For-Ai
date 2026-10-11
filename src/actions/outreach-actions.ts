@@ -4,7 +4,7 @@ import {prisma} from '@/lib/prisma';
 import {getAdminSession} from '@/lib/auth';
 import {revalidatePath} from 'next/cache';
 import {dueStep,istDayStart} from '@/lib/outreach-policy';
-import {outreachConfiguration,stopAddress,syncOutreachInbox} from '@/lib/outreach-engine';
+import {outreachConfiguration,stopAddress,syncOutreachInbox,runOutreachTick} from '@/lib/outreach-engine';
 export type {ParsedProspect} from '@/lib/csv-parser';
 export type OutreachActionState={success?:boolean;message?:string;campaignId?:string;errors?:Record<string,string[]>};
 async function admin(){const s=await getAdminSession();if(!s||s.role!=='ADMIN')throw new Error('Unauthorized');return s;}
@@ -37,7 +37,7 @@ export async function approveProspectsAction(ids:string[],note:string):Promise<O
 export async function updateCampaignStatusAction(id:string,status:'ACTIVE'|'PAUSED'|'COMPLETED'):Promise<OutreachActionState>{
  await admin();if(!['ACTIVE','PAUSED','COMPLETED'].includes(status))return {success:false,message:'Invalid status'};
  if(status==='ACTIVE'){
- const c=outreachConfiguration();if(!c.enabled||c.missing.length)return {success:false,message:!c.enabled?'Sending disabled in server settings.':`Setup needed: ${c.missing.join(', ')}`};
+ const c=outreachConfiguration();if(!c.enabled||c.missing.length)return {success:false,message:!c.enabled?'Activation blocked: OUTREACH_SENDING_ENABLED is not true on this deployment. Enable it in Vercel Production settings and redeploy after reviewing campaigns. No email was sent.':`Setup needed: ${c.missing.join(', ')}`};
  if(!await prisma.outreachProspect.count({where:{campaignId:id,status:{in:['SELECTED','SENT']},permissionGranted:true}}))return {success:false,message:'Select recipients and record permission first.'};
  }
  await prisma.outreachCampaign.update({where:{id},data:{status,automationEnabled:status==='ACTIVE'}});refresh();return {success:true,message:status==='ACTIVE'?'Active: the scheduled worker will process eligible recipients.':'Campaign paused/completed. An already accepted in-flight email cannot be recalled.'};
@@ -67,4 +67,12 @@ export async function getOutreachAnalytics(session?:Awaited<ReturnType<typeof ge
  const total=(key:'totalSent'|'sentToday'|'totalFailed'|'totalProspects'|'replies'|'followup1'|'followup2')=>normal.reduce((n,c)=>n+c[key],0);
  const mailbox=await prisma.outreachMailbox.findUnique({where:{id:'primary'}});
  return {campaigns,totalSent:total('totalSent'),sentToday:total('sentToday'),previousSent:total('totalSent')-total('sentToday'),totalFailed:total('totalFailed'),totalProspects:total('totalProspects'),replies:total('replies'),followup1:total('followup1'),followup2:total('followup2'),testSent:campaigns.filter(c=>c.purpose==='TEST').reduce((n,c)=>n+c.totalSent,0),mailbox,configuration:outreachConfiguration()};
+}
+
+export async function processCampaignNextAction(id:string):Promise<OutreachActionState>{
+ await admin();
+ const campaign=await prisma.outreachCampaign.findUnique({where:{id}});
+ if(!campaign||campaign.status!=='ACTIVE'||!campaign.automationEnabled)return {success:false,message:'Activate this campaign before processing its next email.'};
+ try{const result=await runOutreachTick(id);refresh();return {success:true,message:result.message+(result.sent?' Acceptance is not confirmation of inbox delivery.':' No email was sent by this request.')};}
+ catch{refresh();return {success:false,message:'Processing failed. Check sending configuration and mailbox connectivity. Review uncertain dispatches in Hostinger before retrying.'};}
 }
