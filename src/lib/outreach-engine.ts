@@ -45,7 +45,7 @@ export async function syncOutreachInbox() {
   await prisma.outreachMailbox.upsert({where:{id:'primary'},create:{id:'primary',lastInboxSyncAt:new Date()},update:{lastInboxSyncAt:new Date(),lastError:null}});
   return replies;
 }
-export async function runOutreachTick(campaignId?:string) {
+async function dispatchOutreachTick(campaignId?:string) {
   const config=outreachConfiguration();
   if(!config.enabled)throw new Error('Sending is disabled. Configure and review the setup before enabling OUTREACH_SENDING_ENABLED.');
   if(config.missing.length)throw new Error(`Missing configuration: ${config.missing.join(', ')}`);
@@ -56,11 +56,11 @@ export async function runOutreachTick(campaignId?:string) {
   try {
     const mailbox=await prisma.outreachMailbox.findUniqueOrThrow({where:{id:'primary'}});
     if(mailbox.nextSendAt && mailbox.nextSendAt>now)return {message:'Waiting for the mailbox sending interval.',sent:false};
-    await syncOutreachInbox(); // Fail closed: stale/unavailable inbox must never allow follow-ups.
     const ceiling=Math.max(1,Math.min(100,Number(process.env.OUTREACH_MAILBOX_DAILY_LIMIT)||20));
     const limit=dailyRampLimit(mailbox.rampStartedAt,now,ceiling);
     const attempts=await prisma.outreachMessage.count({where:{createdAt:{gte:istDayStart(now)},status:{in:['CLAIMED','ACCEPTED','UNKNOWN']}}});
     if(attempts>=limit)return {message:`Mailbox daily cap reached (${limit}, IST).`,sent:false};
+    await syncOutreachInbox(); // Never dispatch without a successful reply check.
     const campaigns=await prisma.outreachCampaign.findMany({where:{...(campaignId?{id:campaignId}:{}),status:'ACTIVE',automationEnabled:true},orderBy:[{lastSentAt:'asc'},{createdAt:'asc'}],include:{prospects:{where:{status:{in:['SELECTED','SENT']},permissionGranted:true},include:{messages:true},orderBy:{createdAt:'asc'}}}});
     for(const c of campaigns) {
       const count=await prisma.outreachMessage.count({where:{campaignId:c.id,createdAt:{gte:istDayStart(now)},status:{in:['CLAIMED','ACCEPTED','UNKNOWN']}}});
@@ -113,4 +113,21 @@ export async function runOutreachTick(campaignId?:string) {
   } finally {
     await prisma.outreachMailbox.updateMany({where:{id:'primary',lockToken:token},data:{lockToken:null,lockUntil:null}});
   }
+}
+
+// Record scheduler arrivals separately from manual inbox checks and manual dispatch.
+export async function runOutreachTick(campaignId?:string,source:'manual'|'scheduler'='manual') {
+ const now=new Date();
+ const data={lastWorkerAt:now,...(source==='scheduler'?{lastScheduledAt:now}:{}),lastWorkerResult:'Checking queue and mailbox...'};
+ await prisma.outreachMailbox.upsert({where:{id:'primary'},create:{id:'primary',...data},update:data});
+ try {
+  const result=await dispatchOutreachTick(campaignId);
+  await prisma.outreachMailbox.update({where:{id:'primary'},data:{lastWorkerResult:result.message}});
+  return result;
+ } catch(error) {
+  // Do not store provider payloads or credentials in the dashboard.
+  const message='Worker could not complete. Check inbox connectivity, sending settings and server logs.';
+  await prisma.outreachMailbox.update({where:{id:'primary'},data:{lastWorkerResult:message,lastError:message}});
+  throw error;
+ }
 }

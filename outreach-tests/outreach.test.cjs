@@ -71,7 +71,7 @@ function harness({smtpFail=false,inboxFail=false,reply=false,cap=0}={}){
  const c={...campaign,id:'c',name:'Test',subject:'Hello',body:'Test message',status:'ACTIVE',automationEnabled:true,dailyLimit:20,prospects:[p]};
  const mailbox={id:'primary',lockUntil:null,rampStartedAt:null,nextSendAt:null};let calls=0,syncs=0;const events=[];let suppressed=false;
  const db={
-  outreachMailbox:{upsert:async()=>mailbox,findUniqueOrThrow:async()=>mailbox,update:async({data})=>Object.assign(mailbox,data),updateMany:async({where,data})=>{
+  outreachMailbox:{upsert:async({update})=>Object.assign(mailbox,update),findUniqueOrThrow:async()=>mailbox,update:async({data})=>Object.assign(mailbox,data),updateMany:async({where,data})=>{
    if(where.OR&&mailbox.lockUntil&&mailbox.lockUntil>new Date())return {count:0};
    if(where.lockToken&&mailbox.lockToken!==where.lockToken)return {count:0};Object.assign(mailbox,data);return {count:1};
   }},
@@ -177,4 +177,16 @@ test('sending flag remains off for missing, false and unrecognized values',()=>{
   const h=harness();if(value===undefined)delete h.env.OUTREACH_SENDING_ENABLED;else h.env.OUTREACH_SENDING_ENABLED=value;
   assert.equal(h.engine.outreachConfiguration().enabled,false);
  }
+});
+
+test('scheduler heartbeat is distinct from manual processing',async()=>{
+ const h=harness();await h.engine.runOutreachTick('c','scheduler');assert.ok(h.mailbox.lastScheduledAt instanceof Date);assert.match(h.mailbox.lastWorkerResult,/accepted/);
+ const manual=actionHarness();assert.equal(manual.ticks(),0);
+ const m=harness();await m.engine.runOutreachTick('c');assert.equal(m.mailbox.lastScheduledAt,undefined);assert.ok(m.mailbox.lastWorkerAt instanceof Date);
+});
+test('daily cap avoids unnecessary inbox requests and records why',async()=>{
+ const h=harness({cap:5});await h.engine.runOutreachTick(undefined,'scheduler');assert.equal(h.syncs(),0);assert.equal(h.calls(),0);assert.match(h.mailbox.lastWorkerResult,/daily cap/);
+});
+test('worker records failure without claiming success or exposing provider details',async()=>{
+ const h=harness({inboxFail:true});await assert.rejects(h.engine.runOutreachTick(undefined,'scheduler'));assert.ok(h.mailbox.lastScheduledAt);assert.match(h.mailbox.lastWorkerResult,/could not complete/);assert.equal(h.calls(),0);
 });

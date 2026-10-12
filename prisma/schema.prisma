@@ -282,6 +282,9 @@ model OutreachMailbox {
   lockUntil DateTime?
   nextSendAt DateTime?
   rampStartedAt DateTime?
+  lastWorkerAt DateTime?
+  lastScheduledAt DateTime?
+  lastWorkerResult String?
   lastInboxSyncAt DateTime?
   lastError String?
 }
