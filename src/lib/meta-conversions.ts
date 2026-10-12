@@ -193,14 +193,15 @@ export async function sendMetaConversionsApiEvent(payload: MetaCapiPayload): Pro
     };
   }
 
-  const graphApiVersion = process.env.META_GRAPH_API_VERSION || 'v20.0';
-  const url = `https://graph.facebook.com/${graphApiVersion}/${pixelId}/events?access_token=${encodeURIComponent(accessToken)}`;
+  const graphApiVersion = process.env.META_GRAPH_API_VERSION || 'v26.0';
+  const url = `https://graph.facebook.com/${graphApiVersion}/${pixelId}/events`;
 
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(8000),
@@ -209,7 +210,7 @@ export async function sendMetaConversionsApiEvent(payload: MetaCapiPayload): Pro
     const data = await res.json();
 
     if (!res.ok) {
-      console.error('[META CAPI] Meta Conversions API returned error response:', data);
+      console.error('[META CAPI] Request rejected:', {status:res.status,code:data.error?.code,subcode:data.error?.error_subcode});
       return {
         success: false,
         error: data.error?.message || 'Meta API returned non-200 status',
@@ -227,7 +228,7 @@ export async function sendMetaConversionsApiEvent(payload: MetaCapiPayload): Pro
       result: data,
     };
   } catch (err: any) {
-    console.error('[META CAPI] Network dispatch failure sending event to Meta:', err);
+    console.error('[META CAPI] Network dispatch failed; saved lead remains available.');
     return {
       success: false,
       error: err.message || 'Unknown network error',

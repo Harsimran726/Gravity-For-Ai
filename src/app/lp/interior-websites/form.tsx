@@ -1,11 +1,20 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitWebsiteEnquiry } from './action';
 
 function Submit() { const {pending}=useFormStatus(); return <button disabled={pending} className="w-full bg-[#122C57] text-white px-5 py-4 font-semibold disabled:opacity-60">{pending?'Sending your enquiry...':'Request my discovery call'} <span aria-hidden="true">→</span></button>; }
 export function WebsiteEnquiryForm() {
  const [state,action]=useFormState(submitWebsiteEnquiry,{});
+ const trackedEvent=useRef<string|null>(null);
+ useEffect(()=>{
+  if(!state.success||!state.eventId||trackedEvent.current===state.eventId)return;
+  const eventId=state.eventId;let attempts=0;
+  const track=()=>{if(window.fbq){window.fbq('track','Lead',{content_name:'Interior website consultation'},{eventID:eventId});trackedEvent.current=eventId;return true;}return false;};
+  if(track())return;
+  const timer=setInterval(()=>{if(track()||++attempts>=10)clearInterval(timer);},1000);
+  return()=>clearInterval(timer);
+ },[state.success,state.eventId]);
  const [tags,setTags]=useState<Record<string,string>>({});
  useEffect(()=>{const q=new URLSearchParams(window.location.search);setTags(Object.fromEntries(['utm_source','utm_medium','utm_campaign','utm_content'].map(k=>[k,(q.get(k)||'').slice(0,150)])));},[]);
  useEffect(()=>{if(state.success) window.dispatchEvent(new Event("website-enquiry-saved"));},[state.success]);

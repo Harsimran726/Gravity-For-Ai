@@ -20,6 +20,7 @@ const LeadSchema = z.object({
 });
 
 export type FormState = {
+  eventId?: string;
   success?: boolean;
   message?: string;
   errors?: Record<string, string[]>;
@@ -87,25 +88,6 @@ export async function submitLeadAction(
     };
   }
 
-  // Await the bounded dispatch; never fire and forget in a serverless function.
-  if(createdLeadId)await safelyDispatchCallback(createdLeadId);
-  revalidatePath('/admin/callbacks');
-
-  // 4. Send email notification AFTER DB save
-  try {
-    await sendContactInquiryEmail({
-      name: validated.data.name,
-      email: validated.data.email,
-      phone: validated.data.phone,
-      businessName: validated.data.businessName,
-      serviceInterest: validated.data.serviceInterest,
-      message: validated.data.message,
-    });
-  } catch (emailErr) {
-    // Non-critical - lead is already saved in DB
-    console.error('[LEAD] Email notification failed (inquiry still saved):', emailErr);
-  }
-
   const isWebsiteCampaign = formData.get('websiteCampaign') === 'interior-websites';
   // 5. Send Meta Conversions API (CAPI) Server-Side Lead event
   try {
@@ -113,7 +95,8 @@ export async function submitLeadAction(
       buildMetaLeadEventPayload({
         email: validated.data.email,
         phone: validated.data.phone,
-        leadId: isWebsiteCampaign ? undefined : createdLeadId || undefined,
+        // Website CRM IDs are not Meta-generated lead IDs.
+        leadId: undefined,
         eventId: createdLeadId ? `lead-${createdLeadId}` : undefined,
         ...(isWebsiteCampaign ? {
           eventSourceUrl: 'https://gravityforai.com/lp/interior-websites',
@@ -135,8 +118,30 @@ export async function submitLeadAction(
     console.error('[LEAD] Meta CAPI dispatch error (lead still saved):', capiErr);
   }
 
+
+  // Await the bounded dispatch; never fire and forget in a serverless function.
+  if(createdLeadId)await safelyDispatchCallback(createdLeadId);
+  revalidatePath('/admin/callbacks');
+
+  // 4. Send email notification AFTER DB save
+  try {
+    await sendContactInquiryEmail({
+      name: validated.data.name,
+      email: validated.data.email,
+      phone: validated.data.phone,
+      businessName: validated.data.businessName,
+      serviceInterest: validated.data.serviceInterest,
+      message: validated.data.message,
+    });
+  } catch (emailErr) {
+    // Non-critical - lead is already saved in DB
+    console.error('[LEAD] Email notification failed (inquiry still saved):', emailErr);
+  }
+
+
   return {
     success: true,
+    eventId: createdLeadId ? `lead-${createdLeadId}` : undefined,
     message:
       'Thank you! Your inquiry has been submitted. We have sent a confirmation to your email and our team will contact you shortly.',
   };

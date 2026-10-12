@@ -27,6 +27,6 @@ export async function submitWebsiteEnquiry(_: FormState, data: FormData): Promis
   clean.set('message',`Landing page: /lp/interior-websites\nRequest: Website consultation for an interior or renovation business.\nCity: ${parsed.data.city}\nWebsite budget (INR): ${parsed.data.budget}\nCurrent website or Instagram: ${parsed.data.website || 'Not provided'}\n${attribution}`);
   clean.set('callbackNotice',String(data.get('callbackNotice')||''));
   const result = await submitLeadAction({},clean);
-  return result.success ? {success:true,message:'Your website enquiry has been received. We will contact you to understand your project and discuss a suitable scope.'} : result;
+  return result.success ? {success:true,eventId:result.eventId,message:'Your website enquiry has been received. We will contact you to understand your project and discuss a suitable scope.'} : result;
 }
 
