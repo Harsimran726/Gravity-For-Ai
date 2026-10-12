@@ -100,79 +100,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': ['LocalBusiness', 'ProfessionalService'],
-    name: 'Gravity For AI',
-    legalName: 'Gravity For AI',
-    alternateName: ['Gravity For AI Mansa', 'Gravity For AI Punjab', 'Gravity For AI India'],
-    disambiguatingDescription:
-      'Gravity For AI is an AI engineering and automation consultancy based in Mansa, Punjab, India, founded by Harsimran Singh. Specializes in AI voice agents, autonomous agentic workflows, and conversion web platforms. Independent entity distinct from Gravity AI (NYC marketplace).',
-    description:
-      'Gravity For AI designs, builds, and manages AI voice agents, agentic automation, and websites for local businesses.',
-    url: 'https://gravityforai.com',
-    email: 'contact@gravityforai.com',
-    hasMap: 'https://maps.google.com/?q=Mansa,Punjab,India',
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 29.9975,
-      longitude: 75.3983,
-    },
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-        ],
-        opens: '09:00',
-        closes: '18:00',
-      },
-    ],
-    founder: {
-      '@type': 'Person',
-      name: 'Harsimran Singh',
-      jobTitle: 'Founder & Lead AI Engineer',
-      url: 'https://github.com/harsimran726',
-      sameAs: [
-        'https://www.linkedin.com/in/harsimransinghaiengineer/',
-        'https://github.com/harsimran726',
-      ],
-    },
-    sameAs: [
-      'https://www.linkedin.com/in/harsimransinghaiengineer/',
-      'https://github.com/harsimran726',
-    ],
-    knowsAbout: [
-      'AI Voice Agents',
-      'Agentic AI Systems',
-      'LLM Workflow Automation',
-      'Local Business Automation',
-      'Full-Stack Next.js Engineering',
-    ],
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Mansa',
-      addressRegion: 'Punjab',
-      postalCode: '151505',
-      addressCountry: 'IN',
-    },
-    areaServed: [
-      'Mansa',
-      'Bathinda',
-      'Ludhiana',
-      'Chandigarh Tricity',
-      'Punjab',
-      'Delhi NCR',
-      'India',
-      'United States',
-      'Europe',
-    ],
-  };
 
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-KGBMFDBJ';
 
@@ -181,12 +108,6 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} scroll-smooth`}
     >
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
       <body className="font-sans antialiased bg-[#FFFFFF] text-[#0A1B3D] min-h-screen flex flex-col selection:bg-[#122C57] selection:text-[#F7F5F0]">
         <SkipToContent />
         <PublicAnalytics gtmId={gtmId}/>

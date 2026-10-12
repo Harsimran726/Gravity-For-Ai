@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -66,10 +67,7 @@ export default function PunjabRegionalPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+      <PageSchema path="/locations/punjab-regional" metadata={metadata} nodes={[schema]} />
 
       <div className="w-full flex flex-col">
         {/* Hero */}

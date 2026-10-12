@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <SectionWrapper variant="white" className="pt-12 pb-24">
+      <PageSchema path="/privacy-policy" metadata={metadata} type="WebPage" />
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
           <Link

@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -8,9 +9,21 @@ export const metadata: Metadata = {
  description: 'A clear path from your project portfolio to customer enquiries. Founder-led website development from ₹20,000.',
  alternates: {canonical: 'https://gravityforai.com/lp/interior-websites'}, robots: {index:false,follow:true},
 };
+const interiorFaqs = [
+    ['Can you create a new website or redesign our current one?','Both. We review your business, current website and priorities, then agree what should be built or improved.'],
+    ['What is included in the website project?','We agree the pages, project galleries, enquiry forms and any integrations in your written scope. The sample websites show design possibilities; they are not a fixed package.'],
+    ['How much does a website cost?','Projects start from ₹20,000. Your quote depends on the content, pages and functionality you need. We confirm the full scope and any recurring costs before work begins.'],
+    ['How long will it take?','We agree a delivery timeline after reviewing the scope and how much content is ready. Your proposal includes review milestones and the information we need from you.'],
+    ['Will the website work on mobile?','Yes. The agreed website is designed for mobile and desktop, with responsive layouts and a clear enquiry journey.'],
+    ['Do you help with content and project photos?','We can plan the page structure and discuss copy support. You provide approved business details and project images, or we agree suitable licensed or illustrative alternatives.'],
+    ['Are hosting, domain and support included?','These are itemised in the proposal so you can see what is included and what, if anything, renews separately.'],
+    ['What happens after I request a call?','Our AI assistant may call to understand your enquiry. We then confirm a suitable time for a founder discussion. Submitting the form does not automatically book a meeting.'],
+    ['Will a website guarantee customers?','No. We can improve how your business presents its work and receives enquiries. Results also depend on traffic, your offer, demand and follow-up.'],
+   ];
 const cta = 'inline-flex items-center justify-center rounded-lg bg-[#122C57] px-7 py-4 text-white font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#946A26]';
 export default function InteriorWebsitesPage() {
  return <div className="bg-[#F8F6F0] text-[#122C57] pb-24 md:pb-0">
+  <PageSchema path="/lp/interior-websites" metadata={metadata} faqs={interiorFaqs.map(([question, answer]) => ({question, answer}))} nodes={[{ "@type":"Service", name:"Websites for interior businesses", provider:{"@id":"https://gravityforai.com/#organization"}, areaServed:["Mohali","Chandigarh"] }]} />
   <header className="mx-auto max-w-6xl px-6 py-7 flex flex-wrap items-center justify-between gap-3 border-b border-[#DDD6C7]">
    <span className="text-sm font-semibold tracking-[0.2em]">GRAVITY FOR AI</span><span className="text-xs text-[#946A26] tracking-widest uppercase">Mohali · Chandigarh</span>
   </header>
@@ -94,17 +107,7 @@ export default function InteriorWebsitesPage() {
    <p className="text-xs uppercase tracking-widest text-[#946A26]">Before we talk</p><h2 id="faq-heading" className="font-serif text-3xl sm:text-4xl mt-3">Your questions, answered.</h2>
    <p className="text-slate-600 leading-relaxed mt-5 max-w-sm">A little clarity before the first conversation. Here’s what to expect when we build your website.</p>
    <div className="relative mt-8 rounded-2xl bg-[#122C57] text-white p-7 overflow-hidden"><div aria-hidden="true" className="absolute -right-10 -top-10 w-40 h-40 border border-[#C99A44]/40 rounded-full"/><div aria-hidden="true" className="absolute -right-4 -top-4 w-28 h-28 border border-[#C99A44]/40 rounded-full"/><span aria-hidden="true" className="relative font-serif text-5xl text-[#E0BA70]">?</span><h3 className="relative font-serif text-2xl mt-4">Have something else in mind?</h3><p className="relative text-sm text-white/75 mt-3 leading-relaxed">Tell us about your business and the website you’d like to create.</p><a href="#website-enquiry" className="relative inline-flex items-center gap-5 text-sm font-semibold text-[#E0BA70] mt-6 underline underline-offset-8">Let’s talk about it <span aria-hidden="true">↗</span></a></div></div>
-   <div className="space-y-3">{[
-    ['Can you create a new website or redesign our current one?','Both. We review your business, current website and priorities, then agree what should be built or improved.'],
-    ['What is included in the website project?','We agree the pages, project galleries, enquiry forms and any integrations in your written scope. The sample websites show design possibilities; they are not a fixed package.'],
-    ['How much does a website cost?','Projects start from ₹20,000. Your quote depends on the content, pages and functionality you need. We confirm the full scope and any recurring costs before work begins.'],
-    ['How long will it take?','We agree a delivery timeline after reviewing the scope and how much content is ready. Your proposal includes review milestones and the information we need from you.'],
-    ['Will the website work on mobile?','Yes. The agreed website is designed for mobile and desktop, with responsive layouts and a clear enquiry journey.'],
-    ['Do you help with content and project photos?','We can plan the page structure and discuss copy support. You provide approved business details and project images, or we agree suitable licensed or illustrative alternatives.'],
-    ['Are hosting, domain and support included?','These are itemised in the proposal so you can see what is included and what, if anything, renews separately.'],
-    ['What happens after I request a call?','Our AI assistant may call to understand your enquiry. We then confirm a suitable time for a founder discussion. Submitting the form does not automatically book a meeting.'],
-    ['Will a website guarantee customers?','No. We can improve how your business presents its work and receives enquiries. Results also depend on traffic, your offer, demand and follow-up.'],
-   ].map(([q,a],i)=><details key={q} open={i===0} className="group rounded-xl border border-[#DDD6C7] bg-white open:border-[#C99A44] open:shadow-sm transition-shadow"><summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center gap-3 sm:gap-4 p-5 sm:p-6 font-semibold text-sm sm:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#946A26] rounded-xl"><span aria-hidden="true" className="text-xs font-normal text-[#946A26] shrink-0">0{i+1}</span><span className="flex-1">{q}</span><span aria-hidden="true" className="w-7 h-7 shrink-0 rounded-full bg-[#F3F0E8] group-open:bg-[#122C57] group-open:text-white flex items-center justify-center text-lg font-normal"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span></summary><div className="px-5 sm:px-6 pb-6"><p className="border-t border-[#EEEAE1] pt-4 text-sm sm:text-base text-slate-600 leading-relaxed">{a}</p></div></details>)}</div>
+   <div className="space-y-3">{interiorFaqs.map(([q,a],i)=><details key={q} open={i===0} className="group rounded-xl border border-[#DDD6C7] bg-white open:border-[#C99A44] open:shadow-sm transition-shadow"><summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer flex items-center gap-3 sm:gap-4 p-5 sm:p-6 font-semibold text-sm sm:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#946A26] rounded-xl"><span aria-hidden="true" className="text-xs font-normal text-[#946A26] shrink-0">0{i+1}</span><span className="flex-1">{q}</span><span aria-hidden="true" className="w-7 h-7 shrink-0 rounded-full bg-[#F3F0E8] group-open:bg-[#122C57] group-open:text-white flex items-center justify-center text-lg font-normal"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span></summary><div className="px-5 sm:px-6 pb-6"><p className="border-t border-[#EEEAE1] pt-4 text-sm sm:text-base text-slate-600 leading-relaxed">{a}</p></div></details>)}</div>
    </div>
   </section>
   <footer className="border-t border-[#DDD6C7] px-6 py-8 text-sm"><div className="max-w-6xl mx-auto flex flex-wrap gap-4 justify-between"><span>Gravity For AI · Mansa, Punjab</span><a className="underline" href="mailto:contact@gravityforai.com">contact@gravityforai.com</a><a className="underline" href="/privacy-policy">Privacy policy</a></div></footer>

@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -42,6 +43,7 @@ export default function LocationsDirectoryPage() {
 
   return (
     <div className="w-full flex flex-col pt-12 sm:pt-20">
+      <PageSchema path="/locations" metadata={metadata} type="CollectionPage" />
       {/* Header */}
       <section className="bg-[#FFFFFF] py-16 sm:py-24 border-b border-[#E4E2DC]">
         <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-6">

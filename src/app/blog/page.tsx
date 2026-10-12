@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -41,14 +42,14 @@ export default async function BlogListingPage() {
       title: post.title,
       metaDescription: post.metaDescription,
       canonicalUrl: post.canonicalUrl || `https://gravityforai.com/blog/${post.slug}`,
-      publishedAt: post.publishedAt?.toISOString() || new Date().toISOString(),
+      publishedAt: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
       category: post.category?.name || 'General',
       readingTime: post.readingTime || 5,
       author: {
         name: post.author?.name || 'Gravity Team',
       },
     })),
-    ...BLOG_POSTS_SEED
+    ...BLOG_POSTS_SEED.filter(seed => !dbPosts.some(post => post.slug === seed.slug))
   ];
 
   const collectionSchema = {
@@ -79,10 +80,7 @@ export default async function BlogListingPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
-      />
+      <PageSchema path="/blog" metadata={metadata} type="CollectionPage" nodes={[collectionSchema]} />
 
       <div className="w-full flex flex-col">
         <SectionWrapper variant="white" className="pt-12 sm:pt-16 pb-16">

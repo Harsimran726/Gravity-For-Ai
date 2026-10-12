@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -116,10 +117,7 @@ export default function CityPage({ params }: { params: { city: string } }) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localSchema) }}
-      />
+      <PageSchema path={`/locations/${city.citySlug}`} title={city.title} description={city.metaDescription} nodes={[localSchema]} />
 
       <div className="w-full flex flex-col">
         {/* Hero */}

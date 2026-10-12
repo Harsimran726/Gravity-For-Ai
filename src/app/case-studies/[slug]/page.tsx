@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -43,6 +44,7 @@ export default function CaseStudyDetailPage({ params }: { params: { slug: string
 
   return (
     <div className="w-full flex flex-col">
+      <PageSchema path={`/case-studies/${study.slug}`} title={study.title} description={study.summary} />
       <SectionWrapper variant="white" className="pt-10 sm:pt-14 pb-16">
         <div className="max-w-4xl space-y-8">
           {/* Back link */}

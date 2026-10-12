@@ -1,3 +1,5 @@
+import { JsonLd } from '@/components/seo/page-schema';
+import { buildBlogGraph } from '@/lib/structured-data';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         description: dbPost.metaDescription,
         url: dbPost.canonicalUrl || `https://gravityforai.com/blog/${dbPost.slug}`,
         type: 'article',
-        publishedTime: dbPost.publishedAt?.toISOString() || new Date().toISOString(),
+        publishedTime: dbPost.publishedAt?.toISOString() || dbPost.createdAt.toISOString(),
         authors: [dbPost.author?.name || 'Gravity Team'],
         images: [{ url: dbPost.ogImage || 'https://gravityforai.com/og-default.jpg' }],
       },
@@ -83,7 +85,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       },
       content: { intro: '', sections: [], conclusion: '' },
       faqs: dbPost.faqs || [],
-      publishedAt: dbPost.publishedAt?.toISOString() || new Date().toISOString(),
+      publishedAt: dbPost.publishedAt?.toISOString() || dbPost.createdAt.toISOString(),
       ogImage: dbPost.ogImage || 'https://gravityforai.com/og-default.jpg',
       readingTime: dbPost.readingTime || 5,
     };
@@ -97,39 +99,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   }
 
   // Advanced Nested Schema (Person + Organization + Article + Breadcrumbs + FAQPage)
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.metaDescription,
-    image: post.ogImage,
-    datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: post.author.name,
-      url: post.author.linkedinUrl,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Gravity For AI',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://gravityforai.com/icon.png',
-      },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': post.canonicalUrl || `https://gravityforai.com/blog/${post.slug}`,
-    },
-  };
+  const articleSchema = buildBlogGraph(post, true);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema).replace(/</g, '\\u003c') }}
-      />
+      <JsonLd data={articleSchema} />
 
       <div className="w-full flex flex-col">
         <SectionWrapper variant="white" className="pt-10 pb-16">

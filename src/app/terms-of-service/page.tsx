@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { SectionWrapper } from '@/components/ui/section-wrapper';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 export default function TermsOfServicePage() {
   return (
     <SectionWrapper variant="white" className="pt-12 pb-24">
+      <PageSchema path="/terms-of-service" metadata={metadata} type="WebPage" />
       <div className="max-w-3xl space-y-8">
         <span className="font-mono text-xs uppercase tracking-widest text-[#C99A44]">
           Legal & Compliance

@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="w-full flex flex-col">
+      <PageSchema path="/about" metadata={metadata} type="AboutPage" />
       {/* Hero Section */}
       <SectionWrapper variant="white" className="pt-12 sm:pt-16 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">

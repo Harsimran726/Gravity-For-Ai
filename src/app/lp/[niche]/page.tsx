@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -60,10 +61,7 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(landingSchema) }}
-      />
+      <PageSchema path={`/lp/${data.slug}`} title={data.meta.title} description={data.meta.description} nodes={[landingSchema]} faqs={data.faqSection.faqs} />
 
       <div className="w-full flex flex-col">
         {/* Minimal Distraction-Free Landing Nav Bar */}

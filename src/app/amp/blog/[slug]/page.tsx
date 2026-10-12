@@ -1,9 +1,12 @@
+import { JsonLd } from '@/components/seo/page-schema';
+import { buildBlogGraph } from '@/lib/structured-data';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { notFound } from 'next/navigation';
 import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
+import { publicAuthorSelect, socialUrl } from '@/lib/public-author';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -44,7 +47,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function AmpBlogPostPage({ params }: { params: { slug: string } }) {
   let dbPost = await prisma.blogPost.findUnique({ 
     where: { slug: params.slug },
-    include: { author: {select:{name:true,title:true}}, category: true }
+    include: { author: {select:publicAuthorSelect}, category: true }
   });
 
   let post: any = null;
@@ -57,9 +60,11 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
       author: {
         name: dbPost.author?.name || 'Gravity Team',
         role: dbPost.author?.title || 'Author',
+        linkedinUrl: socialUrl(dbPost.author?.linkedinUrl, 'linkedin.com'),
+        githubUrl: socialUrl(dbPost.author?.githubUrl, 'github.com'),
       },
       content: { intro: '', sections: [] },
-      publishedAt: dbPost.publishedAt?.toISOString() || new Date().toISOString(),
+      publishedAt: dbPost.publishedAt?.toISOString() || dbPost.createdAt.toISOString(),
       readingTime: dbPost.readingTime || 5,
     };
     isDbPost = true;
@@ -73,33 +78,7 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
 
   const canonicalUrl = isDbPost ? (post.canonicalUrl || `https://gravityforai.com/blog/${post.slug}`) : post.canonicalUrl;
 
-  const ampSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    headline: post.title,
-    description: post.metaDescription,
-    datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: post.author.name,
-      jobTitle: post.author.role,
-      url: 'https://gravityforai.com/about',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Gravity For AI',
-      url: 'https://gravityforai.com',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://gravityforai.com/icon.png',
-      },
-    },
-  };
+  const ampSchema = buildBlogGraph(post, false);
 
   return (
     <>
@@ -123,10 +102,7 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
           }}
         />
       </head>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ampSchema) }}
-      />
+      <JsonLd data={ampSchema} />
 
       <header className="amp-header">
         <a href="/" className="amp-logo">Gravity For AI</a>

@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { SectionWrapper } from '@/components/ui/section-wrapper';
@@ -84,6 +85,7 @@ const ALL_TIERS = [
 export default function PricingPage() {
   return (
     <div className="w-full flex flex-col">
+      <PageSchema path="/pricing" metadata={metadata} type="WebPage" />
       <SectionWrapper variant="white" className="pt-12 sm:pt-16 pb-16">
         <div className="max-w-3xl space-y-4">
           <span className="font-mono text-xs uppercase tracking-widest text-[#C99A44]">

@@ -1,3 +1,4 @@
+import { PageSchema } from '@/components/seo/page-schema';
 import * as React from 'react';
 import type { Metadata } from 'next';
 import { HeroSection } from '@/components/home/hero';
@@ -87,14 +88,8 @@ export default function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
-      />
+      <PageSchema path="/" metadata={metadata} nodes={[faqSchema, servicesSchema]} />
+
 
       <div className="w-full flex flex-col">
         {/* 1. Hero: Headline + Subhead + Primary CTA + Orbit Motif */}
