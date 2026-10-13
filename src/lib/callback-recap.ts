@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import {sendTrackedMail} from './mail-sent-copy';
 import {z} from 'zod';
 import {prisma} from '@/lib/prisma';
 import {analyseConversation,recapCopy} from '@/lib/callback-recap-analysis';
@@ -25,12 +25,10 @@ export async function sendCallRecap(id:string){
   if(!host||!user||!pass){await prisma.aiCallback.updateMany({where:{id,recapStatus:'PENDING'},data:{recapStatus:'BLOCKED',recapError:'SMTP configuration missing.'}});return;}
   const reserved=await prisma.aiCallback.updateMany({where:{id,analysisStatus:'CHECKED',recapStatus:'PENDING'},data:{recapStatus:'SENDING',recapError:null}});
   if(!reserved.count)return;
-  const port=Number(process.env.SMTP_PORT)||465;
-  const transport=nodemailer.createTransport({host,port,secure:port===465,requireTLS:true,auth:{user,pass},connectionTimeout:8000,greetingTimeout:8000,socketTimeout:12000});
   try{
-    const result=await transport.sendMail({from:{name:'Gravity For AI',address:process.env.SMTP_FROM||'contact@gravityforai.com'},to:call.lead.email,replyTo:'contact@gravityforai.com',subject:call.recapSubject||'Your Gravity For AI call recap',text:call.recapBody,messageId:'<callback-recap-'+call.id+'@gravityforai.com>'});
+    const result=await sendTrackedMail({from:{name:'Gravity For AI',address:process.env.SMTP_FROM||'contact@gravityforai.com'},to:call.lead.email,replyTo:'contact@gravityforai.com',subject:call.recapSubject||'Your Gravity For AI call recap',text:call.recapBody,messageId:'<callback-recap-'+call.id+'@gravityforai.com>'});
     if(!result.accepted?.length){await prisma.aiCallback.updateMany({where:{id,recapStatus:'SENDING'},data:{recapStatus:'REJECTED',recapError:'Mail server did not accept recipient.'}});return;}
     await prisma.aiCallback.updateMany({where:{id,recapStatus:'SENDING'},data:{recapStatus:'SENT',recapSentAt:new Date(),recapError:null}});
-  }catch{await prisma.aiCallback.updateMany({where:{id,recapStatus:'SENDING'},data:{recapStatus:'UNKNOWN',recapError:'Email acceptance uncertain. Check Sent mail/provider logs before resending; automatic retry disabled.'}});}finally{transport.close();}
+  }catch{await prisma.aiCallback.updateMany({where:{id,recapStatus:'SENDING'},data:{recapStatus:'UNKNOWN',recapError:'Email acceptance uncertain. Check Sent mail/provider logs before resending; automatic retry disabled.'}});}
 }
 export async function safelyProcessCallRecap(id:string){try{await processCallRecap(id);await sendCallRecap(id);}catch{console.error('[CALL RECAP] Processing interrupted; review dashboard.');}}

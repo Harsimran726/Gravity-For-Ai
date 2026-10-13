@@ -322,3 +322,18 @@ model AiCallback {
   @@index([status,createdAt])
   @@index([phone,requestedAt])
 }
+
+// Encrypted outgoing MIME retained only until its Sent copy is saved.
+model MailSentCopy {
+  id String @id @default(cuid())
+  messageId String @unique
+  status String @default("PREPARED")
+  encryptedMime String? @db.Text
+  attempts Int @default(0)
+  retryAt DateTime @default(now())
+  lockUntil DateTime?
+  error String?
+  createdAt DateTime @default(now())
+  savedAt DateTime?
+  @@index([status, retryAt])
+}

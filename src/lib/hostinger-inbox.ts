@@ -18,3 +18,12 @@ export async function readHostingerInbox(since:Date):Promise<InboxMessage[]> {
   }
   throw new Error('Inbox scan exceeded 5,000 messages; review inbox coverage before sending.');
 }
+
+/** Metadata only: never marks a message as read. */
+export async function latestInboxMessages():Promise<InboxMessage[]> {
+ const token=process.env.HOSTINGER_MAIL_API_TOKEN, mailbox=process.env.HOSTINGER_MAILBOX_ID;
+ if(!token||!mailbox) throw new Error('Inbox connection unavailable');
+ const response=await fetch(`https://api.mail.hostinger.com/api/v1/mailboxes/${encodeURIComponent(mailbox)}/folders/INBOX/messages?perPage=5&sort=-date`,{headers:{Authorization:`Bearer ${token}`},cache:'no-store',signal:AbortSignal.timeout(5000)});
+ if(!response.ok)throw new Error('Inbox connection unavailable');
+ return Page.parse(await response.json()).data;
+}

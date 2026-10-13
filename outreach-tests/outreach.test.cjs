@@ -83,7 +83,7 @@ function harness({smtpFail=false,inboxFail=false,reply=false,cap=0}={}){
   outreachSuppression:{findUnique:async()=>suppressed?{email:p.email}:null,upsert:async()=>{suppressed=true;}},
  };
  db.$transaction=async fn=>fn(db);
- const engine=loader({'./prisma':{prisma:db},'./hostinger-inbox':{readHostingerInbox:async()=>{syncs++;if(inboxFail)throw Error('Inbox offline');return reply?[{from:{address:p.email},date:new Date().toISOString(),subject:'No thanks'}]:[];}},nodemailer:{createTransport:()=>({sendMail:async mail=>{calls++;assert.ok(mail.text.includes('Stop future emails: https://'));if(smtpFail)throw Error('Timeout');return {accepted:[p.email]};},close(){}})}},{process:{env}})('src/lib/outreach-engine.ts');
+ const engine=loader({'./prisma':{prisma:db},'./hostinger-inbox':{readHostingerInbox:async()=>{syncs++;if(inboxFail)throw Error('Inbox offline');return reply?[{from:{address:p.email},date:new Date().toISOString(),subject:'No thanks'}]:[];}},'./mail-sent-copy':{sendTrackedMail:async mail=>{calls++;assert.ok(mail.text.includes('Stop future emails: https://'));if(smtpFail)throw Error('Timeout');return {accepted:[p.email]};}}},{process:{env}})('src/lib/outreach-engine.ts');
  return {engine,events,p,mailbox,env,calls:()=>calls,syncs:()=>syncs};
 }
 test('concurrent workers send a recipient step only once',async()=>{

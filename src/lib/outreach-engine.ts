@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import {sendTrackedMail} from './mail-sent-copy';
 import {prisma} from './prisma';
 import {readHostingerInbox} from './hostinger-inbox';
 import {istDayStart,dailyRampLimit,dueStep,normalizeEmail,personalize,EMAIL} from './outreach-policy';
@@ -89,11 +89,7 @@ async function dispatchOutreachTick(campaignId?:string) {
           if(active.status!=='ACTIVE'||!active.automationEnabled||!latest.permissionGranted||!['SELECTED','SENT'].includes(latest.status)||await prisma.outreachSuppression.findUnique({where:{email:p.email}})) {
             await prisma.outreachMessage.update({where:{id:message.id},data:{status:'CANCELLED'}});return {message:'Stopped before dispatch.',sent:false};
           }
-          const transport=nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT)||465,secure:(Number(process.env.SMTP_PORT)||465)===465,requireTLS:true,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS},connectionTimeout:15000,greetingTimeout:15000,socketTimeout:20000});
-          try {
-            const result=await transport.sendMail({from:{name:'Gravity For AI',address:config.address},to:{name:p.name,address:p.email},replyTo:config.address,subject,text,messageId,headers:{'List-Unsubscribe':`<${link}>`,'List-Unsubscribe-Post':'List-Unsubscribe=One-Click'}});
-            if(!result.accepted?.length)throw new Error('SMTP did not accept the recipient.');
-          } finally {transport.close();}
+          await sendTrackedMail({from:{name:'Gravity For AI',address:config.address},to:{name:p.name,address:p.email},replyTo:config.address,subject,text,messageId,headers:{'List-Unsubscribe':`<${link}>`,'List-Unsubscribe-Post':'List-Unsubscribe=One-Click'}});
           await prisma.$transaction(async tx=>{
             await tx.outreachMessage.update({where:{id:message.id},data:{status:'ACCEPTED',sentAt:new Date()}});
             await tx.outreachProspect.updateMany({where:{id:p.id,status:{in:['SELECTED','SENT']}},data:{status:'SENT',sentAt:p.sentAt||new Date(),error:null}});

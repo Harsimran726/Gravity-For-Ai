@@ -1,5 +1,6 @@
 'use server';
 
+import {sendTrackedMail} from '@/lib/mail-sent-copy';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
@@ -27,32 +28,8 @@ export type TeamActionState = {
   errors?: Record<string, string[]>;
 };
 
-// Helper to dispatch email (inline, no import needed, uses Resend or SMTP from env)
-async function sendTeamEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  const fromEmail = process.env.SMTP_FROM || 'contact@gravityforai.com';
-  const fromHeader = `"Gravity For AI" <${fromEmail}>`;
-
-  if (process.env.RESEND_API_KEY) {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: fromHeader, to: [to], subject, html }),
-    });
-    if(!response.ok)throw new Error('Mail provider rejected request');
-    return;
-  }
-
-  const nodemailer = await import('nodemailer');
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (host && user && pass) {
-    const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass }, tls: { rejectUnauthorized: true } });
-    await transporter.sendMail({ from: fromHeader, to, subject, html });
-  } else {
-    throw new Error('Mail is not configured');
-  }
+async function sendTeamEmail({to,subject,html}:{to:string;subject:string;html:string}) {
+  await sendTrackedMail({to,subject,html});
 }
 
 // ACTION 1: Invite a new team member

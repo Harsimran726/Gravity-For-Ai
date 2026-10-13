@@ -1,3 +1,4 @@
+import {retrySentCopies} from '@/lib/mail-sent-copy';
 import {NextResponse} from 'next/server';
 import {secureEqual} from '@/lib/outreach-security';
 import {runOutreachTick} from '@/lib/outreach-engine';
@@ -7,5 +8,6 @@ export const maxDuration=120;
 export async function POST(request:Request){
  const secret=process.env.OUTREACH_CRON_SECRET;
  if(!secret||secret.length<32||!secureEqual(request.headers.get('authorization')||'',`Bearer ${secret}`))return NextResponse.json({error:'Unauthorized'},{status:401});
+ try{await retrySentCopies();}catch{console.error('[MAIL] Archive worker needs review.');}
  try{return NextResponse.json(await runOutreachTick(undefined,'scheduler'));}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Worker failed'},{status:503});}
 }

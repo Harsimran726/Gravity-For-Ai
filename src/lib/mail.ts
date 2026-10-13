@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import {sendTrackedMail,senderAddress} from './mail-sent-copy';
 
 interface BookingEmailParams {
   name: string;
@@ -21,99 +21,9 @@ interface ContactEmailParams {
   message: string;
 }
 
-function getTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (host && user && pass) {
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465, // SSL on 465, STARTTLS on 587
-      auth: { user, pass },
-      tls: {
-        rejectUnauthorized: true, // Prevents self-signed cert failures
-      },
-    });
-  }
-
-  return null;
-}
-
-/**
- * Universal dispatcher that automatically chooses between:
- * 1. Resend REST API (if RESEND_API_KEY is defined)
- * 2. SMTP Transporter via Nodemailer (if SMTP_HOST, SMTP_USER, SMTP_PASS are defined)
- * 3. Local development console logging fallback
- */
-async function dispatchEmail({
-  to,
-  subject,
-  html,
-}: {
-  to: string;
-  subject: string;
-  html: string;
-}): Promise<boolean> {
-  const fromEmail = process.env.SMTP_FROM || 'contact@gravityforai.com';
-  const fromName = 'Gravity For AI';
-  const fromHeader = `"${fromName}" <${fromEmail}>`;
-
-  // --- Option A: Resend API (HTTP REST — zero timeout, best for Vercel Serverless) ---
-  if (process.env.RESEND_API_KEY) {
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromHeader,
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.error('[MAIL] Resend API error:', data);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.error('[MAIL] Resend network error:', err);
-      return false;
-    }
-  }
-
-  // --- Option B: Standard SMTP via Nodemailer (Hostinger, Google Workspace, Zoho, Titan) ---
-  const transporter = getTransporter();
-  if (transporter) {
-    try {
-      await transporter.sendMail({
-        from: fromHeader,
-        to,
-        subject,
-        html,
-      });
-      return true;
-    } catch (err) {
-      console.error('[MAIL] SMTP send error:', err);
-      return false;
-    }
-  }
-
-  // --- Option C: Fallback development logger ---
-  console.log('----------------------------------------------------');
-  console.log(`[MAIL DISPATCH DEV MOCK] To: ${to}`);
-  console.log(`[MAIL DISPATCH DEV MOCK] Subject: ${subject}`);
-  console.log('[MAIL DISPATCH DEV MOCK] Configure SMTP_* or RESEND_API_KEY in Vercel to send real emails.');
-  console.log('----------------------------------------------------');
-  return true;
+export async function dispatchEmail({to,subject,html}:{to:string;subject:string;html:string}):Promise<boolean>{
+  try { await sendTrackedMail({to,subject,html,replyTo:senderAddress()});return true; }
+  catch { console.error('[MAIL] Send failed or outcome uncertain; check mail activity.');return false; }
 }
 
 export async function sendBookingEmails(params: BookingEmailParams) {

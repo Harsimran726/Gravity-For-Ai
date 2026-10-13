@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS "MailSentCopy" (
+ "id" TEXT PRIMARY KEY, "messageId" TEXT NOT NULL UNIQUE,
+ "status" TEXT NOT NULL DEFAULT 'PREPARED', "encryptedMime" TEXT,
+ "attempts" INTEGER NOT NULL DEFAULT 0, "retryAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ "lockUntil" TIMESTAMP(3), "error" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ "savedAt" TIMESTAMP(3)
+);
+CREATE INDEX IF NOT EXISTS "MailSentCopy_status_retryAt_idx" ON "MailSentCopy"("status","retryAt");
