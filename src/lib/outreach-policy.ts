@@ -1,4 +1,5 @@
 export const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+import {nextSequenceStep} from './outreach-sequence';
 export const STOP = ['REPLIED', 'UNSUBSCRIBED', 'BOUNCED', 'SKIPPED'];
 export function normalizeEmail(email: string) { return email.trim().toLowerCase(); }
 export function istDayStart(now = new Date()) {
@@ -19,11 +20,12 @@ export function dailyRampLimit(start: Date | null, now: Date, ceiling: number) {
   const age = start ? Math.floor((istDayStart(now).getTime() - istDayStart(start).getTime()) / 86400000) : 0;
   return Math.min(ceiling, age < 3 ? 5 : age < 7 ? 10 : 20);
 }
-export function personalize(template: string, p: {name: string; company: string | null; email: string}) {
+export function personalize(template: string, p: {name: string; company?: string | null; email: string}) {
   const values: Record<string,string> = {name:p.name || 'there', firstname:p.name?.split(' ')[0] || 'there', company:p.company || 'your business', email:p.email};
   return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => values[key.toLowerCase()] ?? '');
 }
-export function dueStep(p: {status:string; permissionGranted:boolean; sentAt:Date|null}, sent: {step:number; sentAt:Date|null; status:string}[], c:{followup1Body:string|null;followup2Body:string|null;followup1Days:number;followup2Days:number}, now:Date) {
+export function dueStep(p: {status:string; permissionGranted:boolean; sentAt:Date|null;sequenceMessages?:unknown;customSubject?:string|null;customBody?:string|null}, sent: {step:number; sentAt:Date|null; status:string}[], c:{sequence?:unknown;subject?:string;body?:string;followup1Body:string|null;followup2Body:string|null;followup1Days:number;followup2Days:number}, now:Date) {
+  if(c.sequence){const next=nextSequenceStep(p,sent,c);return next&&(!next.dueAt||next.dueAt<=now)?next.step:null;}
   if (!p.permissionGranted || STOP.includes(p.status)) return null;
   // Never automatically retry an uncertain attempt, or any reserved step.
   if (sent.some(m=>m.status==='CLAIMED'||m.status==='UNKNOWN')) return null;

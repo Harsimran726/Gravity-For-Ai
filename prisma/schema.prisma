@@ -206,6 +206,7 @@ model AuditLog {
 }
 
 model OutreachCampaign {
+  sequence Json?
   automationEnabled Boolean @default(false)
   followup1Body String? @db.Text
   followup2Body String? @db.Text
@@ -233,6 +234,7 @@ model OutreachCampaign {
 }
 
 model OutreachProspect {
+  sequenceMessages Json?
   permissionGranted Boolean @default(false)
   permissionNote String?
   repliedAt DateTime?

@@ -12,7 +12,7 @@ function loader(mocks={},globals={}) {
     if(cache.has(file))return cache.get(file).exports;
     const module={exports:{}};cache.set(file,module);
     const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,esModuleInterop:true}}).outputText;
-    const req=id=>id in mocks?mocks[id]:id.startsWith('.')?load(path.resolve(path.dirname(file),id+'.ts')):require(id);
+    const req=id=>id in mocks?mocks[id]:id.startsWith('@/')?load('src/'+id.slice(2)+'.ts'):id.startsWith('.')?load(path.resolve(path.dirname(file),id+'.ts')):require(id);
     vm.runInNewContext(code,{module,exports:module.exports,require:req,process,Buffer,Date,URL,AbortSignal,fetch,...globals},{filename:file});
     return module.exports;
   };

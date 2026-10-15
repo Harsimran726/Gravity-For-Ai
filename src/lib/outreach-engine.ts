@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import {resolveSteps} from './outreach-sequence';
 import {sendTrackedMail} from './mail-sent-copy';
 import {prisma} from './prisma';
 import {readHostingerInbox} from './hostinger-inbox';
@@ -68,8 +69,10 @@ async function dispatchOutreachTick(campaignId?:string) {
       for(const p of c.prospects) {
         const step=dueStep(p,p.messages,c,now);if(step===null)continue;
         if(await prisma.outreachSuppression.findUnique({where:{email:p.email}}))continue;
-        const template=step===0?(p.customBody||c.body):step===1?c.followup1Body:c.followup2Body;
-        const subject=personalize(p.customSubject||c.subject,p).replace(/[\r\n]/g,' ');
+        const content=resolveSteps(c,p)[step];
+        if(!content?.subject.trim()||!content.body.trim())continue;
+        const template=content.body;
+        const subject=personalize(content.subject,p).replace(/[\r\n]/g,' ');
         const link=`${process.env.OUTREACH_PUBLIC_URL!.replace(/\/$/,'')}/api/outreach/unsubscribe?token=${encodeURIComponent(unsubscribeToken(p.id))}`;
         const text=`${personalize(template||'',p)}\n\nGravity For AI\n${process.env.OUTREACH_POSTAL_ADDRESS}\nStop future emails: ${link}`;
         const messageId=`<${crypto.randomUUID()}@${config.address.split('@')[1]}>`;

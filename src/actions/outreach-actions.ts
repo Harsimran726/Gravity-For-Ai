@@ -1,5 +1,6 @@
 'use server';
 import {z} from 'zod';
+import {readSequence,resolveSteps} from '@/lib/outreach-sequence';
 import {prisma} from '@/lib/prisma';
 import {getAdminSession} from '@/lib/auth';
 import {revalidatePath} from 'next/cache';
@@ -9,18 +10,20 @@ export type {ParsedProspect} from '@/lib/csv-parser';
 export type OutreachActionState={success?:boolean;message?:string;campaignId?:string;errors?:Record<string,string[]>};
 async function admin(){const s=await getAdminSession();if(!s||s.role!=='ADMIN')throw new Error('Unauthorized');return s;}
 function refresh(){revalidatePath('/admin/outreach','layout');}
-const Prospect=z.object({name:z.string().trim().max(200).default('there'),email:z.string().trim().toLowerCase().email().max(320),company:z.string().max(300).optional(),customSubject:z.string().max(200).optional(),customBody:z.string().max(10000).optional()});
+const Prospect=z.object({name:z.string().trim().max(200).default('there'),email:z.string().trim().toLowerCase().email().max(320),company:z.string().max(300).optional(),customSubject:z.string().max(200).optional(),customBody:z.string().max(10000).optional(),sequenceMessages:z.array(z.object({subject:z.string().max(200),body:z.string().max(10000)})).max(8).optional()});
 export async function createCampaignAction(_:OutreachActionState,form:FormData):Promise<OutreachActionState>{
  const session=await admin();
- const parsed=z.object({name:z.string().trim().min(1).max(150),subject:z.string().trim().min(1).max(200),body:z.string().min(20).max(10000),dailyLimit:z.coerce.number().int().min(1).max(100),purpose:z.enum(['CAMPAIGN','TEST']),followup1Body:z.string().max(10000),followup2Body:z.string().max(10000)}).safeParse(Object.fromEntries(['name','subject','body','dailyLimit','purpose','followup1Body','followup2Body'].map(k=>[k,form.get(k)|| (k==='purpose'?'CAMPAIGN':'')])));
+ const parsed=z.object({name:z.string().trim().min(1).max(150),dailyLimit:z.coerce.number().int().min(1).max(100),purpose:z.enum(['CAMPAIGN','TEST'])}).safeParse({name:form.get('name'),dailyLimit:form.get('dailyLimit'),purpose:form.get('purpose')||'CAMPAIGN'});
  if(!parsed.success)return {success:false,message:'Check the campaign fields.',errors:parsed.error.flatten().fieldErrors};
- if(parsed.data.followup2Body&&!parsed.data.followup1Body)return {success:false,message:'Add the first follow-up before a second follow-up.'};
+ let sequence;
+ try {const text=String(form.get('sequenceJson')||'');if(text.length>100000)throw Error('Sequence is too large.');sequence=readSequence(JSON.parse(text));if(!sequence)throw Error('Add a first email.');}catch(e){return {success:false,message:e instanceof Error?e.message:'Invalid sequence.'};}
  const json=String(form.get('prospectsJson')||'[]');if(json.length>5_000_000)return {success:false,message:'Import is too large.'};
  let rows:z.infer<typeof Prospect>[];
- try{rows=z.array(Prospect).min(1).max(5000).parse(JSON.parse(json));}catch{return {success:false,message:'Upload 1–5,000 valid prospects with email addresses.'};}
+ try{rows=z.array(Prospect).min(1).max(5000).parse(JSON.parse(json));}catch{return {success:false,message:'Upload 1–5,000 valid prospects with email addresses and valid messages.'};}
+ for(const row of rows){const messages=resolveSteps({sequence},row);const missing=messages.findIndex(m=>!m.subject.trim()||!m.body.trim());if(missing>=0)return {success:false,message:`${row.email}: add a subject and message for ${missing===0?'the first email':'follow-up '+missing}, or supply a default.`};if(row.sequenceMessages&&row.sequenceMessages.length!==sequence.steps.length)return {success:false,message:'The number of mapped messages must match your sequence.'};}
  const unique=Array.from(new Map(rows.map(p=>[p.email,p])).values());
  const blocked=await prisma.outreachSuppression.findMany({where:{email:{in:unique.map(p=>p.email)}}});const blockedSet=new Set(blocked.map(p=>p.email));
- const campaign=await prisma.outreachCampaign.create({data:{...parsed.data,followup1Body:parsed.data.followup1Body||null,followup2Body:parsed.data.followup2Body||null,createdById:session.id,prospects:{create:unique.map(p=>({...p,name:p.name||'there',status:blockedSet.has(p.email)?'SKIPPED':'PENDING'}))}}});
+ const campaign=await prisma.outreachCampaign.create({data:{...parsed.data,sequence:JSON.parse(JSON.stringify(sequence)),subject:sequence.steps[0].subject,body:sequence.steps[0].body,createdById:session.id,prospects:{create:unique.map(p=>({...p,name:p.name||'there',status:blockedSet.has(p.email)?'SKIPPED':'PENDING'}))}}});
  refresh();return {success:true,campaignId:campaign.id,message:`Imported ${unique.length} unique records; ${blocked.length} suppressed. Nothing sent.`};
 }
 export async function updateProspectStatusAction(ids:string[],status:'SELECTED'|'PENDING'):Promise<OutreachActionState>{
@@ -61,7 +64,7 @@ export async function getOutreachAnalytics(session?:Awaited<ReturnType<typeof ge
  const accepted=c.messages.filter(m=>m.status==='ACCEPTED');
  const legacy=c.prospects.filter(p=>p.sentAt&&!p.messages.some(m=>m.step===0));
  const sentToday=accepted.filter(m=>m.sentAt&&m.sentAt>=start).length+legacy.filter(p=>p.sentAt!>=start).length;
- return {id:c.id,name:c.name,status:c.status,purpose:c.purpose,dailyLimit:c.dailyLimit,createdAt:c.createdAt,totalSent:accepted.length+legacy.length,sentToday,totalFailed:c.messages.filter(m=>m.status==='UNKNOWN'||m.status==='CLAIMED').length,totalProspects:c.prospects.length,replies:c.prospects.filter(p=>p.repliedAt).length,followup1:c.prospects.filter(p=>dueStep(p,p.messages,c,now)===1).length,followup2:c.prospects.filter(p=>dueStep(p,p.messages,c,now)===2).length};
+ return {id:c.id,name:c.name,status:c.status,purpose:c.purpose,dailyLimit:c.dailyLimit,createdAt:c.createdAt,totalSent:accepted.length+legacy.length,sentToday,totalFailed:c.messages.filter(m=>m.status==='UNKNOWN'||m.status==='CLAIMED').length,totalProspects:c.prospects.length,replies:c.prospects.filter(p=>p.repliedAt).length,followup1:c.prospects.filter(p=>dueStep(p,p.messages,c,now)===1).length,followup2:c.prospects.filter(p=>(dueStep(p,p.messages,c,now)??-1)>=2).length};
  });
  const normal=campaigns.filter(c=>c.purpose!=='TEST');
  const total=(key:'totalSent'|'sentToday'|'totalFailed'|'totalProspects'|'replies'|'followup1'|'followup2')=>normal.reduce((n,c)=>n+c[key],0);

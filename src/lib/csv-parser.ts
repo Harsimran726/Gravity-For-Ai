@@ -1,4 +1,4 @@
-export interface ParsedProspect { name:string; email:string; company?:string; customSubject?:string; customBody?:string }
+export interface ParsedProspect { name:string; email:string; company?:string; customSubject?:string; customBody?:string; sequenceMessages?:{subject:string;body:string}[] }
 export interface ParseResult { prospects:ParsedProspect[]; errors:string[]; hasCustomSubject:boolean; hasCustomBody:boolean }
 const emailPattern=/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 const empty=(message:string):ParseResult=>({prospects:[],errors:[message],hasCustomSubject:false,hasCustomBody:false});
@@ -16,10 +16,12 @@ export function suggestColumnMapping(headers:string[]):ColumnMapping {
   const keys=headers.map(c=>c.replace(/^\uFEFF/,'').trim().toLowerCase().replace(/[\s_-]/g,''));
   return Object.fromEntries(Object.entries(aliases).map(([field,names])=>[field,keys.findIndex(k=>names.includes(k))])) as ColumnMapping;
 }
-function tableFromRows(rows:string[][]):ProspectTable {
+export function tableFromRows(rows:string[][]):ProspectTable {
   rows=rows.filter(r=>r.some(c=>c.trim()));
   if(!rows.length)return {headers:[],rows:[],errors:['The file is empty.']};
   if(rows[0].length===1&&emailPattern.test(rows[0][0].trim()))rows=[['email'],...rows];
+  const header=rows.slice(0,20).findIndex(r=>r.some(v=>/^(email|email address|contact id)$/i.test(v.trim())));
+  if(header>0)rows=rows.slice(header);
   const width=rows.reduce((max,row)=>Math.max(max,row.length),0);
   return {headers:Array.from({length:width},(_,i)=>(rows[0][i]||'').replace(/^\uFEFF/,'').trim()),rows:rows.slice(1),errors:[]};
 }

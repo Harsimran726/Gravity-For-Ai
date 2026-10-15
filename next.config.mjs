@@ -15,6 +15,7 @@ const cspHeader = `
 `.replace(/\s{2,}/g, ' ').trim();
 
 const nextConfig = {
+  experimental: { serverActions: { bodySizeLimit: '10mb' } },
   reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],

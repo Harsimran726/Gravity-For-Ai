@@ -1,0 +1,4 @@
+BEGIN;
+ALTER TABLE "OutreachCampaign" ADD COLUMN IF NOT EXISTS "sequence" JSONB;
+ALTER TABLE "OutreachProspect" ADD COLUMN IF NOT EXISTS "sequenceMessages" JSONB;
+COMMIT;
