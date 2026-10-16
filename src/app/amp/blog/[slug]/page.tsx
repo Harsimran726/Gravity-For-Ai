@@ -1,3 +1,4 @@
+import { blogMediaComponents } from '@/components/blog/blog-media-renderer';
 import { JsonLd } from '@/components/seo/page-schema';
 import { buildBlogGraph } from '@/lib/structured-data';
 import * as React from 'react';
@@ -124,6 +125,7 @@ export default async function AmpBlogPostPage({ params }: { params: { slug: stri
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]}
             components={{
+                    ...blogMediaComponents,
               h1: ({node, ...props}) => <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', color: '#122C57', marginTop: '32px', marginBottom: '16px', fontWeight: 'normal' }} {...props} />,
               h2: ({node, ...props}) => <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#122C57', marginTop: '32px', marginBottom: '16px', fontWeight: 'normal' }} {...props} />,
               h3: ({node, ...props}) => <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '20px', color: '#122C57', marginTop: '24px', marginBottom: '12px', fontWeight: 'normal' }} {...props} />,

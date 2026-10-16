@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, AlertCircle, Sparkles, ShieldCheck, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { BlogContentEditor } from '@/components/admin/blog-content-editor';
 
 const initialState: BlogActionState = {
   success: false,
@@ -69,7 +70,7 @@ export function EditBlogClient({ initialData }: { initialData: any }) {
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Blog List
           </Link>
-          <h1 className="font-serif text-3xl text-[#122C57]">Create New Blog Post</h1>
+          <h1 className="font-serif text-3xl text-[#122C57]">Edit Blog Post</h1>
           <p className="text-xs text-[#6B7280]">
             Enforces strict SEO, AEO, and GEO fields before publishing.
           </p>
@@ -214,20 +215,7 @@ export function EditBlogClient({ initialData }: { initialData: any }) {
             />
           </div>
 
-          {/* Article Body Content */}
-          <div className="space-y-1">
-            <label className="text-xs font-mono uppercase tracking-wider text-[#122C57] font-semibold">
-              Article Content (Markdown) <span className="text-[#C99A44]">*</span>
-            </label>
-            <textarea
-              name="bodyContent"
-              required
-              rows={12}
-              defaultValue={initialData?.bodyContent}
-              placeholder="Write or paste your article markdown here..."
-              className="w-full px-4 py-3 bg-[#F7F5F0] border border-[#E4E2DC] text-xs font-mono text-[#0A1B3D] focus:outline-none focus:border-[#122C57]"
-            />
-          </div>
+          <BlogContentEditor initialContent={initialData?.bodyContent || ''} />
 
           {/* Action Row */}
           <div className="pt-4 border-t border-[#E4E2DC] flex items-center justify-between">

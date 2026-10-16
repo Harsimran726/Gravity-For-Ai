@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, AlertCircle, Sparkles, ShieldCheck, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { BlogContentEditor } from '@/components/admin/blog-content-editor';
 
 const initialState: BlogActionState = {
   success: false,
@@ -213,19 +214,7 @@ export default function NewBlogPostPage() {
             />
           </div>
 
-          {/* Article Body Content */}
-          <div className="space-y-1">
-            <label className="text-xs font-mono uppercase tracking-wider text-[#122C57] font-semibold">
-              Article Content (Markdown) <span className="text-[#C99A44]">*</span>
-            </label>
-            <textarea
-              name="bodyContent"
-              required
-              rows={12}
-              placeholder="Write or paste your article markdown here..."
-              className="w-full px-4 py-3 bg-[#F7F5F0] border border-[#E4E2DC] text-xs font-mono text-[#0A1B3D] focus:outline-none focus:border-[#122C57]"
-            />
-          </div>
+          <BlogContentEditor />
 
           {/* Action Row */}
           <div className="pt-4 border-t border-[#E4E2DC] flex items-center justify-between">

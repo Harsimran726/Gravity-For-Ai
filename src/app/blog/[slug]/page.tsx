@@ -1,3 +1,4 @@
+import { blogMediaComponents } from '@/components/blog/blog-media-renderer';
 import { JsonLd } from '@/components/seo/page-schema';
 import { buildBlogGraph } from '@/lib/structured-data';
 import * as React from 'react';
@@ -187,6 +188,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 <ReactMarkdown 
                   remarkPlugins={[remarkGfm]}
                   components={{
+                    ...blogMediaComponents,
                     h1: ({node, ...props}) => <h1 className="font-serif text-3xl sm:text-4xl text-[#122C57] font-normal leading-snug mt-12 mb-6" {...props} />,
                     h2: ({node, ...props}) => <h2 className="font-serif text-2xl sm:text-3xl text-[#122C57] font-normal leading-snug mt-10 mb-4" {...props} />,
                     h3: ({node, ...props}) => <h3 className="font-serif text-xl sm:text-2xl text-[#122C57] font-medium leading-snug mt-8 mb-4" {...props} />,
