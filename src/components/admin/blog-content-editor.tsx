@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { BLOG_MEDIA_TYPES, insertMediaAtCursor, mediaMarkdown, validateBlogMedia } from '@/lib/blog-media';
 
@@ -19,28 +19,47 @@ export function BlogContentEditor({ initialContent = '' }: { initialContent?: st
   const cursor = useRef(0);
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const activeUpload = useRef<AbortController | null>(null);
+  useEffect(() => () => activeUpload.current?.abort(), []);
+
   async function uploadFile(file: File) {
+    const controller = new AbortController();
+    activeUpload.current = controller;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let stalled = false;
+    const resetTimeout = () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => { stalled = true; controller.abort(); }, 90_000);
+    };
+    const cancelled = new Promise<never>((_, reject) => controller.signal.addEventListener('abort', () => reject(new Error('Upload cancelled')), { once: true }));
+    // Attach a rejection handler before loading the SDK to avoid unhandled cancellation.
+    void cancelled.catch(() => {});
     setMessage('');
     setUploaded(null);
     try {
       const rule = validateBlogMedia(file.type, file.size);
       setBusy(true);
       setProgress(0);
+      resetTimeout();
       const { upload } = await import('@vercel/blob/client');
-      const blob = await upload(`blog-media/${crypto.randomUUID()}.${rule.extension}`, file, {
+      if (controller.signal.aborted) throw new Error('Upload cancelled');
+      const blob = await Promise.race([upload(`blog-media/${crypto.randomUUID()}.${rule.extension}`, file, {
         access: 'public',
+        abortSignal: controller.signal,
         handleUploadUrl: '/api/blog/media',
         contentType: file.type,
         clientPayload: JSON.stringify({ type: file.type, size: file.size }),
         multipart: file.size > 4 * 1024 * 1024,
-        onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
-      });
+        onUploadProgress: ({ percentage }) => { if (!controller.signal.aborted) { resetTimeout(); setProgress(Math.round(percentage)); } },
+      }), cancelled]);
       setUploaded({ url: blob.url, video: file.type.startsWith('video/') });
       setMessage('Uploaded. Add a description and choose Insert into article.');
     } catch (error) {
       // The token endpoint returns actionable errors without credentials.
-      setMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
+      setMessage(stalled ? 'Upload stalled for 90 seconds. Check your connection and retry. Your article text is unchanged.' : controller.signal.aborted ? 'Upload cancelled. You can choose the file again.' : error instanceof Error ? error.message : 'Upload failed. Please try again.');
     } finally {
+      if (timeout) clearTimeout(timeout);
+      activeUpload.current = null;
       setBusy(false);
       if (fileInput.current) fileInput.current.value = '';
     }
@@ -81,7 +100,7 @@ export function BlogContentEditor({ initialContent = '' }: { initialContent?: st
         <input ref={fileInput} type="file" aria-label="Upload blog image or video" accept={Object.keys(BLOG_MEDIA_TYPES).join(',')} disabled={busy} onChange={e => { const file = e.target.files?.[0]; if (file) void uploadFile(file); }} className="block max-w-full text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-[#122C57] file:px-4 file:py-2 file:text-white" />
       </div>
       <p className="text-xs text-[#6B7280]">Images: JPG, PNG, WebP or GIF, up to 10 MB. Videos: MP4 or WebM, up to 100 MB. Uploaded files are publicly accessible; use only media intended for your website.</p>
-      {busy && <div><progress className="w-full" value={progress} max={100} aria-label="Upload progress" /><p className="text-sm">Uploading… {progress}%</p></div>}
+      {busy && <div><progress className="w-full" value={progress} max={100} aria-label="Upload progress" /><p className="text-sm">{progress === 0 ? "Connecting to secure storage…" : progress === 100 ? "Finalising upload…" : `Uploading… ${progress}%`}</p><button type="button" onClick={() => activeUpload.current?.abort()} className="mt-2 rounded border px-3 py-2 text-sm">Cancel upload</button></div>}
       {uploaded && <div className="space-y-3">
         {uploaded.video ? <video src={uploaded.url} controls preload="metadata" className="max-h-48 rounded-lg" /> : <img src={uploaded.url} alt={description || 'Uploaded image preview'} className="max-h-48 rounded-lg" />}
         <button type="button" disabled={!description.trim()} onClick={insert} className="rounded-lg bg-[#122C57] px-4 py-2 text-sm text-white disabled:opacity-50">Insert into article</button>

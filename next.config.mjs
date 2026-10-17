@@ -4,7 +4,7 @@ const cspHeader = `
   script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.ampproject.org https://connect.facebook.net;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' blob: data: https://*.public.blob.vercel-storage.com https://github.com https://avatars.githubusercontent.com https://gravityforai.com https://www.google-analytics.com https://www.facebook.com https://connect.facebook.net;
-  connect-src 'self' https://blob.vercel-storage.com https://*.blob.vercel-storage.com https://graph.facebook.com https://www.facebook.com https://www.google-analytics.com https://www.googletagmanager.com;
+  connect-src 'self' https://vercel.com/api/blob https://vercel.com/api/blob/ https://blob.vercel-storage.com https://*.blob.vercel-storage.com https://graph.facebook.com https://www.facebook.com https://www.google-analytics.com https://www.googletagmanager.com;
   media-src 'self' blob: https://*.public.blob.vercel-storage.com;
   frame-src 'self' https://www.googletagmanager.com https://www.facebook.com;
   font-src 'self' https://fonts.gstatic.com data:;
