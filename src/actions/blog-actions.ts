@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { normalizeBlogSlug } from '@/lib/blog-slug';
 import { prisma } from '@/lib/prisma';
 import { getAdminSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
@@ -36,7 +37,7 @@ export async function saveBlogPostAction(
   
   const rawData = {
     title: String(formData.get('title') || ''),
-    slug: String(formData.get('slug') || ''),
+    slug: normalizeBlogSlug(String(formData.get('slug') || '')),
     metaDescription: String(formData.get('metaDescription') || ''),
     category: String(formData.get('category') || ''),
     primaryKeyword: String(formData.get('primaryKeyword') || ''),
@@ -45,6 +46,11 @@ export async function saveBlogPostAction(
     bodyContent: String(formData.get('bodyContent') || ''),
     status,
   };
+
+  const id = String(formData.get('postId') || '');
+  if (!['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(status) || rawData.slug.length < 3) {
+    return { success: false, message: 'Use a URL slug with at least 3 letters or numbers and a valid post status.' };
+  }
 
   // Pre-Publish SEO Validation (Strict enforcement when marking PUBLISHED)
   if (status === 'PUBLISHED') {
@@ -59,6 +65,10 @@ export async function saveBlogPostAction(
   }
 
   try {
+    const existing = id ? await prisma.blogPost.findUnique({ where: { id } }) : null;
+    if (id && !existing) return { success: false, message: 'This post no longer exists. Refresh the blog list.' };
+    const duplicate = await prisma.blogPost.findUnique({ where: { slug: rawData.slug } });
+    if (duplicate && duplicate.id !== id) return { success: false, message: 'Another article already uses this URL slug. Choose a different slug.' };
     const postData = {
       title: rawData.title,
       slug: rawData.slug,
@@ -68,11 +78,11 @@ export async function saveBlogPostAction(
       status: rawData.status,
       // Only update publishedAt if it's currently being published and wasn't before, or just keep setting it to now. 
       // A better way is to leave it to DB default or just new Date().
-      publishedAt: rawData.status === 'PUBLISHED' ? new Date() : null,
+      publishedAt: rawData.status === 'PUBLISHED' ? (existing?.publishedAt || new Date()) : existing?.publishedAt || null,
       primaryKeyword: rawData.primaryKeyword,
       geoAnswer: rawData.geoAnswer,
       readingTime: rawData.readingTime,
-      author: { connect: { id: session.id } },
+      author: { connect: { id: existing?.authorId || session.id } },
       category: rawData.category ? {
         connectOrCreate: {
           where: { name: rawData.category },
@@ -84,11 +94,15 @@ export async function saveBlogPostAction(
       } : undefined,
     };
 
-    await prisma.blogPost.upsert({
-      where: { slug: rawData.slug },
-      update: postData,
-      create: postData,
-    });
+    if (existing) {
+      await prisma.blogPost.update({ where: { id }, data: postData });
+      revalidatePath('/blog/' + existing.slug);
+      revalidatePath('/amp/blog/' + existing.slug);
+      revalidatePath('/admin/blog/' + id + '/edit');
+    } else {
+      await prisma.blogPost.create({ data: postData });
+    }
+    revalidatePath('/sitemap.xml');
 
     revalidatePath('/blog');
     revalidatePath(`/blog/${rawData.slug}`);
@@ -110,3 +124,16 @@ export async function saveBlogPostAction(
   }
 }
 
+
+export async function trashBlogPostAction(id: string, restore = false): Promise<BlogActionState> {
+  const session = await getAdminSession();
+  if (!session || !['ADMIN', 'EDITOR'].includes(session.role)) return { success: false, message: 'Unauthorized. Please log in.' };
+  if (!id) return { success: false, message: 'Missing post.' };
+  try {
+    const post = await prisma.blogPost.findUnique({ where: { id } });
+    if (!post) return { success: false, message: 'Post not found.' };
+    await prisma.blogPost.update({ where: { id }, data: { status: restore ? 'DRAFT' : 'ARCHIVED' } });
+    for (const route of ['/admin/blog', '/blog', '/', '/sitemap.xml', '/blog/' + post.slug, '/amp/blog/' + post.slug, '/admin/blog/' + id + '/edit']) revalidatePath(route);
+    return { success: true, message: restore ? 'Restored as a draft.' : 'Moved to Trash. You can restore this article from the Trash tab.' };
+  } catch { return { success: false, message: 'Unable to update this post. Please try again.' }; }
+}

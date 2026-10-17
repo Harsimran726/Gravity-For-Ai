@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, AlertCircle, Sparkles, ShieldCheck, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { BlogTrashButton } from '@/components/admin/blog-trash-button';
 import { BlogContentEditor } from '@/components/admin/blog-content-editor';
 
 const initialState: BlogActionState = {
@@ -77,6 +78,8 @@ export function EditBlogClient({ initialData }: { initialData: any }) {
         </div>
       </div>
 
+      <BlogTrashButton id={initialData.id} title={initialData.title} restore={initialData.status === "ARCHIVED"} />
+
       {state.message && (
         <div
           className={`p-4 text-xs sm:text-sm flex items-center gap-2.5 ${
@@ -91,6 +94,7 @@ export function EditBlogClient({ initialData }: { initialData: any }) {
       )}
 
       <form action={formAction} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <input type="hidden" name="postId" value={initialData.id} />
         {/* Main Content Fields */}
         <div className="lg:col-span-8 space-y-6 bg-[#FFFFFF] p-6 sm:p-8 border border-[#E4E2DC]">
           {/* Title */}

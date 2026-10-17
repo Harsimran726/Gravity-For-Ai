@@ -4,18 +4,22 @@ import { BLOG_POSTS_SEED } from '@/data/blog-seed-data';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, ExternalLink, Zap, Edit3 } from 'lucide-react';
+import { BlogTrashButton } from '@/components/admin/blog-trash-button';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminBlogListPage() {
+export default async function AdminBlogListPage({ searchParams }: { searchParams: { view?: string } }) {
+  const trash = searchParams.view === 'trash';
   const dbPosts = await prisma.blogPost.findMany({
+    where: { status: trash ? 'ARCHIVED' : { not: 'ARCHIVED' } },
     include: { category: true },
     orderBy: { publishedAt: 'desc' },
   });
 
   const mergedPosts = [
     ...dbPosts.map((post) => ({
+      id: post.id,
       slug: post.slug,
       title: post.title,
       category: post.category?.name || 'Uncategorized',
@@ -23,7 +27,8 @@ export default async function AdminBlogListPage() {
       status: post.status,
       isDbPost: true,
     })),
-    ...BLOG_POSTS_SEED.map((post) => ({
+    ...(trash ? [] : BLOG_POSTS_SEED).map((post) => ({
+      id: "",
       slug: post.slug,
       title: post.title,
       category: post.category,
@@ -48,6 +53,7 @@ export default async function AdminBlogListPage() {
         </Button>
       </div>
 
+      <nav className="flex gap-4 text-sm"><Link href="/admin/blog" className={!trash ? "font-bold underline" : ""}>Articles</Link><Link href="/admin/blog?view=trash" className={trash ? "font-bold underline" : ""}>Trash</Link></nav>
       {/* Posts Table */}
       <div className="bg-[#FFFFFF] border border-[#E4E2DC] overflow-x-auto">
         <table className="w-full text-left text-xs">
@@ -87,14 +93,15 @@ export default async function AdminBlogListPage() {
                 <td className="p-3.5 text-right space-x-3">
                   {post.isDbPost && (
                     <Link
-                      href={`/admin/blog/${post.slug}/edit`}
+                      href={`/admin/blog/${encodeURIComponent(post.id)}/edit`}
                       className="inline-flex items-center gap-1 font-mono text-[11px] text-[#C99A44] hover:underline"
                     >
                       Edit <Edit3 className="w-3 h-3" />
                     </Link>
                   )}
+                  {post.isDbPost && <BlogTrashButton id={post.id} title={post.title} restore={trash} />}
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`/blog/${encodeURIComponent(post.slug)}`}
                     target="_blank"
                     className="inline-flex items-center gap-1 font-mono text-[11px] text-[#122C57] hover:underline"
                   >
