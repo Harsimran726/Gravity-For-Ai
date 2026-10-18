@@ -30,7 +30,7 @@ export function buildPageGraph({ path, title, description, type = 'WebPage', nod
   };
   const founder: SchemaNode = { '@type': 'Person', '@id': FOUNDER, name: 'Harsimran Singh',
     jobTitle: 'Founder & Lead AI Engineer', worksFor: ref(ORG), url: `${SITE_URL}/about`,
-    sameAs: ['https://www.linkedin.com/in/harsimransinghaiengineer/', 'https://github.com/harsimran726'] };
+    sameAs: ['https://harsimransingh.bio', 'https://www.linkedin.com/in/harsimransinghaiengineer/', 'https://github.com/harsimran726'] };
   const page: SchemaNode = { '@type': type, '@id': pageId, url: canonical || SITE_URL, name: title,
     description, inLanguage: 'en', isPartOf: ref(WEBSITE), publisher: ref(ORG), about: ref(ORG) };
   const graph: SchemaNode[] = [organization, founder,
