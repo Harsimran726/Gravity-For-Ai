@@ -29,7 +29,7 @@ export function CampaignDetailClient({campaign,initialProspects,readiness}:{camp
  const rows=matching.slice(currentPage*25,currentPage*25+25);
  const preview=initialProspects.find(p=>p.id===previewId);
  return <div className="space-y-6 text-[#122C57]">
-  <Link href="/admin/outreach" className="text-sm underline">← Campaigns</Link><h1 className="font-serif text-3xl">{campaign.name}</h1>
+  <Link href="/admin/outreach" className="text-sm underline">← Campaigns</Link><div className="flex flex-wrap items-center justify-between gap-4"><h1 className="font-serif text-3xl">{campaign.name}</h1><Link href={'/admin/outreach/'+campaign.id+'/edit'} className="rounded-lg border border-[#122C57] bg-white px-4 py-2 text-sm font-medium">Edit campaign</Link></div>
   <p>{campaign.status} · {campaign.purpose==='TEST'?'Trusted-recipient delivery test':'Prospect campaign'} · Campaign cap {campaign.dailyLimit}/day</p>
   <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4" aria-label="Campaign sending status">
    <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-semibold text-lg">{state}</h2><span className="text-xs text-slate-500">Updates every 30 seconds</span></div>
