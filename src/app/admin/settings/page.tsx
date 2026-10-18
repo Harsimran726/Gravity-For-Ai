@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save, CheckCircle2, Shield } from 'lucide-react';
@@ -24,6 +25,8 @@ export default function AdminSettingsPage() {
           </p>
         </div>
       </div>
+
+      <Link href="/admin/about" className="block max-w-3xl rounded-xl border border-[#E4E2DC] bg-white p-6 text-[#122C57] hover:border-[#C99A44]"><strong>About-page photo →</strong><span className="mt-2 block text-sm">Upload, preview or replace the founder portrait.</span></Link>
 
       {saved && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-2">

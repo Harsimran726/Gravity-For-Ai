@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
+import { FounderPhoto } from '@/components/founder-photo';
+import { getFounderPhoto } from '@/lib/founder-photo';
 import { ArrowUpRight, Workflow, Code2, AudioLines, Check, Plus, MapPin } from 'lucide-react';
 import { PageSchema } from '@/components/seo/page-schema';
 import { SectionWrapper } from '@/components/ui/section-wrapper';
@@ -32,7 +33,8 @@ const steps = [
   ['Hand over', 'Document the workflow and agree training, access and ongoing support.'],
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const founderPhoto = await getFounderPhoto().catch(() => null);
   return <div className="text-[#122C57]">
     <PageSchema path="/about" metadata={metadata} type="AboutPage" faqs={faqs} />
     <SectionWrapper animate={false} className="!py-16 sm:!py-24">
@@ -58,7 +60,7 @@ export default function AboutPage() {
     <SectionWrapper animate={false} id="founder" className="!py-16 sm:!py-24">
       <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 items-center">
         <div className="overflow-hidden rounded-3xl bg-[#122C57] text-white">
-          <div className="p-8 sm:p-10"><p className="text-xs font-mono uppercase tracking-widest text-[#EAC580]">The person behind the work</p><Image src="https://1.gravatar.com/avatar/85b5ed2edbd43fe08a87b9a1f045331e52a152a4349f94aa1235fba0849ba60f?s=512&d=initials" width={256} height={256} alt="Harsimran Singh, founder of Gravity For AI" className="mx-auto my-8 aspect-square rounded-2xl object-cover" unoptimized /><h2 className="font-serif text-3xl">Harsimran Singh</h2><p className="mt-2 text-sm text-white/80">Founder &amp; Lead AI Engineer</p></div>
+          <div className="p-8 sm:p-10"><p className="text-xs font-mono uppercase tracking-widest text-[#EAC580]">The person behind the work</p><FounderPhoto url={founderPhoto} /><h2 className="font-serif text-3xl">Harsimran Singh</h2><p className="mt-2 text-sm text-white/80">Founder &amp; Lead AI Engineer</p></div>
           <a href="https://harsimransingh.bio" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 border-t border-white/20 px-8 py-5 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-white"><span>Explore my personal profile<span className="mt-1 block text-xs text-white/70">harsimransingh.bio · opens in a new tab</span></span><ArrowUpRight aria-hidden="true" /></a>
         </div>
         <div><p className="text-xs font-mono uppercase tracking-widest text-[#896425]">Our approach</p><h3 className="mt-4 font-serif text-3xl sm:text-4xl leading-tight">Technology should make your work easier to manage.</h3><p className="mt-6 text-[#40516C] leading-relaxed">Harsimran founded Gravity For AI to help businesses put AI and web technology to practical use. His work brings together workflow design, AI development and the integrations that connect a business day to day.</p><p className="mt-4 text-[#40516C] leading-relaxed">We begin by understanding what your team needs. Then we agree what to build, how to check it works and where a person should remain in control.</p><ul className="mt-7 space-y-4">{['A clear scope before development begins', 'Human review where judgement matters', 'Progress you can review, with an agreed handover'].map(item => <li key={item} className="flex items-start gap-3"><Check size={20} className="shrink-0 text-[#896425]" aria-hidden="true" /><span>{item}</span></li>)}</ul><a href="https://www.linkedin.com/in/harsimransinghaiengineer/" target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 font-medium underline underline-offset-4">Connect with Harsimran on LinkedIn <ArrowUpRight size={16} aria-hidden="true" /><span className="sr-only">(opens in a new tab)</span></a></div>

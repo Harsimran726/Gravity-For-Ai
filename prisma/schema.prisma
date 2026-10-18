@@ -170,6 +170,7 @@ model PricingTier {
 }
 
 model SiteSettings {
+  founderImageUrl    String?
   id                String   @id @default(cuid())
   siteName          String   @default("Gravity For AI")
   companyName       String   @default("Gravity For AI")
