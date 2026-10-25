@@ -14,7 +14,7 @@ export function MainContentWrapper({ children }: { children: React.ReactNode }) 
       tabIndex={-1}
       className={cn(
         'flex-grow focus:outline-none',
-        (isAdmin || (pathname === '/lp/interior-websites' || pathname?.startsWith('/lp/interior-websites/'))) ? 'pt-0' : 'pt-20'
+        (isAdmin || (pathname === '/workshop' || pathname?.startsWith('/workshop/') || pathname === '/lp/interior-websites' || pathname?.startsWith('/lp/interior-websites/'))) ? 'pt-0' : 'pt-20'
       )}
     >
       {children}

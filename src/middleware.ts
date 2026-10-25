@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4. Admin-only routes (EDITOR and VIEWER cannot access these)
-    const adminOnlyRoutes = ['/admin/callbacks', '/admin/team', '/admin/settings', '/admin/audit-log', '/admin/outreach'];
+    const adminOnlyRoutes = ['/admin/workshop', '/admin/callbacks', '/admin/team', '/admin/settings', '/admin/audit-log', '/admin/outreach'];
     const isAdminOnly = adminOnlyRoutes.some((r) => pathname === r || pathname.startsWith(r + '/'));
     if (isAdminOnly && role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/admin', request.url));

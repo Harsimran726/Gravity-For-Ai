@@ -1,0 +1,18 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {workshop,formatWorkshopPrice} from '@/lib/workshop-config';
+type State={amount?:number;status?:string;groupUrl?:string|null;error?:string};
+export default function Confirmation(){
+ const [state,setState]=useState<State>({}),[refresh,setRefresh]=useState(0);
+ useEffect(()=>{
+  let active=true;const controller=new AbortController();
+  const params=new URLSearchParams(location.hash.slice(1));
+  if(!params.get('order')||!params.get('token')){setState({error:'Open the private confirmation link from your booking email.'});return;}
+  fetch('/api/workshop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'status',order:params.get('order'),token:params.get('token')}),signal:controller.signal}).then(r=>r.json()).then(data=>{if(active)setState(data);}).catch(()=>{if(active)setState({error:'Could not check your booking. Please retry.'});});
+  return()=>{active=false;controller.abort();};
+ },[refresh]);
+ const paid=state.status==='paid';
+ return <div className="ws"><div className="ws-confirm"><p className="ws-eyebrow">GRAVITY FOR AI / IDEA TO APP</p><h1>{paid?'You’re in. Let’s build.':state.status==='refunded'?'This booking was refunded.':state.error?'Let’s find your booking.':state.status==='pending'?'Payment verification pending.':'Checking your booking…'}</h1><p role="status">{state.error||(!state.status?'Loading your payment status…':paid?`Payment verified. ${formatWorkshopPrice(state.amount||workshop.amount)} paid for both live sessions.`:state.status==='pending'?'Payment is still pending verification. Please check again shortly. Do not pay again if your bank has debited you.':'Contact support if you need help.')}</p>{!paid?<button className="ws-button" onClick={()=>{setState({});setRefresh(n=>n+1);}}>Check again</button>:<><div className="ws-card"><h2>Your weekend build plan</h2><p>{workshop.dates}<br/>{workshop.time}</p><ol><li>Bring a laptop, charger and stable internet.</li><li>Choose one simple business idea: tutor, salon or consultant.</li><li>Check your booking email for setup guidance and joining instructions.</li></ol>{state.groupUrl?<a className="ws-button" href={state.groupUrl} target="_blank" rel="noopener noreferrer">Request to join the workshop group ↗</a>:<p>Joining instructions will be shared by email. WhatsApp membership is optional; contact support if you want an invitation.</p>}<small>Group admins match join requests to paid registrations. Other members can see your number. Do not forward your private booking link.</small></div>
+ <h2>Your starter prompt guide</h2><p><b>1. Define before you generate.</b> “I’m building a booking app for [business]. The user needs to [task]. Plan three screens, the required fields and what happens after submission. Keep the first version simple.”</p><p><b>2. Add constraints.</b> “Use a readable mobile layout, labelled inputs and clear validation. Do not add payment or login yet. Explain any setup I must complete.”</p><p><b>3. Debug with evidence.</b> “Expected: [result]. Actual: [result]. Error: [exact message]. Relevant code: [snippet without secrets]. Explain the cause and propose the smallest fix and a test.”</p><p><b>4. Check before publishing.</b> “Review this project for broken links, form storage, validation, mobile overflow and exposed credentials. Give me manual checks I can repeat.”</p><p>Never paste passwords, private API keys or customer data into prompts. Additional templates and the recording are shared during the workshop.</p></>}
+ <p>Need help? <a href="mailto:contact@gravityforai.com">contact@gravityforai.com</a></p></div></div>;
+}

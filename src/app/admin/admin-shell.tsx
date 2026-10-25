@@ -22,6 +22,7 @@ import { logoutAdminAction } from '@/actions/auth-actions';
 const NAV_ITEMS = [
   { label: 'My profile', href: '/admin/profile', icon: Users },
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Workshop learners', href: '/admin/workshop', icon: UsersRound, adminOnly: true },
   { label: 'AI Callbacks', href: '/admin/callbacks', icon: Calendar, adminOnly: true },
   { label: 'Bookings & Calls', href: '/admin/bookings', icon: Calendar },
   { label: 'Blog / CMS', href: '/admin/blog', icon: FileText },
