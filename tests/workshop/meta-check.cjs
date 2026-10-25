@@ -1,0 +1,15 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'../..'),ts=require(path.join(root,'node_modules/typescript'));
+const calls=[],storage=new Map(),window={location:{pathname:'/workshop'},fbq:(...args)=>calls.push(args)};
+const moduleStub={exports:{}};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root,'src/lib/workshop-meta.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{module:moduleStub,exports:moduleStub.exports,require:()=>({META_PIXEL_ID:'existing-site-pixel'}),window,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
+const {trackWorkshopEvent:track,pagePixelId}=moduleStub.exports;
+assert.equal(pagePixelId('/workshop'),'1126458823106886');assert.equal(pagePixelId('/about'),'existing-site-pixel');
+track('Purchase','order_test',29900,false);assert.equal(calls.length,0,'Test payments excluded');
+track('InitiateCheckout','order_live',29900,true);track('Purchase','order_live',29900,true);track('Purchase','order_live',29900,true);track('CompleteRegistration','order_live',29900,true);
+assert.equal(calls.filter(c=>c[0]==='init').length,1);assert.equal(calls.filter(c=>c[2]==='Purchase').length,1);
+const purchase=calls.find(c=>c[2]==='Purchase');assert.equal(purchase[1],'1126458823106886');assert.equal(purchase[3].value,299);assert.equal(purchase[3].currency,'INR');assert.equal(purchase[4].eventID,'workshop:Purchase:order_live');
+track('Purchase','order_regular',99900,true);assert.equal(calls.at(-1)[3].value,999);
+const count=calls.length;window.location.pathname='/workshop/confirmed';track('Purchase','order_private',29900,true);assert.equal(calls.length,count,'Private confirmation never tracked');
+window.location.pathname='/workshop';window.fbq=()=>{throw Error('Blocked');};assert.doesNotThrow(()=>track('Purchase','order_blocked',29900,true));
+console.log('PASS: workshop pixel routing, live-only conversions, INR amounts, stable event IDs, repeat suppression, private-page exclusion and blocked analytics.');
