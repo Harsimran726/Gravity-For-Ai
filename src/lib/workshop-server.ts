@@ -7,7 +7,16 @@ import {dispatchEmail} from '@/lib/mail';
 import {workshop,formatWorkshopPrice} from './workshop-config';
 const singleton=globalThis as unknown as {workshopPool?:Pool};
 export function db(){return singleton.workshopPool ?? (singleton.workshopPool=new Pool({connectionString:process.env.DATABASE_URL,max:3}));}
-export function ready(){return process.env.WORKSHOP_CHECKOUT_ENABLED==='true' && (process.env.WORKSHOP_ACCESS_SECRET||'').length>=32 && ['DATABASE_URL','RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET','WORKSHOP_ACCESS_SECRET'].every(k=>Boolean(process.env[k]));}
+export function paymentConfigured(){
+ const key=process.env.RAZORPAY_KEY_ID||'';
+ if(!/^rzp_(test|live)_[A-Za-z0-9]+$/.test(key)||!process.env.RAZORPAY_KEY_SECRET||!process.env.RAZORPAY_WEBHOOK_SECRET)return false;
+ if(process.env.VERCEL_ENV==='production'){
+  if(!key.startsWith('rzp_live_'))return false;
+  try{if(new URL(process.env.WORKSHOP_SITE_ORIGIN||'').protocol!=='https:')return false;}catch{return false;}
+ }
+ return true;
+}
+export function ready(){return process.env.WORKSHOP_CHECKOUT_ENABLED==='true' && (process.env.WORKSHOP_ACCESS_SECRET||'').length>=32 && Boolean(process.env.DATABASE_URL) && paymentConfigured();}
 export function sign(value:string,key:string){return createHmac('sha256',key).update(value).digest('hex');}
 export function matches(actual:string,expected:string){return /^[a-f0-9]{64}$/.test(actual) && /^[a-f0-9]{64}$/.test(expected) && timingSafeEqual(Buffer.from(actual,'hex'),Buffer.from(expected,'hex'));}
 export function token(order:string){if(!process.env.WORKSHOP_ACCESS_SECRET)throw Error('Not configured');return sign(`workshop:${order}`,process.env.WORKSHOP_ACCESS_SECRET);}
@@ -17,6 +26,7 @@ export class RazorpayRequestError extends Error {
 export function provider(path:'orders',data:Orders.RazorpayOrderCreateRequestBody):Promise<Orders.RazorpayOrder>;
 export function provider(path:`payments/${string}`):Promise<Payments.RazorpayPayment>;
 export async function provider(path:string,data?:Orders.RazorpayOrderCreateRequestBody){
+ if(!paymentConfigured())throw new RazorpayRequestError(503);
  try{
   const client=new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET});
   if(path==='orders'&&data)return await client.orders.create(data);

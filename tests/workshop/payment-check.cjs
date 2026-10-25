@@ -3,6 +3,7 @@ const root=path.resolve(__dirname,'../..'),deps=path.join(root,'node_modules'),t
 function load(relative,imports){const module={exports:{}};const code=ts.transpileModule(fs.readFileSync(path.join(root,relative),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;vm.runInNewContext(code,{module,exports:module.exports,require:id=>id in imports?imports[id]:require(id),process,Buffer,AbortSignal,URL,console,setTimeout},{filename:relative});return module.exports;}
 process.env.WORKSHOP_ACCESS_SECRET='test-access-secret-with-at-least-32-characters';
 process.env.RAZORPAY_KEY_SECRET='test-provider-secret';process.env.RAZORPAY_WEBHOOK_SECRET='test-webhook-secret';
+process.env.RAZORPAY_KEY_ID='rzp_test_dummy';delete process.env.VERCEL_ENV;
 let emails=0,writes=0,sequence=0,providerFailure=null;
 const rowsByOrder=new Map(),rowsById=new Map();
 const initial={id:'r1',email:'test@example.invalid',order_id:'order_one',group_consent:true,amount:29900,currency:'INR',status:'pending',confirmation_sent_at:null};rowsByOrder.set('order_one',initial);rowsById.set('r1',initial);
@@ -59,5 +60,14 @@ const cookieFor=offer=>`${server.offerCookieName}=${server.serializeBookingOffer
  providerFailure={statusCode:401};response=await api.POST(req(orderBody,cookie));assert.equal(response.status,401);providerFailure={statusCode:500};response=await api.POST(req(orderBody,cookie));assert.equal(response.status,500);providerFailure=null;
  response=await webhook.POST(new Request('http://localhost/api/workshop/webhook',{method:'POST',body:'{}'}));assert.equal(response.status,400);
  console.log('PASS: first-visit cookie, persistent deadline, exact expiry boundary, ₹299 to ₹999 pricing, tampering and price-change acknowledgement.');
+ process.env.VERCEL_ENV='production';process.env.WORKSHOP_SITE_ORIGIN='https://gravityforai.com';
+ assert.equal(server.ready(),false,'Production rejects test keys');
+ await assert.rejects(()=>server.provider('payments/pay_one'),error=>error.status===503);
+ process.env.RAZORPAY_KEY_ID='rzp_live_dummy';assert.equal(server.ready(),true,'Live keys enable configured production checkout');
+ process.env.WORKSHOP_SITE_ORIGIN='http://gravityforai.com';assert.equal(server.ready(),false,'Production requires HTTPS');
+ process.env.WORKSHOP_SITE_ORIGIN='https://gravityforai.com';process.env.WORKSHOP_CHECKOUT_ENABLED='false';assert.equal(server.ready(),false);
+ delete process.env.VERCEL_ENV;
+ assert(Number.isFinite(discounted.checkoutExpiresAt));assert(Number.isFinite(regular.checkoutExpiresAt));
+ console.log('PASS: production live-key requirement, HTTPS origin, collection switch and checkout deadlines.');
  console.log('PASS: order amount persistence, both price tiers, underpayment rejection, HMAC verification, capture/refund gates, deduplication and provider errors.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

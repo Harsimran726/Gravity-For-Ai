@@ -10,11 +10,11 @@ export function BookingWindow({enabled,children,initialOffer=null,initialNow}:{e
  const started=useRef(false);
  const begin=useCallback(async()=>{
   try{
-   const response=await fetch('/api/workshop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reserve'})});
+   const response=await fetch('/api/workshop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reserve'}),signal:AbortSignal.timeout(10000)});
    const data=await response.json();if(!response.ok)throw Error(data.error||'Could not check your workshop price.');
    if(typeof data.expiresAt!=='number'||typeof data.visitorId!=='string'||typeof data.signature!=='string')throw Error('Please refresh to check your price.');
    const next={visitorId:data.visitorId,expiresAt:data.expiresAt,signature:data.signature};setSession(next);setNow(Date.now());setMessage('');return next;
-  }catch(error){setMessage(error instanceof Error?error.message:'Please refresh to check your price.');return null;}
+  }catch(error){setMessage(error instanceof Error&&error.name!=='TimeoutError'&&error.name!=='AbortError'?error.message:'Could not check your price. Please try again.');return null;}
  },[]);
  useEffect(()=>{
   if(!started.current){started.current=true;void begin();}
@@ -30,10 +30,10 @@ export function BookingWindow({enabled,children,initialOffer=null,initialNow}:{e
 }
 export function useBookingWindow(){const value=useContext(BookingContext);if(!value)throw Error('Booking window is missing');return value;}
 export function WorkshopAmount(){const {amount}=useBookingWindow();return <>{amount===null?'…':formatWorkshopPrice(amount)}</>;}
-export function WorkshopPrice({large=false}:{large?:boolean}){const {amount,expired}=useBookingWindow();return <div className={`ws-offer-price ${large?'is-large':''}`}>{!expired&&<del>₹999</del>}<strong><WorkshopAmount/></strong><span>{amount===null?'Checking your price…':expired?'regular price · both days':'first-visit offer · both days'}</span></div>;}
+export function WorkshopPrice({large=false}:{large?:boolean}){const {amount,expired,message}=useBookingWindow();return <div className={`ws-offer-price ${large?'is-large':''}`}>{amount!==null&&!expired&&<del>₹999</del>}<strong><WorkshopAmount/></strong><span>{amount===null?(message?'Price unavailable':'Checking your price…'):expired?'regular price · both days':'first-visit offer · both days'}</span></div>;}
 export function BookingTimer({compact=false}:{compact?:boolean}){
- const {session,remaining,expired}=useBookingWindow();
+ const {session,remaining,expired,message,begin}=useBookingWindow();
  const time=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
- return <div className={`ws-countdown ${compact?'ws-countdown-compact':''} ${expired?'is-expired':''}`}><Clock3 size={compact?15:19} aria-hidden="true"/><span>{!session?'Checking your first-visit offer…':expired?'Offer ended. Workshop price: ₹999':'Your ₹299 offer ends in'}{!compact&&<small>{expired?'Book at the regular price below.':'Starts on your first visit. After 20 minutes: ₹999.'}</small>}</span><strong aria-label={session?`${Math.floor(remaining/60)} minutes ${remaining%60} seconds`:'Checking price'}>{session?time:'--:--'}</strong></div>;
+ return <div className={`ws-countdown ${compact?'ws-countdown-compact':''} ${expired?'is-expired':''}`}><Clock3 size={compact?15:19} aria-hidden="true"/><span>{!session?(message?'Unable to check your offer':'Checking your offer…'):expired?'Offer ended. Workshop price: ₹999':'Your ₹299 offer ends in'}{!compact&&session&&<small>{expired?'Book at the regular price below.':'After the timer ends: ₹999.'}</small>}</span>{!session&&message?<button type="button" onClick={()=>{void begin();}}>Try again</button>:<strong aria-label={session?`${Math.floor(remaining/60)} minutes ${remaining%60} seconds`:'Checking price'}>{session?time:'--:--'}</strong>}</div>;
 }
 export function BookingButton({children,className='ws-button'}:{children:ReactNode;className?:string}){return <a href="#register" className={className}>{children}<ArrowUpRight size={18} aria-hidden="true"/></a>;}
