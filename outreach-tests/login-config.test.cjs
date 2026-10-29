@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
-function setup(secret, passwordMatches = true) {
+function setup(secret, passwordMatches = true, databaseUnavailable = false) {
   const calls = { queries: 0, cookies: 0, signatures: 0 };
   const module = { exports: {} };
   const source = fs.readFileSync(path.join(__dirname, '../src/actions/auth-actions.ts'), 'utf8');
@@ -14,7 +14,7 @@ function setup(secret, passwordMatches = true) {
     'next/headers': { cookies: () => ({ set() { calls.cookies++; }, delete() {} }) },
     'next/navigation': { redirect() {} },
     '@/lib/prisma': { prisma: {
-      user: { findUnique: async () => { calls.queries++; return { id: 'test-user', email: 'editor@example.com', name: 'Test', role: 'EDITOR', passwordHash: 'test-only' }; } },
+      user: { findUnique: async () => { calls.queries++; if (databaseUnavailable) throw new Error('Database unavailable'); return { id: 'test-user', email: 'editor@example.com', name: 'Test', role: 'EDITOR', passwordHash: 'test-only' }; } },
       auditLog: { create: async () => ({}) },
     } },
     '@/lib/auth': { ADMIN_COOKIE_NAME: 'test-session', verifyPassword: async () => passwordMatches, signSession: () => { calls.signatures++; return 'test-signed-cookie'; } },
@@ -41,6 +41,17 @@ test('incorrect password does not create a session', async () => {
   assert.equal(h.calls.cookies, 0); assert.equal(h.calls.signatures, 0);
 });
 
+test('database failure reports temporary unavailability without creating a session', async () => {
+  const h = setup('x'.repeat(32), true, true);
+  const result = await h.run();
+  assert.equal(result.success, false);
+  assert.match(result.message, /temporarily unavailable/);
+  assert.doesNotMatch(result.message, /Invalid email or password/);
+  assert.equal(h.calls.queries, 1);
+  assert.equal(h.calls.cookies, 0);
+  assert.equal(h.calls.signatures, 0);
+});
+
 test('existing shorter configured secrets remain compatible', async () => {
   const h = setup('existing-key'); assert.equal((await h.run()).success, true);
   assert.equal(h.calls.cookies, 1); assert.equal(h.calls.signatures, 1);
@@ -54,9 +65,10 @@ test('real session signer preserves existing keys and rejects tampered cookies',
   vm.runInNewContext(code, { module, exports: module.exports, Buffer, process: { env: { NEXTAUTH_SECRET: secret } }, require: id => {
     if (id === 'next/headers') return { cookies() {} };
     if (id === './auth-constants') return { ADMIN_COOKIE_NAME: 'test' };
+    if (id === './prisma') return { prisma: {} };
     return require(id);
   } });
-  const session = { id: 'test', email: 'editor@example.com', role: 'EDITOR' };
+  const session = { id: 'test', email: 'editor@example.com', role: 'EDITOR', loginTime: new Date().toISOString() };
   const token = module.exports.signSession(session);
   const [payload, signature] = token.split('.');
   assert.equal(signature, require('node:crypto').createHmac('sha256', secret).update(payload).digest('base64url'));

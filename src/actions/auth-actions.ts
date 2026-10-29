@@ -54,7 +54,7 @@ export async function loginAdminAction(
     role: 'ADMIN' | 'EDITOR' | 'VIEWER';
   } | null = null;
 
-  // 2. Query PostgreSQL Database via Prisma (with graceful error handling)
+  // 2. Authenticate against the saved account without masking a database outage.
   try {
     const dbUser = await prisma.user.findUnique({
       where: { email },
@@ -81,9 +81,12 @@ export async function loginAdminAction(
         };
       }
     }
-  } catch (err) {
-    // Non-fatal: Log database query error and proceed to emergency founder fallback check
+  } catch {
     console.error('[AUTH] Database authentication unavailable.');
+    return {
+      success: false,
+      message: 'Sign-in is temporarily unavailable because we could not verify your account. Please try again shortly. If this continues, contact the site administrator.',
+    };
   }
 
 
