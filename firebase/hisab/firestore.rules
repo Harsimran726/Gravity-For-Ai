@@ -1,0 +1,327 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidTimestamp(val) {
+      return val is timestamp && val <= request.time;
+    }
+
+    function isSubscriptionActive(userData) {
+      let status = userData.get('subscriptionStatus', 'free');
+      let validUntil = userData.get('validUntil', 0);
+      let expiryEpoch = userData.get('subscriptionExpiryEpoch', 0);
+      let effExpiry = validUntil is int && validUntil > 0 ? validUntil : expiryEpoch;
+      return status == 'active' && effExpiry > 0 && request.time.toMillis() < effExpiry;
+    }
+
+    function getMaxWorkers(userId) {
+      let userDocPath = /databases/$(database)/documents/users/$(userId);
+      let existsUser = exists(userDocPath);
+      let u = existsUser ? get(userDocPath).data : {};
+      let plan = isSubscriptionActive(u) ? u.get('subscriptionPlan', 'free') : 'free';
+      return (plan == 'business' || plan == 'business_999' || plan == 'annual') ? 50 :
+             (plan == 'professional' || plan == 'pro' || plan == 'pro_499') ? 25 :
+             (plan == 'starter' || plan == 'starter_299' || plan == 'monthly') ? 10 : 3;
+    }
+
+    function getMaxClients(userId) {
+      let userDocPath = /databases/$(database)/documents/users/$(userId);
+      let existsUser = exists(userDocPath);
+      let u = existsUser ? get(userDocPath).data : {};
+      let plan = isSubscriptionActive(u) ? u.get('subscriptionPlan', 'free') : 'free';
+      return (plan == 'business' || plan == 'business_999' || plan == 'annual') ? 50 :
+             (plan == 'professional' || plan == 'pro' || plan == 'pro_499') ? 15 :
+             (plan == 'starter' || plan == 'starter_299' || plan == 'monthly') ? 5 : 2;
+    }
+
+    // Client-created profile: only free tier allowed on client creation.
+    // Server-owned fields cannot be self-assigned to paid or custom quotas.
+    function isValidInitialProfile(data, userId) {
+      return !('subscription' in data) && data.userId == userId &&
+        data.email is string && data.email.size() > 3 &&
+        (!('displayName' in data) || data.displayName is string) &&
+        (!('photoUrl' in data) || data.photoUrl is string) &&
+        (!('companyName' in data) || data.companyName is string) &&
+        (!('businessTrade' in data) || data.businessTrade is string) &&
+        (!('phoneNumber' in data) || data.phoneNumber is string) &&
+        (!('subscriptionStatus' in data) || data.subscriptionStatus == 'free') &&
+        (!('subscriptionPlan' in data) || data.subscriptionPlan in ['free', 'none']) &&
+        (!('subscriptionExpiryEpoch' in data) || data.subscriptionExpiryEpoch == 0) &&
+        (!('validUntil' in data) || data.validUntil == 0) &&
+        (!('maxWorkers' in data) || data.maxWorkers <= 3) &&
+        (!('maxClients' in data) || data.maxClients <= 2) &&
+        (!('trialStartEpoch' in data) || data.trialStartEpoch == 0) &&
+        (!('trialEndEpoch' in data) || data.trialEndEpoch == 0) &&
+        (!('lastPaymentId' in data) || data.lastPaymentId == '') &&
+        (!('lastPaymentMethod' in data) || data.lastPaymentMethod == '') &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    // Client update: client can edit profile details (name, photo, business info, phone),
+    // but CANNOT alter subscription status, plan, expiry epoch, validUntil, or quotas.
+    function clientDoesNotModifyEntitlements() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'displayName', 'email', 'photoUrl', 'companyName', 'businessTrade', 'phoneNumber', 'updatedAt'
+      ]);
+    }
+
+    function isValidWorker(data, userId) {
+      return data.userId == userId &&
+        data.id is string && data.id.size() > 0 &&
+        data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+        data.dailyWage is number && data.dailyWage >= 0 &&
+        data.isActive is bool &&
+        (!('phone' in data) || data.phone is string) &&
+        (!('skillTag' in data) || data.skillTag is string) &&
+        (!('joinDate' in data) || data.joinDate is int) &&
+        (!('notes' in data) || data.notes is string) &&
+        (!('slotId' in data) || data.slotId is string) &&
+        (!('slotIndex' in data) || data.slotIndex is int) &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidAttendance(data, userId) {
+      return data.userId == userId &&
+        data.id is string && data.id.size() > 0 &&
+        data.workerId is string && data.workerId.size() > 0 &&
+        data.dateEpochDay is int &&
+        data.status in ['FULL_DAY', 'HALF_DAY', 'OVERTIME', 'ABSENT'] &&
+        data.multiplier is number && data.multiplier >= 0 &&
+        data.wageEarned is number && data.wageEarned >= 0 &&
+        (!('notes' in data) || data.notes is string) &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidWorkerPayout(data, userId) {
+      return data.userId == userId &&
+        data.id is string && data.id.size() > 0 &&
+        data.workerId is string && data.workerId.size() > 0 &&
+        data.amount is number && data.amount > 0 &&
+        data.payoutType in ['ADVANCE', 'WAGE_PAYOUT', 'ADJUSTMENT'] &&
+        data.paymentMode in ['CASH', 'UPI_BANK', 'CHEQUE'] &&
+        (!('timestamp' in data) || data.timestamp is int) &&
+        (!('notes' in data) || data.notes is string) &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidClient(data, userId) {
+      return data.userId == userId &&
+        data.id is string && data.id.size() > 0 &&
+        data.clientName is string && data.clientName.size() > 0 &&
+        data.projectName is string && data.projectName.size() > 0 &&
+        data.totalBudget is number && data.totalBudget >= 0 &&
+        data.status in ['ACTIVE', 'COMPLETED', 'ON_HOLD', 'ARCHIVED'] &&
+        (!('phone' in data) || data.phone is string) &&
+        (!('location' in data) || data.location is string) &&
+        (!('startDate' in data) || data.startDate is int) &&
+        (!('notes' in data) || data.notes is string) &&
+        (!('slotId' in data) || data.slotId is string) &&
+        (!('slotIndex' in data) || data.slotIndex is int) &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidClientTransaction(data, userId) {
+      return data.userId == userId &&
+        data.id is string && data.id.size() > 0 &&
+        data.clientId is string && data.clientId.size() > 0 &&
+        data.amount is number && data.amount > 0 &&
+        data.type in ['PAYMENT_RECEIVED', 'SITE_EXPENSE'] &&
+        data.category is string && data.category.size() > 0 &&
+        (!('timestamp' in data) || data.timestamp is int) &&
+        (!('notes' in data) || data.notes is string) &&
+        (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+        (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidInitialProfile(request.resource.data, userId);
+      allow update: if isOwner(userId) &&
+        clientDoesNotModifyEntitlements() &&
+        (!('displayName' in request.resource.data) || request.resource.data.displayName is string) &&
+        (!('photoUrl' in request.resource.data) || request.resource.data.photoUrl is string) &&
+        (!('companyName' in request.resource.data) || request.resource.data.companyName is string) &&
+        (!('businessTrade' in request.resource.data) || request.resource.data.businessTrade is string) &&
+        (!('phoneNumber' in request.resource.data) || request.resource.data.phoneNumber is string) &&
+        (!('updatedAt' in request.resource.data) || isValidTimestamp(request.resource.data.updatedAt));
+      allow delete: if false; // User accounts are retained
+
+      // Bounded worker slots for atomic concurrency-safe quota enforcement
+      match /worker_slots/{slotId} {
+        function occupiedAfter(recordId) {
+          let recordPath = /databases/$(database)/documents/users/$(userId)/workers/$(recordId);
+          return existsAfter(recordPath) && getAfter(recordPath).data.isActive == true;
+        }
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.id == slotId &&
+          request.resource.data.slotIndex is int && request.resource.data.slotIndex >= 0 &&
+          slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+          request.resource.data.workerId is string &&
+          (resource == null || resource.data.workerId == request.resource.data.workerId ||
+            !occupiedAfter(resource.data.workerId)) &&
+          ((request.resource.data.active == false && !occupiedAfter(request.resource.data.workerId)) ||
+           (request.resource.data.active == true &&
+            request.resource.data.slotIndex < getMaxWorkers(userId) &&
+            occupiedAfter(request.resource.data.workerId) &&
+            getAfter(/databases/$(database)/documents/users/$(userId)/workers/$(request.resource.data.workerId)).data.slotId == slotId));
+        allow delete: if isOwner(userId) && !occupiedAfter(resource.data.workerId);
+      }
+
+      // Bounded client slots for atomic concurrency-safe quota enforcement
+      match /client_slots/{slotId} {
+        function occupiedAfter(recordId) {
+          let recordPath = /databases/$(database)/documents/users/$(userId)/clients/$(recordId);
+          return existsAfter(recordPath) && getAfter(recordPath).data.status != 'ARCHIVED';
+        }
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.id == slotId &&
+          request.resource.data.slotIndex is int && request.resource.data.slotIndex >= 0 &&
+          slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+          request.resource.data.clientId is string &&
+          (resource == null || resource.data.clientId == request.resource.data.clientId ||
+            !occupiedAfter(resource.data.clientId)) &&
+          ((request.resource.data.active == false && !occupiedAfter(request.resource.data.clientId)) ||
+           (request.resource.data.active == true &&
+            request.resource.data.slotIndex < getMaxClients(userId) &&
+            occupiedAfter(request.resource.data.clientId) &&
+            getAfter(/databases/$(database)/documents/users/$(userId)/clients/$(request.resource.data.clientId)).data.slotId == slotId));
+        allow delete: if isOwner(userId) && !occupiedAfter(resource.data.clientId);
+      }
+
+      match /workers/{workerId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidWorker(request.resource.data, userId) && request.resource.data.id == workerId &&
+          (
+            // Inactive worker doesn't consume an active quota slot
+            request.resource.data.isActive == false ||
+            // Active worker must have a valid bound slot
+            (
+              request.resource.data.slotIndex is int &&
+              request.resource.data.slotIndex >= 0 &&
+              request.resource.data.slotIndex < getMaxWorkers(userId) &&
+              request.resource.data.slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+              (
+                getAfter(/databases/$(database)/documents/users/$(userId)/worker_slots/$(request.resource.data.slotId)).data.active == true &&
+                getAfter(/databases/$(database)/documents/users/$(userId)/worker_slots/$(request.resource.data.slotId)).data.workerId == workerId
+              )
+            )
+          );
+        allow update: if isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.id == resource.data.id &&
+          isValidWorker(request.resource.data, userId) && request.resource.data.id == workerId &&
+          (
+            // If was already active, editing existing worker attributes is always allowed
+            (resource.data.isActive == true && request.resource.data.get('slotId', '') == resource.data.get('slotId', '') &&
+             request.resource.data.get('slotIndex', -1) == resource.data.get('slotIndex', -1)) ||
+            // If deactivating or staying inactive, allowed
+            request.resource.data.isActive == false ||
+            // Reactivating from inactive to active requires a valid bound slot
+            (
+              request.resource.data.slotIndex is int &&
+              request.resource.data.slotIndex >= 0 &&
+              request.resource.data.slotIndex < getMaxWorkers(userId) &&
+              request.resource.data.slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+              (
+                getAfter(/databases/$(database)/documents/users/$(userId)/worker_slots/$(request.resource.data.slotId)).data.active == true &&
+                getAfter(/databases/$(database)/documents/users/$(userId)/worker_slots/$(request.resource.data.slotId)).data.workerId == workerId
+              )
+            )
+          );
+        allow delete: if isOwner(userId);
+      }
+
+      match /attendance/{attendanceId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidAttendance(request.resource.data, userId);
+        allow update: if isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.id == resource.data.id &&
+          isValidAttendance(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /payouts/{payoutId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWorkerPayout(request.resource.data, userId);
+        allow update: if isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.id == resource.data.id &&
+          isValidWorkerPayout(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /clients/{clientId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidClient(request.resource.data, userId) && request.resource.data.id == clientId &&
+          (
+            // Archived client doesn't consume an active quota slot
+            request.resource.data.status == 'ARCHIVED' ||
+            // Active client must have a valid bound slot
+            (
+              request.resource.data.slotIndex is int &&
+              request.resource.data.slotIndex >= 0 &&
+              request.resource.data.slotIndex < getMaxClients(userId) &&
+              request.resource.data.slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+              (
+                getAfter(/databases/$(database)/documents/users/$(userId)/client_slots/$(request.resource.data.slotId)).data.active == true &&
+                getAfter(/databases/$(database)/documents/users/$(userId)/client_slots/$(request.resource.data.slotId)).data.clientId == clientId
+              )
+            )
+          );
+        allow update: if isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.id == resource.data.id &&
+          isValidClient(request.resource.data, userId) && request.resource.data.id == clientId &&
+          (
+            // If was already active/completed/on-hold, editing existing client is always allowed
+            (resource.data.status != 'ARCHIVED' && request.resource.data.get('slotId', '') == resource.data.get('slotId', '') &&
+             request.resource.data.get('slotIndex', -1) == resource.data.get('slotIndex', -1)) ||
+            // If archiving or staying archived, allowed
+            request.resource.data.status == 'ARCHIVED' ||
+            // Restoring from archived requires a valid bound slot
+            (
+              request.resource.data.slotIndex is int &&
+              request.resource.data.slotIndex >= 0 &&
+              request.resource.data.slotIndex < getMaxClients(userId) &&
+              request.resource.data.slotId == ('slot_' + string(request.resource.data.slotIndex)) &&
+              (
+                getAfter(/databases/$(database)/documents/users/$(userId)/client_slots/$(request.resource.data.slotId)).data.active == true &&
+                getAfter(/databases/$(database)/documents/users/$(userId)/client_slots/$(request.resource.data.slotId)).data.clientId == clientId
+              )
+            )
+          );
+        allow delete: if isOwner(userId);
+      }
+
+      match /client_transactions/{txnId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidClientTransaction(request.resource.data, userId);
+        allow update: if isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.id == resource.data.id &&
+          isValidClientTransaction(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

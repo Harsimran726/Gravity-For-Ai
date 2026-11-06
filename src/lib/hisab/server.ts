@@ -131,3 +131,27 @@ export function failure(error: unknown) {
   console.error('Hisab operation failed; sensitive details omitted.');
   return reply({error: 'Service temporarily unavailable. Retry the same request; do not pay again.'}, 503);
 }
+
+type MerchantEvent = {
+  event: string;
+  payload?: {
+    payment?: {entity?: {id?: string; order_id?: string}};
+    refund?: {entity?: {payment_id?: string}};
+  };
+};
+
+// Called only after the receiving route verifies its own Razorpay signature.
+export async function reconcileHisabEvent(event: MerchantEvent) {
+  if (!['payment.captured', 'order.paid', 'refund.processed'].includes(event.event)) return false;
+  const paymentId = event.payload?.payment?.entity?.id ?? event.payload?.refund?.entity?.payment_id;
+  if (typeof paymentId !== 'string' || !/^pay_[A-Za-z0-9]+$/.test(paymentId)) throw new HisabError(400, 'Missing payment ID.');
+  // Refund events may omit the payment entity. Fetch only if needed.
+  let orderId = event.payload?.payment?.entity?.order_id;
+  if (!orderId) {
+    orderId = (await provider().payments.fetch(paymentId)).order_id;
+  }
+  const {rowCount} = await db().query('SELECT order_id FROM hisab_orders WHERE order_id=$1', [orderId]);
+  if (!rowCount) return false; // Other products share the merchant account.
+  await recordPayment(orderId, paymentId);
+  return true;
+}
