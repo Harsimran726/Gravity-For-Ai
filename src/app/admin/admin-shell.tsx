@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { label: 'Hisab', href: '/admin/hisab', icon: UsersRound, adminOnly: true },
   { label: 'Workshop learners', href: '/admin/workshop', icon: UsersRound, adminOnly: true },
   { label: 'AI Callbacks', href: '/admin/callbacks', icon: Calendar, adminOnly: true },
+  { label: 'Voice Agent Testing', href: '/admin/voice-tests', icon: MessageSquare, adminOnly: true },
   { label: 'Bookings & Calls', href: '/admin/bookings', icon: Calendar },
   { label: 'Blog / CMS', href: '/admin/blog', icon: FileText },
   { label: 'Leads & Inquiries', href: '/admin/leads', icon: Users },
