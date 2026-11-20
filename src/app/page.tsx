@@ -11,20 +11,21 @@ import { ExplainerSection } from '@/components/home/explainer';
 import { PricingSection } from '@/components/home/pricing';
 import { FaqSection } from '@/components/home/faq';
 import { ClosingCtaSection } from '@/components/home/closing-cta';
+import { ServiceDiscovery } from '@/components/home/service-discovery';
 import { FAQ_ITEMS } from '@/data/faq-data';
 
 export const metadata: Metadata = {
-  title: 'Gravity For AI - AI Voice Agents, Websites & Agentic Systems | Mansa, Punjab',
+  title: 'Gravity For AI | Website Development & AI Automation, Punjab',
   description:
-    'Gravity For AI builds AI voice agents, agentic AI systems, and premium websites for local businesses in Punjab, India & beyond. Book a free AI audit.',
+    'Gravity For AI builds websites, AI agents and private AI infrastructure from Mansa, Punjab. Serving India and international teams remotely. Discuss your project.',
   alternates: {
     canonical: 'https://gravityforai.com',
   },
   openGraph: {
     url: 'https://gravityforai.com',
-    title: 'Gravity For AI - AI Voice Agents, Websites & Agentic Systems | Mansa, Punjab',
+    title: 'Gravity For AI | Website Development & AI Automation, Punjab',
     description:
-      'Gravity For AI builds AI voice agents, agentic AI systems, and premium websites for local businesses in Punjab, India & beyond. Book a free AI audit.',
+      'Gravity For AI builds websites, AI agents and private AI infrastructure from Mansa, Punjab. Serving India and international teams remotely. Discuss your project.',
   },
 };
 
@@ -100,6 +101,7 @@ export default function HomePage() {
 
         {/* 3. Value Proposition: Solution + 3 Pillars + GEO Answer */}
         <ValuePropSection />
+        <ServiceDiscovery />
 
         {/* 4. The Philosophy: Brand Manifesto (Dark Room 1) */}
         <PhilosophySection />

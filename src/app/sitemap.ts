@@ -190,6 +190,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  // AMP alternatives are discovered through canonical articles; keep the sitemap canonical-only.
   // AMP Blog Pages
   const ampBlogPages: MetadataRoute.Sitemap = allPosts.map((post) => ({
     url: `${baseUrl}/amp/blog/${post.slug}`,
@@ -200,10 +201,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
+    { url: `${baseUrl}/services/private-ai-infrastructure`, lastModified: new Date('2026-11-20T00:00:00Z'), changeFrequency: 'monthly', priority: 0.9 },
     ...servicePages,
     ...cityPages,
     ...caseStudyPages,
     ...blogPages,
-    ...ampBlogPages,
+
   ];
 }

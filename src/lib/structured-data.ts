@@ -22,7 +22,8 @@ export function buildPageGraph({ path, title, description, type = 'WebPage', nod
   const pageId = `${canonical}#webpage`;
   const ref = (id: string) => ({ '@id': id });
   const organization: SchemaNode = {
-    '@type': 'Organization', '@id': ORG, name: 'Gravity For AI', url: SITE_URL,
+    '@type': 'Organization', '@id': ORG, name: 'Gravity For AI', alternateName: 'Gravity 4 AI', url: SITE_URL,
+    sameAs: ['https://www.google.com/search?kgmid=/g/11nvxdjg4s'],
     description: 'AI automation, voice agents, workflow integrations and custom website development.',
     email: 'contact@gravityforai.com', logo: { '@type': 'ImageObject', '@id': `${SITE_URL}/#logo`, url: `${SITE_URL}/android-chrome-512x512.png` },
     address: { '@type': 'PostalAddress', addressLocality: 'Mansa', addressRegion: 'Punjab', addressCountry: 'IN' },
@@ -34,7 +35,7 @@ export function buildPageGraph({ path, title, description, type = 'WebPage', nod
   const page: SchemaNode = { '@type': type, '@id': pageId, url: canonical || SITE_URL, name: title,
     description, inLanguage: 'en', isPartOf: ref(WEBSITE), publisher: ref(ORG), about: ref(ORG) };
   const graph: SchemaNode[] = [organization, founder,
-    { '@type': 'WebSite', '@id': WEBSITE, url: SITE_URL, name: 'Gravity For AI', publisher: ref(ORG), inLanguage: 'en' }, page];
+    { '@type': 'WebSite', '@id': WEBSITE, url: SITE_URL, name: 'Gravity For AI', alternateName: 'Gravity 4 AI', publisher: ref(ORG), inLanguage: 'en' }, page];
   const segments = url.pathname.split('/').filter(Boolean);
   if (segments.length) {
     const labels: Record<string,string> = { blog:'Blog', services:'Services', locations:'Locations', lp:'Industry Solutions', 'case-studies':'Case Studies' };

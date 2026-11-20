@@ -77,6 +77,7 @@ export default function ServicesIndexPage() {
           </div>
         </section>
 
+        <section className="max-w-[1240px] mx-auto px-6 py-8"><Link className="text-xl underline" href="/services/private-ai-infrastructure">Private AI infrastructure and self-hosted LLM setup</Link><p className="mt-3">Explore infrastructure, private document search and deployment planning in your own environment.</p></section>
         {/* Services Grid */}
         <SectionWrapper variant="warm">
           <div className="max-w-3xl space-y-3 mb-12">
@@ -84,7 +85,7 @@ export default function ServicesIndexPage() {
               Core Capabilities
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-[#122C57]">
-              Three Pillars of Operational Automation
+              AI & Web Services for Your Business
             </h2>
             <p className="text-sm sm:text-base text-[#6B7280]">
               Each solution is custom-engineered and fully managed — so you never need to hire an in-house technical department.

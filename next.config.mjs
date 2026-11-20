@@ -29,6 +29,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      { source: '/:path*', has: [{ type: 'host', value: 'www.gravityforai.com' }], destination: 'https://gravityforai.com/:path*', permanent: true },
       // Direct alias for privacy policy
       { source: '/privacy', destination: '/privacy-policy', permanent: true },
       // Tricity merges → /locations/chandigarh

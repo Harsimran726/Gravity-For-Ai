@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://gravityforai.com'),
   title: {
     default: 'Gravity For AI - AI Voice Agents, Websites & Agentic Systems | Mansa, Punjab',
-    template: '%s | Gravity For AI',
+    template: '%s',
   },
   description:
     'Gravity For AI builds AI voice agents, agentic AI systems, and premium websites for local businesses in Punjab, India & beyond. Book a free AI audit.',

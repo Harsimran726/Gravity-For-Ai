@@ -230,12 +230,12 @@ export const SERVICES_DATA: Record<string, ServiceData> = {
   'website-development': {
     slug: 'website-development',
     serviceType: 'Website Development',
-    title: 'Website Development for Local & Premium Businesses | Gravity For AI',
+    title: 'Website Development in Mansa & Punjab | Gravity For AI',
     metaDescription:
       'Fast, modern, conversion-focused websites built by Gravity For AI for local and premium businesses. Engineered for sub-2s load speed and lead capture.',
     hero: {
       badge: 'High-Performance Web Engineering',
-      h1: 'A Website That Actually Brings In Customers - Not Just Looks Good',
+      h1: 'Website Development for Businesses in Mansa, Punjab & India',
       subheadline:
         'Fast, mobile-first, conversion-engineered websites built to turn local Google searches into real discovery calls and revenue.',
     },
@@ -370,7 +370,7 @@ export const SERVICES_DATA: Record<string, ServiceData> = {
       {
         question: 'Will my website rank on Google in my city?',
         answer:
-          'Yes. We build all pages with semantic HTML, local NAP schema, fast Core Web Vitals, and localized keywords specifically engineered for regional rankings.',
+          'We build the technical foundations for search visibility: crawlable pages, clear service content, canonical URLs and performance improvements. Rankings depend on competition, relevance and business authority, and cannot be guaranteed.',
       },
     ],
   },
@@ -378,12 +378,12 @@ export const SERVICES_DATA: Record<string, ServiceData> = {
   'agentic-ai-systems': {
     slug: 'agentic-ai-systems',
     serviceType: 'Agentic AI System Development',
-    title: 'Agentic AI Systems for Business Automation | Gravity For AI',
+    title: 'Agentic AI Development & Implementation India | Gravity For AI',
     metaDescription:
       'Gravity For AI designs agentic AI systems that automate multi-step business workflows end-to-end. Reclaim 20+ hours a week in back-office operations.',
     hero: {
       badge: 'Autonomous Workflow Automation',
-      h1: 'AI That Doesn’t Just Answer - It Gets the Work Done',
+      h1: 'Agentic AI Implementation for Business Workflows',
       subheadline:
         'Custom autonomous AI agent pipelines that handle your multi-step back-office operations end-to-end, quietly in the background.',
     },

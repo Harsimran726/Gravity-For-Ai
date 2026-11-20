@@ -30,7 +30,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            Automate Your Local Business - Without Writing a Line of Code
+            Website Development &amp; AI Automation for Your Business
           </motion.h1>
 
           {/* Subheadline: Who + How */}
@@ -40,7 +40,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.35 }}
           >
-            AI voice agents, agentic automation, and websites built and managed for you - for businesses across Punjab and beyond who don&apos;t have time to become AI experts themselves.
+            Gravity For AI builds business websites, AI agents, and private AI infrastructure. Based in Mansa, Punjab, we work with businesses across India and international teams remotely.
           </motion.p>
 
           {/* Action CTAs */}

@@ -44,6 +44,7 @@ export function Footer() {
                 Mansa, Punjab 151505, India (HQ) →
               </Link>
               <p>contact@gravityforai.com</p>
+              <a href="https://www.google.com/search?kgmid=/g/11nvxdjg4s" className="underline">Find Gravity For AI on Google</a>
             </div>
           </div>
 
@@ -66,6 +67,7 @@ export function Footer() {
                   Agentic AI Systems
                 </Link>
               </li>
+              <li><Link href="/services/private-ai-infrastructure" className="hover:text-[#122C57]">Private AI Infrastructure</Link></li>
               <li>
                 <Link href="/services" className="hover:text-[#122C57] transition-colors font-medium text-[#122C57]">
                   All Services Overview →
