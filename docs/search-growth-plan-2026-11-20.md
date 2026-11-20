@@ -3,7 +3,7 @@
 ## Findings and baseline
 Live home, robots and sitemap returned HTTP 200. Search sampling found About and service URLs indexed. This is not evidence of their Google position in a given city. Both www and non-www served 200 before this release. Service titles repeated the brand through the root title template. There was no dedicated private AI infrastructure landing page. The Google share link resolves to entity /g/11nvxdjg4s; profile categories, verification, reviews and owner access have not been verified.
 
-No Search Console, GBP performance or keyword-volume dataset was available in this audit. The phrases below are intent-led hypotheses, not measured search volume or ranking promises.
+Initial public audit had no Search Console data. Authenticated Search Console was subsequently inspected; see the verified baseline below. No keyword-volume dataset was available. The phrases below are intent-led hypotheses, not measured search volume or ranking promises.
 
 ## Priority keyword-to-page map
 | Priority | Buyer searches | Destination | Geographic focus |
@@ -49,4 +49,16 @@ Measure brand query impressions/clicks, nonbrand commercial query impressions/cl
 - https://developers.google.com/search/apis/indexing-api/v3/using-api
 
 ## Remaining external work
-Search Console and GBP ownership/access are needed to verify settings, submit URLs, read actual query data and apply profile updates. Deployment verification is recorded in the completion message. Rankings and AI citations require subsequent crawling and evaluation and cannot be guaranteed immediately.
+Authenticated Search Console and GBP access were available later in this session. The sitemap was resubmitted successfully. Deployment bac4bd4 reached READY; live home and private AI page returned 200, the sitemap includes the private AI page and www redirects to the main domain. Rankings and AI citations require subsequent crawling and evaluation and cannot be guaranteed immediately.
+
+
+## Verified account baseline and actions
+Search Console selected three-month range, chart 6 September–18 November 2026: 12 clicks, 564 impressions, 2.1% CTR and average position 10.6. These are all-query aggregates, not branded-query ranking. Visible query examples include “gemini 4 argon” (16 impressions), “gemini argon” (15), “gravity” (9), and “agentic ai for small business” (5); each displayed zero clicks. This points to limited commercial discovery, with some exposure concentrated in informational topics.
+
+Page indexing report updated 16 November: 21 indexed; 21 discovered but not indexed; 2 redirected; 1 soft 404; 1 duplicate without user-selected canonical; 1 alternate with proper canonical. Redirects and correct canonical alternatives are expected exclusions, not all errors. Soft 404 example: /case-studies/mansa-clinic-ai-receptionist (last crawl 20 October). Review this page's substantive evidence and visible content before requesting validation. Do not mark it fixed without investigating. Homepage URL Inspection stalled retrieving data and was cancelled; no individual indexing request was confirmed.
+
+Sitemap resubmission confirmed successful on 20 November. Previously last read 17 November, 44 discovered pages. This does not prove Google has crawled the newly released page yet.
+
+GBP primary category: Software company. New description saved; subsequent UI displayed it as current. Correct WhatsApp link https://wa.me/917814351011 submitted and pending review, based on user-confirmed business number +917814351011. Previous WhatsApp link used 78146 rather than 78143. Phone edit for 078143 51011 is separately marked NOT APPROVED and requires resolving Google's rejection; resubmission/appeal not performed. Profile lists remote US areas, including Boston, NY and Manhattan; owner confirmation of in-person versus remote service is outstanding before changing location/service areas.
+
+Validation: Next production build completed; live HTTP/title/sitemap/redirect checks passed. Focused schema alias/ID/FAQ checks passed. Standalone full tsc reported pre-existing errors in tests/e2e/seo.test.ts; existing schema coverage test fails on workshop pages. Those unrelated tests were left unchanged.
