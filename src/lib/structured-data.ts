@@ -23,7 +23,12 @@ export function buildPageGraph({ path, title, description, type = 'WebPage', nod
   const ref = (id: string) => ({ '@id': id });
   const organization: SchemaNode = {
     '@type': 'Organization', '@id': ORG, name: 'Gravity For AI', alternateName: 'Gravity 4 AI', url: SITE_URL,
-    sameAs: ['https://www.google.com/search?kgmid=/g/11nvxdjg4s'],
+    sameAs: [
+      'https://www.google.com/search?kgmid=/g/11nvxdjg4s',
+      'https://www.instagram.com/gravityforai/',
+      'https://www.linkedin.com/company/gravityforai/',
+      'https://linktr.ee/gravityforai',
+    ],
     description: 'AI automation, voice agents, workflow integrations and custom website development.',
     email: 'contact@gravityforai.com', logo: { '@type': 'ImageObject', '@id': `${SITE_URL}/#logo`, url: `${SITE_URL}/android-chrome-512x512.png` },
     address: { '@type': 'PostalAddress', addressLocality: 'Mansa', addressRegion: 'Punjab', addressCountry: 'IN' },

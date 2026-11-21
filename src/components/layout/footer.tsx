@@ -45,6 +45,10 @@ export function Footer() {
               </Link>
               <p>contact@gravityforai.com</p>
               <a href="https://www.google.com/search?kgmid=/g/11nvxdjg4s" className="underline">Find Gravity For AI on Google</a>
+              <div className="flex flex-wrap gap-4 pt-3" aria-label="Official Gravity For AI profiles">
+                <a href="https://www.instagram.com/gravityforai/" target="_blank" rel="me noopener noreferrer" className="underline">Gravity For AI on Instagram</a>
+                <a href="https://www.linkedin.com/company/gravityforai/" target="_blank" rel="me noopener noreferrer" className="underline">Gravity For AI on LinkedIn</a>
+              </div>
             </div>
           </div>
 
