@@ -1,0 +1,4 @@
+const fs=require('node:fs'),{Client}=require('pg');
+async function migrate(url){const c=new Client({connectionString:url,connectionTimeoutMillis:10000});try{await c.connect();await c.query(fs.readFileSync('db/audience.sql','utf8'));console.log('Audience table and indexes ready');}finally{await c.end();}}
+if(process.argv.includes('--build')){if(process.env.VERCEL==='1')migrate(process.env.DATABASE_URL).catch(e=>{console.error('Audience migration failed:',e.code||e.name);process.exitCode=1;});else console.log('Audience migration: local build skipped; run with production configuration explicitly.');}
+else{let input='';process.stdin.on('data',c=>input+=c);process.stdin.on('end',()=>migrate(JSON.parse(input).url).catch(e=>{console.error('Audience migration failed:',e.code||e.name);process.exitCode=1;}));}

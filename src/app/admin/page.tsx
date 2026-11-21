@@ -84,6 +84,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
+      <Link href="/admin/audience" className="inline-block underline">View audience analytics: visitors, sources, devices and active time</Link>
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card variant="outline" className="space-y-2 bg-[#FFFFFF]">

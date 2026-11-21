@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
               Privacy Policy
             </h1>
             <p className="text-xs font-mono text-[#6B7280]">
-              Effective Date: September 1, 2026 · Last Updated: September 19, 2026
+              Effective Date: September 1, 2026 · Last Updated: November 21, 2026
             </p>
           </div>
         </div>
@@ -109,7 +109,8 @@ export default function PrivacyPolicyPage() {
             </ul>
           </section>
 
-          {/* Section 3 */}
+          <section className="space-y-4"><h2 className="font-serif text-2xl">First-party audience measurement</h2><p>With your permission through our measurement prompt, we store a random browser identifier, session identifier, visited page paths, referring hostname, campaign tags, IP address, device category, approximate city/region/country and visible page time. Full page query strings and full referring URLs are not stored. Approximate location comes from hosting-network metadata; we do not request GPS access.</p><p>Audience records are restricted to administrators. Records older than 30 days are cleaned up on subsequent tracking requests or dashboard access. Declining the prompt disables this first-party collector. We respect Do Not Track and Global Privacy Control for this collector. This preference does not control the separately described Google and Meta tools. Use Measurement settings to withdraw permission for future collection. Contact us to request removal of previously collected records. Contact contact@gravityforai.com with privacy or deletion requests.</p></section>
+        {/* Section 3 */}
           <section className="space-y-4">
             <h2 className="font-serif text-2xl sm:text-3xl text-[#122C57]">
               3. Advertising, Meta Pixel &amp; Tracking Technologies
